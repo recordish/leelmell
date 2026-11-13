@@ -7,7 +7,9 @@
 .tarotRoom .result span.rev .face{transform:rotate(180deg)}
 .tarotRoom .result span strong em{display:none;position:absolute;top:100%;left:0;width:100%;font-size:85%;letter-spacing:0;color:#6D5AE3}
 .tarotRoom .result span.opened strong em{display:block}
-.tarotRoom .result{margin-bottom:18px}
+/* 카드 사이 간격 (기존 화면은 줄바꿈 공백으로 생기던 틈) */
+.tarotRoom .result{margin-bottom:18px;display:flex;justify-content:center;gap:2%}
+.tarotRoom .result span{flex:0 0 31%}
 
 /* 해석 목록의 작은 카드 그림 (역방향은 거꾸로) */
 .tarotRoom .holytable h4{position:relative;background:none !important}
