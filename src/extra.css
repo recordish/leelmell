@@ -72,3 +72,19 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 .sec-shop li.waiting a .price{background:#8f93a3;font-weight:500;font-size:12px}
 .sec-shop li.waiting a .obj,.sec-shop li.waiting a{opacity:.85}
 .experiments li.waiting a span.per{font-size:11px}
+
+/* ---------- 카드 한 장씩 보기 · 종합 해설 ---------- */
+.tarotRoom .result span.wait{opacity:.5}
+.tarotRoom .flipGuide{margin:34px 0 6px;text-align:center;font-size:15px;font-weight:500;color:#2b3140}
+.tarotRoom .readcards{padding:24px 0 0 0}
+.tarotRoom .holytable{margin-top:34px}
+.tarotRoom .synthesis{margin:40px 10px 0;padding:18px 16px;background:#EFEAFB;border-radius:12px}
+.tarotRoom .synthesis h4{margin:0 0 10px;font-size:16px;font-weight:700;color:#4a2f8f}
+.tarotRoom .synthesis p{margin:0 0 10px;font-size:15px;line-height:170%;color:#2b3140;user-select:text;-webkit-user-select:text}
+.tarotRoom .synthesis p strong{font-weight:700;color:#6A32AB}
+.tarotRoom .synthesis .special{margin:14px 0 0;padding:14px;border-radius:10px;background:#E8EAF7}
+.tarotRoom .synthesis .special.good{background:#E2F5EA}
+.tarotRoom .synthesis .special.bad{background:#FAE3EC}
+.tarotRoom .synthesis .special h4{margin:0 0 6px;font-size:14px;color:#2b3140}
+.tarotRoom .synthesis .special p{margin:0}
+.tarotRoom .eachTitle{margin:34px 10px -14px;font-size:14px;font-weight:700;color:#616D87}

@@ -273,12 +273,14 @@ export function specials(cards) {
 }
 
 // cards: [{ id, rev }] ×3 (과거·현재·미래) → 해설 문단 (카드 이름은 **굵게** 표시)
-export function synthesize(cards) {
+export function synthesizeParts(cards) {
   const [p, n, f] = cards.map((c) => (c.rev ? SYN_REV : SYN)[c.id])
   return [
     p.p,
     LINK_PN[p.tone + n.tone] + ' ' + n.n,
     LINK_NF[n.tone + f.tone] + ' ' + f.f,
     CLOSE[f.tone],
-  ].join(' ')
+  ]
 }
+
+export const synthesize = (cards) => synthesizeParts(cards).join(' ')
