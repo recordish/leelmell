@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 타로 기록: 로그인한 본인만 읽고 쓸 수 있습니다
+    match /readings/{uid} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['days', 'updatedAt'])
+        && request.resource.data.days is map
+        && request.resource.data.days.size() <= 100
+        && request.resource.data.updatedAt == request.time;
+    }
+  }
+}

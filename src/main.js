@@ -1,7 +1,12 @@
-(function () {
-  'use strict';
+import './style.css';
+import { CARDS } from './cards.js';
+import { trimDays } from './merge.js';
 
-  var CARDS = window.CARDS;
+(function () {
+  // Firebase 설정값(.env.production)이 있으면 로그인·동기화를 켜고, 없으면 기기 저장만 씁니다.
+  var FIREBASE_ON = !!import.meta.env.VITE_FIREBASE_API_KEY;
+  var sync = null;   // src/sync.js (로그인했을 때 기록을 Firestore와 맞춤)
+  var user = null;
   var KEY = 'leelmell.v1';
   var KEEP_DAYS = 90;
 
@@ -29,6 +34,16 @@
       close: '닫기',
       today: '오늘',
       langBtn: 'EN',
+      account: '계정',
+      signInDesc: 'Google 계정으로 로그인하면 타로 기록이 저장되어 다른 기기에서도 볼 수 있어요.',
+      signIn: 'Google로 로그인',
+      signedInAs: '로그인 계정',
+      synced: '기록이 계정에 저장되고 있어요.',
+      signOut: '로그아웃',
+      del: '계정과 저장된 기록 삭제',
+      delConfirm: '계정과 서버에 저장된 타로 기록을 모두 삭제할까요? 되돌릴 수 없습니다.',
+      delDone: '계정을 삭제했어요',
+      fail: '잠시 후 다시 시도해 주세요',
     },
     en: {
       tabToday: 'Today', tabHistory: 'History', tabCards: 'Cards',
@@ -53,6 +68,16 @@
       close: 'Close',
       today: 'Today',
       langBtn: '한국어',
+      account: 'Account',
+      signInDesc: 'Sign in with Google to save your readings and see them on other devices.',
+      signIn: 'Sign in with Google',
+      signedInAs: 'Signed in as',
+      synced: 'Your readings are saved to your account.',
+      signOut: 'Sign out',
+      del: 'Delete account and saved readings',
+      delConfirm: 'Delete your account and all readings saved on the server? This cannot be undone.',
+      delDone: 'Account deleted',
+      fail: 'Please try again later',
     },
   };
 
@@ -65,8 +90,7 @@
     return { lang: null, readings: {} };
   }
   function save() {
-    var days = Object.keys(state.readings).sort();
-    while (days.length > KEEP_DAYS) delete state.readings[days.shift()];
+    state.readings = trimDays(state.readings, KEEP_DAYS);
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* 무시 */ }
   }
 
@@ -109,12 +133,16 @@
   var $modal = document.getElementById('modal');
   var $toast = document.getElementById('toast');
   var $lang = document.getElementById('lang');
+  var $acct = document.getElementById('acct');
 
   // ---------- 그리기 ----------
   function render() {
     clearInterval(timer);
     document.documentElement.lang = state.lang;
     $lang.textContent = t('langBtn');
+    $acct.classList.toggle('hidden', !FIREBASE_ON);
+    $acct.classList.toggle('on', !!user);
+    $acct.setAttribute('aria-label', t('account'));
     $tabs.innerHTML = [['today', '✦', t('tabToday')], ['history', '☾', t('tabHistory')], ['cards', '❖', t('tabCards')]]
       .map(function (x) {
         return '<button type="button" data-tab="' + x[0] + '" class="' + (tab === x[0] ? 'on' : '') + '">' +
@@ -268,6 +296,55 @@
     setTimeout(function () { $toast.classList.add('hidden'); }, 2000);
   }
 
+  // ---------- 계정 · 동기화 ----------
+  function openAccount() {
+    $modal.innerHTML =
+      '<div class="sheet" role="dialog" aria-modal="true">' +
+        '<h3>' + t('account') + '</h3>' +
+        (user
+          ? '<p class="alt">' + t('signedInAs') + '</p><p class="mail">' + esc(user.email || user.displayName || '') + '</p>' +
+            '<p>' + t('synced') + '</p>' +
+            '<button type="button" class="cta ghost" data-act="signout">' + t('signOut') + '</button>' +
+            '<button type="button" class="link danger" data-act="delacct">' + t('del') + '</button>'
+          : '<p>' + t('signInDesc') + '</p>' +
+            '<button type="button" class="cta" data-act="signin">' + t('signIn') + '</button>') +
+        '<button type="button" class="link" data-act="close">' + t('close') + '</button>' +
+      '</div>';
+    $modal.classList.remove('hidden');
+  }
+
+  // 로그인 상태면 서버 기록과 합칩니다. 합친 결과가 화면과 다르면 다시 그립니다.
+  function syncNow() {
+    if (!sync || !user) return;
+    sync.syncReadings(state.readings, KEEP_DAYS).then(function (merged) {
+      if (JSON.stringify(merged) === JSON.stringify(state.readings)) return;
+      state.readings = merged;
+      save();
+      if ($modal.classList.contains('hidden')) render();
+    }).catch(function (e) { console.warn('sync failed', e); });
+  }
+
+  function withSync(fn) {
+    if (!sync) return toast(t('fail'));
+    fn().catch(function (e) {
+      if (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) return;
+      console.warn(e);
+      toast(t('fail'));
+    });
+  }
+
+  if (FIREBASE_ON) {
+    import('./sync.js').then(function (m) {
+      sync = m;
+      m.watchUser(function (u) {
+        user = u;
+        if (!$modal.classList.contains('hidden') && $modal.querySelector('[data-act=signin],[data-act=signout]')) openAccount();
+        render();
+        syncNow();
+      });
+    }).catch(function (e) { console.warn('firebase load failed', e); });
+  }
+
   // ---------- 동작 ----------
   function pickCard() {
     var day = dayKey();
@@ -277,6 +354,7 @@
     var rest = CARDS.filter(function (c) { return used.indexOf(c.id) < 0; });
     picks.push({ id: rest[rand(rest.length)].id, rev: rand(10) < 3 });
     save();
+    syncNow();
     if (navigator.vibrate) navigator.vibrate(15);
     if (picks.length >= 3) { picking = false; renderResult(day, 2); window.scrollTo(0, 0); }
     else renderPick(picks.length - 1);
@@ -310,6 +388,13 @@
     else if (act === 'share') share(el.dataset.day);
     else if (act === 'close') closeModal();
     else if (act === 'closeday') { viewDay = null; render(); }
+    else if (act === 'signin') withSync(function () { return sync.signIn(); });
+    else if (act === 'signout') withSync(function () { return sync.signOutUser(); });
+    else if (act === 'delacct') {
+      if (window.confirm(t('delConfirm'))) {
+        withSync(function () { return sync.deleteAccount().then(function () { closeModal(); toast(t('delDone')); }); });
+      }
+    }
     else if (el.dataset.card) {
       openCard(+el.dataset.card,
         el.dataset.rev === undefined ? null : el.dataset.rev === '1',
@@ -317,17 +402,20 @@
     } else if (el.dataset.day) { viewDay = el.dataset.day; render(); window.scrollTo(0, 0); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  $acct.addEventListener('click', openAccount);
   $lang.addEventListener('click', function () {
     state.lang = state.lang === 'ko' ? 'en' : 'ko';
     save(); closeModal(); render();
   });
   document.addEventListener('visibilitychange', function () {
-    if (!document.hidden && tab === 'today') render();
+    if (document.hidden) return;
+    if (tab === 'today') render();
+    syncNow();
   });
 
   render();
 
-  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  if ('serviceWorker' in navigator && import.meta.env.PROD) {
     navigator.serviceWorker.register('sw.js').catch(function () {});
   }
 })();

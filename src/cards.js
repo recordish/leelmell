@@ -1,5 +1,5 @@
 // 메이저 아르카나 22장. up = 정방향, rev = 역방향
-window.CARDS = [
+export const CARDS = [
   { id: 0, num: '0', en: 'The Fool', ko: '바보',
     kw: { ko: ['새로운 시작', '자유', '모험'], en: ['new beginnings', 'freedom', 'adventure'] },
     kwRev: { ko: ['무모함', '망설임', '준비 부족'], en: ['recklessness', 'hesitation', 'unprepared'] },
