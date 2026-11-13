@@ -78,7 +78,7 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 .tarotRoom .flipGuide{margin:34px 0 6px;text-align:center;font-size:15px;font-weight:500;color:#2b3140}
 .tarotRoom .readcards{padding:24px 0 0 0}
 .tarotRoom .holytable{margin-top:34px}
-.tarotRoom .synthesis{margin:40px 10px 0;padding:18px 16px;background:#EFEAFB;border-radius:12px}
+.tarotRoom .synthesis{margin:24px 10px 0;padding:18px 16px;background:#EFEAFB;border-radius:12px;scroll-margin-top:16px}
 .tarotRoom .synthesis h4{margin:0 0 10px;font-size:16px;font-weight:700;color:#4a2f8f}
 .tarotRoom .synthesis p{margin:0 0 10px;font-size:15px;line-height:170%;color:#2b3140;user-select:text;-webkit-user-select:text}
 .tarotRoom .synthesis p strong{font-weight:700;color:#6A32AB}
@@ -87,4 +87,3 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 .tarotRoom .synthesis .special.bad{background:#FAE3EC}
 .tarotRoom .synthesis .special h4{margin:0 0 6px;font-size:14px;color:#2b3140}
 .tarotRoom .synthesis .special p{margin:0}
-.tarotRoom .eachTitle{margin:34px 10px -14px;font-size:14px;font-weight:700;color:#616D87}

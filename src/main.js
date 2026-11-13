@@ -179,10 +179,9 @@ function cardsPage() {
   <p class="todaydate">${t('dateFmt')(new Date())}</p>
   <div class="result">${cards.map((p, i) => `<span class="s${G.randInt(rng, 2, 5)}${p.rev ? ' rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${pos[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
   <p class="flipGuide"></p>
-  ${synthesisHtml(cards)}
-  <h4 class="eachTitle hidden">${t('eachTitle')}</h4>
   <div class="holytable"><ul>${cards.map(meaning).join('')}</ul></div>
   <p class="readcards" style="display:none"><a href="#" data-act="next"></a></p>
+  ${synthesisHtml(cards)}
 </div></div>
 ${color && color.show ? `<div class="seeTodayColor" style="display:none">
   <button class="getTodayColor" type="button" data-act="color" style="${color.seen ? 'display:none' : ''}">${t('colorBtn')}<span class="ct">1</span></button>
@@ -591,8 +590,8 @@ function openCard() {
 
 function finishCards() {
   $$('.holytable li').forEach((li) => li.classList.remove('hidden'))
-  $('.synthesis')?.classList.remove('hidden')
-  $('.eachTitle').classList.toggle('hidden', !$('.synthesis'))
+  const syn = $('.synthesis')
+  syn?.classList.remove('hidden')
   $('.flipGuide').classList.add('hidden')
   $('.readcards').style.display = 'none'
   if ($('.seeTodayColor')) $('.seeTodayColor').style.display = 'block'
@@ -600,7 +599,9 @@ function finishCards() {
   if (c && !c.done) {
     c.done = true
     save()
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // 방금 본 카드별 해석을 지나 종합 해설 위치로 내려갑니다 (없으면 맨 위로)
+    if (syn) syn.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    else window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
@@ -698,6 +699,8 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && (route === 'chambre' || route === 'home')) render()
 })
 
+// 새로고침해도 예전 스크롤 위치로 돌아가지 않고 화면 맨 위부터 보여 줍니다
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 render()
 setInterval(tick, 1000)
 
