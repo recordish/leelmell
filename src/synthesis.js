@@ -272,6 +272,12 @@ export function specials(cards) {
   return out
 }
 
+// 두 카드가 특별한 짝이면 그 문단 (둘 다 정방향일 때만). 연애 타로의 나의 마음 + 상대의 마음에 씁니다
+export function pairSpecial(a, b) {
+  if (a.rev || b.rev) return null
+  return SPECIAL_PAIRS.find((x) => x.ids.includes(a.id) && x.ids.includes(b.id)) || null
+}
+
 // cards: [{ id, rev }] ×3 (과거·현재·미래) → 해설 문단 (카드 이름은 **굵게** 표시)
 export function synthesizeParts(cards) {
   const [p, n, f] = cards.map((c) => (c.rev ? SYN_REV : SYN)[c.id])
