@@ -116,19 +116,24 @@ test('로그인 합치기: 서버 재화가 기준, 서버에 없는 날의 기�
   assert.deepEqual(m.prayers.map((p) => p.text), ['b', 'a'])
 })
 
-test('세 장 종합 해설: 모든 조합이 빠짐없이 만들어진다', async () => {
-  const { SYN, synthesize } = await import('../src/synthesis.js')
-  assert.equal(SYN.length, 22)
-  SYN.forEach((s, i) => {
-    for (const k of ['p', 'n', 'f']) assert.ok(s[k].includes('**' + CARDS[i].name.ko + '**'), `${i} ${k}`)
-  })
+test('세 장 종합 해설: 정·역방향 모든 조합이 빠짐없이 만들어진다', async () => {
+  const { SYN, SYN_REV, synthesize } = await import('../src/synthesis.js')
+  for (const set of [SYN, SYN_REV]) {
+    assert.equal(set.length, 22)
+    set.forEach((s, i) => {
+      assert.ok(['+', '0', '-'].includes(s.tone))
+      for (const k of ['p', 'n', 'f']) assert.ok(s[k].includes('**' + CARDS[i].name.ko + '**'), `${i} ${k}`)
+    })
+  }
+  SYN_REV.forEach((s, i) => { for (const k of ['p', 'n', 'f']) assert.ok(s[k].includes('거꾸로 선 **'), `${i} ${k}`) })
   let count = 0
   for (let a = 0; a < 22; a++) for (let b = 0; b < 22; b++) for (let c = 0; c < 22; c++) {
     if (a === b || b === c || a === c) continue
-    const t = synthesize([{ id: a, rev: false }, { id: b, rev: false }, { id: c, rev: false }])
-    assert.ok(!t.includes('undefined') && t.length > 120)
-    count++
+    for (let r = 0; r < 8; r++) {
+      const t = synthesize([{ id: a, rev: !!(r & 1) }, { id: b, rev: !!(r & 2) }, { id: c, rev: !!(r & 4) }])
+      assert.ok(!t.includes('undefined') && t.length > 120)
+      count++
+    }
   }
-  assert.equal(count, 9240)
-  assert.ok(synthesize([{ id: 0, rev: true }, { id: 1, rev: false }, { id: 2, rev: false }]).includes('거꾸로'))
+  assert.equal(count, 73920)
 })
