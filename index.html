@@ -9,21 +9,24 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 <div class="sky" aria-hidden="true"></div>
 <div class="app">
   <header class="top">
     <h1 class="logo"><img src="assets/img/mm_logo_01.png" alt="Leelmell's Tarot cards"></h1>
-    <button class="lang" id="lang" type="button"></button>
+    <div class="tools">
+      <button class="lang" id="lang" type="button"></button>
+      <button class="acct hidden" id="acct" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+      </button>
+    </div>
   </header>
   <main id="view"></main>
   <nav class="tabs" id="tabs"></nav>
 </div>
 <div class="modal hidden" id="modal"></div>
 <div class="toast hidden" id="toast"></div>
-<script src="cards.js?v=2"></script>
-<script src="app.js?v=2"></script>
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>

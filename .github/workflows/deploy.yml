@@ -1,0 +1,52 @@
+# main 브랜치에 푸시하면 타로 앱을 빌드해서 GitHub Pages에 배포합니다.
+#
+# 사전 설정: 저장소 Settings → Pages → Build and deployment → Source 를 "GitHub Actions" 로 변경
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install & test & build
+        # Firebase 설정값은 저장소의 .env.production 에서 읽습니다.
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
