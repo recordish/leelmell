@@ -55,7 +55,8 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 @keyframes deltaUp{0%{opacity:0;transform:translateY(6px)}15%{opacity:1;transform:translateY(0)}70%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
 
 /* 홈: 릴멜의 한마디, 오늘 상태, 무료 천연석 안내 */
-.home_page .home_talk{position:absolute;top:calc(10% - 8px);left:50%;transform:translateX(-50%);z-index:1;padding:9px 16px;background:#FFF;border-radius:18px;font-size:14px;font-weight:500;color:#2b3140;white-space:nowrap;box-shadow:0 4px 14px rgba(109,90,227,.18);animation:fadeOn 1.2s forwards}
+/* 말풍선 꼬리가 릴멜 머리 바로 위에 오도록: 배경 그림(home_visual)에서 머리 위치를 계산 */
+.home_page .home_talk{position:absolute;top:calc(35% - min(24.2vw, 116px) - 54px);left:50%;transform:translateX(-50%);z-index:1;padding:9px 16px;background:#FFF;border-radius:18px;font-size:14px;font-weight:500;color:#2b3140;white-space:nowrap;box-shadow:0 4px 14px rgba(109,90,227,.18);animation:fadeOn 1.2s forwards}
 .home_page .home_talk:after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;border:7px solid transparent;border-top-color:#FFF;border-bottom:0}
 .seeTodayCard .getTodayCard.done{padding-bottom:46px}
 .seeTodayCard .getTodayCard .next{position:absolute;left:0;bottom:12px;width:100%;font-size:13px;color:#616D87}
