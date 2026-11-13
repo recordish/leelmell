@@ -1,5 +1,6 @@
 // 릴멜의 타로카드: 기존 앱(PHP)의 화면 구조와 스타일(public/legacy/*.css)을 그대로 쓰고,
 // 동작은 이 파일에서 새로 처리합니다. 화면 이동은 주소의 #이름 으로 합니다 (#home, #shop …).
+import 'pretendard-jp/dist/web/variable/pretendardvariable-jp-dynamic-subset.css'
 import './extra.css'
 import { CARDS } from './cards.js'
 import { REVERSED } from './reversed.js'
@@ -36,6 +37,7 @@ function save() {
   G.trim(S.g)
   try { localStorage.setItem(KEY, JSON.stringify(S)) } catch { /* 무시 */ }
   updateGnb()
+  tick()
   if (sync && user) {
     clearTimeout(saveTimer)
     saveTimer = setTimeout(() => sync.saveRemote(user.uid, S.g).catch((e) => console.warn('save failed', e)), 400)
@@ -69,8 +71,8 @@ function frame(cls, inner) {
 <div class="comheader"><h1>Leelmell's Tarot Cards</h1></div>
 <div class="comCont ${S.lang}">${inner}</div>
 <div class="gnb"><ul>
-  <li class="ct">${S.g.crystals}</li>
-  <li class="rk">${S.g.stones}</li>
+  <li class="ct">${shown.ct}</li>
+  <li class="rk">${shown.rk}</li>
   <li class="setting"><a class="setting" href="#locker">SETTING</a></li>
   <li class="home"><a class="home" href="#home">HOME</a></li>
 </ul></div>
@@ -81,19 +83,57 @@ function frame(cls, inner) {
 </div>`
 }
 
+// 위쪽 잔고. 값이 바뀌면 +10, -1 이 잠깐 떠오릅니다
+const shown = { ct: S.g.crystals, rk: S.g.stones }
 function updateGnb() {
-  const ct = $('.gnb .ct')
-  if (ct) ct.textContent = S.g.crystals
-  const rk = $('.gnb .rk')
-  if (rk) rk.textContent = S.g.stones
+  for (const [k, v] of [['ct', S.g.crystals], ['rk', S.g.stones]]) {
+    const li = $('.gnb .' + k)
+    const diff = v - shown[k]
+    shown[k] = v
+    if (!li) continue
+    li.textContent = v
+    if (diff) li.insertAdjacentHTML('beforeend', `<b class="delta ${diff > 0 ? 'plus' : 'minus'}">${diff > 0 ? '+' : ''}${diff}</b>`)
+  }
 }
 
 // ---------- 화면별 내용 ----------
 function homePage() {
+  const done = !!S.g.readings[day()]
+  let tip = ''
+  if (G.free100Status(S.g, day()) === 'ok') tip = t('tipFree100')
+  else if (!G.free10Wait(S.g, Date.now())) tip = t('tipFree10')
+  const btn = done
+    ? `<a href="#cards" class="getTodayCard done">${t('seeAgain')}<span class="next">${t('nextIn')} <b id="countdown"></b></span></a>`
+    : `<a href="#chambre" class="getTodayCard">${t('home')}<span class="ct">1</span></a>`
   return `<div class="home_page">
   <p class="home_visual">Welcome to Leelmell's</p>
-  <div class="seeTodayCard"><a href="#chambre" class="getTodayCard">${t('home')}<span class="ct">1</span></a></div>
+  <p class="home_talk">${t(done ? 'talkDone' : 'talkReady')}</p>
+  <div class="seeTodayCard">${btn}${tip ? `<p class="home_tip"><a href="#shop">${tip}</a></p>` : ''}</div>
 </div>`
+}
+
+// 1초마다: 다음 카드까지 남은 시간, 무료 보상 대기 시간 표시, 자정이 지나면 새로 그림
+let renderedDay = ''
+function tick() {
+  if (renderedDay && renderedDay !== day() && (route === 'home' || route === 'chambre' || route === 'cards')) return render()
+  const cd = $('#countdown')
+  if (cd) {
+    const now = new Date()
+    const sec = Math.max(0, Math.floor((new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now) / 1000))
+    const p2 = (n) => String(n).padStart(2, '0')
+    cd.textContent = `${p2(Math.floor(sec / 3600))}:${p2(Math.floor(sec / 60) % 60)}:${p2(sec % 60)}`
+  }
+  const label = (sel, wait, normal) => {
+    const el = $(sel)
+    if (!el) return
+    el.textContent = wait || normal
+    el.closest('li').classList.toggle('waiting', !!wait)
+  }
+  const now = Date.now()
+  const min = (m) => (m ? t('lblMin')(m) : '')
+  label('.free100stones .price', G.free100Status(S.g, day()) === 'tomorrow' ? t('lblTomorrow') : '', 'Free')
+  label('.free10stones .price', min(G.free10Wait(S.g, now)), 'Free')
+  label('.exchange3 .per', min(G.ex3Wait(S.g, now)), '?')
 }
 
 function chambrePage() {
@@ -281,6 +321,9 @@ function render() {
   const r = ROUTES[name]
   const v = r.visitors ? G.rollVisitors(S.g, rng) : {}
   app.innerHTML = frame(r.cls, r.page() + visitorsHtml(v))
+  renderedDay = day()
+  updateGnb()
+  tick()
   if (name === 'cards') sizeCards()
   window.scrollTo(0, 0)
 }
@@ -602,6 +645,7 @@ document.addEventListener('visibilitychange', () => {
 })
 
 render()
+setInterval(tick, 1000)
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   navigator.serviceWorker.register('sw.js').catch(() => {})

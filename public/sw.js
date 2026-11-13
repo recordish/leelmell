@@ -1,5 +1,5 @@
 // 화면(HTML·JS·CSS)은 네트워크 우선, 그림(assets·icons·vendor)은 한 번 받으면 기기에 저장해 다시 씁니다.
-const CACHE = 'leelmell-v5'
+const CACHE = 'leelmell-v6'
 
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (e) => {
@@ -13,7 +13,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const req = e.request
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return
-  const isStatic = /\/(assets\/(img|svg|tr)|icons|vendor)\//.test(req.url)
+  const isStatic = /\/(assets\/(img|svg|tr)|icons|vendor)\/|\.woff2$/.test(req.url)
   e.respondWith(
     caches.open(CACHE).then(async (cache) => {
       if (isStatic) {

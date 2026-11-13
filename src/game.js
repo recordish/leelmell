@@ -81,18 +81,28 @@ export function pray(s, tribute, text, now) {
 
 // ---------- 상점 (트리마레) ----------
 // 천연석 100개: 하루 1번, 천연석이 100개 이하이고 크리스탈이 없을 때만
+export function free100Status(s, day) {
+  if (s.free100Day === day) return 'tomorrow'
+  return s.stones > 100 || s.crystals > 0 ? 'rich' : 'ok'
+}
+
 export function free100(s, day) {
-  if (s.free100Day === day) return { ok: false, why: 'tomorrow' }
-  if (s.stones > 100 || s.crystals > 0) return { ok: false, why: 'rich' }
+  const why = free100Status(s, day)
+  if (why !== 'ok') return { ok: false, why }
   s.free100Day = day
   s.stones += 100
   return { ok: true }
 }
 
 // 천연석 10개: 60분마다
+// 다시 받을 때까지 남은 분 (0 이면 지금 가능)
+const waitLeft = (at, now) => (at ? Math.max(0, 60 - Math.floor((now - at) / MIN)) : 0)
+export const free10Wait = (s, now) => waitLeft(s.free10At, now)
+export const ex3Wait = (s, now) => waitLeft(s.ex3At, now)
+
 export function free10(s, now) {
-  const left = 60 - Math.floor((now - s.free10At) / MIN)
-  if (s.free10At && left > 0) return { ok: false, why: 'wait', minutes: left }
+  const left = free10Wait(s, now)
+  if (left > 0) return { ok: false, why: 'wait', minutes: left }
   s.free10At = now
   s.stones += 10
   return { ok: true }
@@ -126,8 +136,8 @@ export function exchange(s, kind, now, rng) {
     return { ok: true, got }
   }
   // 3: 천연석 20개, 60분마다, 약 20% 확률로 크리스탈 1~5개
-  const left = 60 - Math.floor((now - s.ex3At) / MIN)
-  if (s.ex3At && left > 0) return { ok: false, why: 'wait', minutes: left }
+  const left = ex3Wait(s, now)
+  if (left > 0) return { ok: false, why: 'wait', minutes: left }
   if (s.stones < 20) return { ok: false, why: 'needStones' }
   s.stones -= 20
   s.ex3At = now
