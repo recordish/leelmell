@@ -10,6 +10,8 @@
 /* 카드 사이 간격 (기존 화면은 줄바꿈 공백으로 생기던 틈) */
 .tarotRoom .result{margin-bottom:18px;display:flex;justify-content:center;gap:2%}
 .tarotRoom .result span{flex:0 0 31%}
+/* 카드 뒷면: 피보나치 황금 나선 (기존 보라 #6A32AB 바탕, 위아래 대칭이라 역방향이 미리 드러나지 않음) */
+.tarotRoom .result span:not(.opened){background:#6A32AB url(./card_back.svg) no-repeat center / 100% 100% !important}
 
 /* 해석 목록의 작은 카드 그림 (역방향은 거꾸로) */
 .tarotRoom .holytable h4{position:relative;background:none !important}
