@@ -6,6 +6,7 @@ import { CARDS } from './cards.js'
 import { REVERSED } from './reversed.js'
 import { LANGS, T } from './i18n.js'
 import * as G from './game.js'
+import { specials, synthesizeParts } from './synthesis.js'
 
 const KEY = 'leelmell.v2'
 const FIREBASE_ON = !!import.meta.env.VITE_FIREBASE_API_KEY
@@ -154,13 +155,22 @@ function meaning(p) {
   const bars = [0, 1, 2, 3].map((i) => `<span class="p${i + 1}" style="width:${G.randInt(rng, 1, 60)}px"></span>`).join('')
   const text = esc(src.text[S.lang]).replace(/\n/g, '<br />')
   const tags = src.tags[S.lang].map((x) => '#' + esc(x)).join(' ')
-  return `<li>
+  return `<li class="hidden">
   <h4 class="${p.rev ? 'rev' : ''}" style="--img:url(${new URL(img(p.id), location.href).href})">${esc(title)}${p.rev ? ` <small>${t('rev')}</small>` : ''}</h4>
   <span class="pp">${bars}</span>
   <p>${text}<br /><br />${tags}</p>
 </li>`
 }
 
+// 세 장의 연관성 해설 (지금은 한국어만 준비되어 있습니다)
+const bold = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+function synthesisHtml(cards) {
+  if (S.lang !== 'ko') return ''
+  const sp = specials(cards).map((x) => `<div class="special ${x.good === true ? 'good' : x.good === false ? 'bad' : 'rare'}"><h4>${t('specialTitle')}</h4><p>${bold(x.text)}</p></div>`).join('')
+  return `<div class="synthesis hidden"><h4>${t('synTitle')}</h4>${synthesizeParts(cards).map((x) => `<p>${bold(x)}</p>`).join('')}${sp}</div>`
+}
+
+// 카드 화면: 과거 → 현재 → 미래 순서로 한 장씩 뒤집어 해석을 보고, 마지막에 종합 해설
 function cardsPage() {
   const cards = S.g.readings[day()]
   const color = S.g.colors[day()]
@@ -168,8 +178,10 @@ function cardsPage() {
   return `<div class="tarotRoom"><div class="room"><div class="card_table" style="display:block">
   <p class="todaydate">${t('dateFmt')(new Date())}</p>
   <div class="result">${cards.map((p, i) => `<span class="s${G.randInt(rng, 2, 5)}${p.rev ? ' rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${pos[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
-  <p class="readcards" style="display:none"><a href="#" data-act="read">${t('readMeanings')}</a></p>
-  <div class="holytable" style="display:none"><ul>${cards.map(meaning).join('')}</ul></div>
+  <p class="flipGuide"></p>
+  <div class="holytable"><ul>${cards.map(meaning).join('')}</ul></div>
+  <p class="readcards" style="display:none"><a href="#" data-act="next"></a></p>
+  ${synthesisHtml(cards)}
 </div></div>
 ${color && color.show ? `<div class="seeTodayColor" style="display:none">
   <button class="getTodayColor" type="button" data-act="color" style="${color.seen ? 'display:none' : ''}">${t('colorBtn')}<span class="ct">1</span></button>
@@ -324,8 +336,11 @@ function render() {
   renderedDay = day()
   updateGnb()
   tick()
-  if (name === 'cards') sizeCards()
   window.scrollTo(0, 0)
+  if (name === 'cards') {
+    sizeCards()
+    cardStep()
+  }
 }
 
 function sizeCards() {
@@ -471,9 +486,8 @@ document.addEventListener('click', (e) => {
   }
 
   // 카드 뒤집기
-  if (el.matches('.tarotRoom .result span') && !el.classList.contains('opened')) {
-    el.classList.add('opened')
-    if (++opened > 2) $('.readcards').style.display = 'block'
+  if (el.matches('.tarotRoom .result span')) {
+    if (+el.dataset.i === opened && opened < 3) openCard()
     return
   }
 
@@ -499,11 +513,7 @@ document.addEventListener('click', (e) => {
       save(); opened = 0; location.hash = '#cards'; return
     }
     case 'again': opened = 0; location.hash = '#cards'; return
-    case 'read':
-      el.style.display = 'none'
-      $('.holytable').style.display = 'block'
-      if ($('.seeTodayColor')) $('.seeTodayColor').style.display = 'block'
-      return
+    case 'next': return opened < 3 ? openCard() : finishCards()
     case 'color': {
       const r = G.seeColor(S.g, day())
       if (!r.ok) return pop02(t('noCrystal'), 'kimim')
@@ -549,6 +559,51 @@ document.addEventListener('click', (e) => {
     case 'delete': return confirmDelete()
   }
 })
+
+// ---------- 카드 한 장씩 보기 ----------
+// opened: 지금까지 뒤집은 장수. 이미 끝까지 본 날은 바로 마지막 화면을 보여 줍니다
+function cardStep() {
+  const spans = $$('.tarotRoom .result span')
+  if (S.g.colors[day()]?.done) {
+    opened = 3
+    spans.forEach((s) => s.classList.add('opened'))
+    return finishCards()
+  }
+  spans.forEach((s, i) => {
+    s.classList.toggle('opened', i < opened)
+    s.classList.toggle('wait', i > opened)
+  })
+  $$('.holytable li').forEach((li, i) => li.classList.toggle('hidden', i !== opened - 1))
+  const guide = $('.flipGuide')
+  guide.textContent = opened < 3 ? t('flipGuide')[opened] : ''
+  guide.classList.toggle('hidden', opened > 0)
+  const btn = $('.readcards')
+  btn.style.display = opened > 0 ? 'block' : 'none'
+  $('a', btn).textContent = opened < 3 ? t('nextCard')[opened] : t(S.lang === 'ko' ? 'seeSynthesis' : 'seeAll')
+}
+
+function openCard() {
+  opened++
+  cardStep()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function finishCards() {
+  $$('.holytable li').forEach((li) => li.classList.remove('hidden'))
+  const syn = $('.synthesis')
+  syn?.classList.remove('hidden')
+  $('.flipGuide').classList.add('hidden')
+  $('.readcards').style.display = 'none'
+  if ($('.seeTodayColor')) $('.seeTodayColor').style.display = 'block'
+  const c = S.g.colors[day()]
+  if (c && !c.done) {
+    c.done = true
+    save()
+    // 방금 본 카드별 해석을 지나 종합 해설 위치로 내려갑니다 (없으면 맨 위로)
+    if (syn) syn.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    else window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
 
 function buy(id) {
   const r = G.buyItem(S.g, id, Date.now())
@@ -644,6 +699,8 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden && (route === 'chambre' || route === 'home')) render()
 })
 
+// 새로고침해도 예전 스크롤 위치로 돌아가지 않고 화면 맨 위부터 보여 줍니다
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 render()
 setInterval(tick, 1000)
 
