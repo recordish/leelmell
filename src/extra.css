@@ -1,0 +1,37 @@
+/* 기존 스타일(public/legacy/base.css) 위에 새로 더한 것만 둡니다 */
+
+/* 카드 앞면: 뒤집기 전에는 숨기고, 역방향은 거꾸로 */
+.tarotRoom .result span .face{position:absolute;inset:0;border-radius:8px;background-size:100% auto;background-repeat:no-repeat;display:none}
+.tarotRoom .result span.opened{background:none !important}
+.tarotRoom .result span.opened .face{display:block}
+.tarotRoom .result span.rev .face{transform:rotate(180deg)}
+.tarotRoom .result span strong em{display:none;position:absolute;top:100%;left:0;width:100%;font-size:85%;letter-spacing:0;color:#6D5AE3}
+.tarotRoom .result span.opened strong em{display:block}
+.tarotRoom .result{margin-bottom:18px}
+
+/* 해석 목록의 작은 카드 그림 (역방향은 거꾸로) */
+.tarotRoom .holytable h4{position:relative;background:none !important}
+.tarotRoom .holytable h4:before{content:"";position:absolute;left:0;top:50%;width:40px;height:69px;margin-top:-34px;background:var(--img) no-repeat;background-size:100% auto}
+.tarotRoom .holytable h4.rev:before{transform:rotate(180deg)}
+.tarotRoom .holytable h4 small{margin-left:6px;font-size:75%;color:#6D5AE3}
+
+/* 사물함(설정): 계정 · 언어 */
+.locker_page .myinfo dt{margin:0 0 6px 0;font-weight:bold}
+.locker_page .myinfo dd{margin:0 0 20px 0}
+.locker_page .myinfo .noti_txt{font-size:90%;color:#777}
+.locker_page .myinfo .acct_btn{margin:10px 0 0 0}
+.locker_page .myinfo .com_btn_01{padding:8px 12px;color:#444A56;border-radius:8px;font-size:85%;margin:0 4px 6px 0}
+.locker_page .myinfo .com_btn_01.on{background:#6D5AE3;border-color:#6D5AE3;color:#FFF}
+.locker_page .myinfo .acct_mail{word-break:break-all}
+.locker_page .escape_way{margin:10px 0}
+.locker_page .privacy_link{margin:30px 20px 140px;text-align:right;font-size:12px}
+.locker_page .privacy_link a{color:#616D87;text-decoration:underline}
+
+a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE3;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;transition:none !important}}
+
+/* 기존 페이지는 html·body·.wrap 높이 100% 에 맞춰져 있어 #app 도 이어 줍니다 */
+#app{height:100%}
+/* 카드 화면 (chambre/cards.php 의 인라인 스타일) */
+.wrap.cards .gnb,.wrap.cards .navi{display:none}
+.wrap.cards .goGarden{display:block}

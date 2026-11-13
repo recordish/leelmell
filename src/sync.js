@@ -1,12 +1,11 @@
-// Firebase: Google 로그인 + 타로 기록 동기화. 설정값이 있을 때만 main.js 가 불러옵니다.
-// 기록은 readings/{uid} 문서 하나에 { days: { 'YYYY-MM-DD': [{ id, rev }] }, updatedAt } 로 저장합니다.
+// Firebase: Google 로그인 + 계정 저장. 설정값(.env.production)이 있을 때만 main.js 가 불러옵니다.
+// 계정 데이터는 users/{uid} 문서 하나에 { g: 게임 상태, updatedAt } 로 저장합니다.
 import { initializeApp } from 'firebase/app'
 import {
   GoogleAuthProvider, deleteUser, getAuth, onAuthStateChanged,
   reauthenticateWithPopup, signInWithPopup, signOut,
 } from 'firebase/auth'
 import { deleteDoc, doc, getDoc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore/lite'
-import { mergeReadings } from './merge.js'
 
 const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -19,37 +18,24 @@ const app = initializeApp({
 const auth = getAuth(app)
 const db = getFirestore(app)
 
-export function watchUser(cb) {
-  return onAuthStateChanged(auth, cb)
+export const watchUser = (cb) => onAuthStateChanged(auth, cb)
+export const signIn = () => signInWithPopup(auth, new GoogleAuthProvider())
+export const signOutUser = () => signOut(auth)
+
+export async function loadRemote(uid) {
+  const snap = await getDoc(doc(db, 'users', uid))
+  return snap.exists() ? snap.data().g : null
 }
 
-export function signIn() {
-  return signInWithPopup(auth, new GoogleAuthProvider())
+export function saveRemote(uid, g) {
+  return setDoc(doc(db, 'users', uid), { g, updatedAt: serverTimestamp() })
 }
 
-export function signOutUser() {
-  return signOut(auth)
-}
-
-// 서버 기록을 읽어 기기 기록과 합치고, 서버와 다르면 저장한 뒤 합친 결과를 돌려줍니다
-export async function syncReadings(local, keep) {
-  const u = auth.currentUser
-  if (!u) return local
-  const ref = doc(db, 'readings', u.uid)
-  const snap = await getDoc(ref)
-  const remote = (snap.exists() && snap.data().days) || {}
-  const merged = mergeReadings(local, remote, keep)
-  if (JSON.stringify(merged) !== JSON.stringify(mergeReadings({}, remote, keep)) || !snap.exists()) {
-    await setDoc(ref, { days: merged, updatedAt: serverTimestamp() })
-  }
-  return merged
-}
-
-// 서버 기록과 로그인 계정을 지웁니다. Firebase 가 최근 로그인을 요구하면 한 번 더 로그인합니다
+// 계정 데이터와 로그인 계정을 지웁니다. Firebase 가 최근 로그인을 요구하면 한 번 더 로그인합니다
 export async function deleteAccount() {
   const u = auth.currentUser
   if (!u) return
-  await deleteDoc(doc(db, 'readings', u.uid))
+  await deleteDoc(doc(db, 'users', u.uid))
   try {
     await deleteUser(u)
   } catch (e) {
