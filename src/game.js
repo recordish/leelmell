@@ -13,6 +13,7 @@ export function newState() {
     colors: {}, // 'YYYY-MM-DD' → { show, color, seen }
     prayers: [], // { at, tribute, text }
     items: [], // { id, at }
+    love: {}, // 'YYYY-MM-DD' → { cards: [{ id, rev }] ×6, done } (율리움의 연애 타로)
     free100Day: null,
     free10At: 0,
     ex3At: 0,
@@ -59,6 +60,31 @@ export function seeColor(s, day) {
   s.crystals -= 1
   c.seen = true
   return { ok: true, color: c.color }
+}
+
+// ---------- 율리움의 방 (연애 타로 6장) ----------
+export const LOVE_COST = 3
+
+// 하루 한 번, 크리스탈 3개 (3장 타로와는 따로 셉니다)
+export function loveStatus(s, day) {
+  if (s.love[day]) return 'done'
+  if (s.crystals >= LOVE_COST) return 'ok'
+  if (s.crystals < 1) return s.stones > 99 ? 'needLab' : 'needShop'
+  return 'lessShop'
+}
+
+export function drawLove(s, day, rng) {
+  const why = loveStatus(s, day)
+  if (why !== 'ok') return { ok: false, why }
+  const deck = [...Array(22).keys()]
+  const cards = []
+  for (let i = 0; i < 6; i++) {
+    const id = deck.splice(randInt(rng, 0, deck.length - 1), 1)[0]
+    cards.push({ id, rev: rng() < REVERSED_CHANCE })
+  }
+  s.crystals -= LOVE_COST
+  s.love[day] = { cards, done: false }
+  return { ok: true, cards }
 }
 
 // ---------- 기도실 ----------
@@ -223,7 +249,7 @@ export function mergeIntoRemote(local, remote) {
 
 // 오래된 기록은 최근 120일만 남깁니다
 export function trim(s) {
-  for (const k of ['readings', 'colors']) {
+  for (const k of ['readings', 'colors', 'love']) {
     const days = Object.keys(s[k] || {}).filter(isDay).sort()
     const keep = new Set(days.slice(-120))
     for (const d of Object.keys(s[k] || {})) if (!keep.has(d)) delete s[k][d]

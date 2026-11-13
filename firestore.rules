@@ -14,12 +14,13 @@ service cloud.firestore {
 
   function validGame(g) {
     return g is map
-      && g.keys().hasOnly(['v', 'stones', 'crystals', 'readings', 'colors', 'prayers', 'items', 'free100Day', 'free10At', 'ex3At'])
+      && g.keys().hasOnly(['v', 'stones', 'crystals', 'readings', 'colors', 'prayers', 'items', 'love', 'free100Day', 'free10At', 'ex3At'])
       && g.stones is int && g.stones >= 0 && g.stones <= 10000000
       && g.crystals is int && g.crystals >= 0 && g.crystals <= 1000000
       && g.readings is map && g.readings.size() <= 130
       && g.colors is map && g.colors.size() <= 130
       && g.prayers is list && g.prayers.size() <= 200
-      && g.items is list && g.items.size() <= 200;
+      && g.items is list && g.items.size() <= 200
+      && (!('love' in g) || (g.love is map && g.love.size() <= 130));
   }
 }

@@ -87,3 +87,33 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 .tarotRoom .synthesis .special.bad{background:#FAE3EC}
 .tarotRoom .synthesis .special h4{margin:0 0 6px;font-size:14px;color:#2b3140}
 .tarotRoom .synthesis .special p{margin:0}
+
+/* ---------- 율리움의 방 (연애 타로, 분홍) ---------- */
+/* 창고 안의 분홍 문 */
+.sec-shop .door02{position:absolute;bottom:0;left:22px;width:60px;height:100px;background:url(./door_pink.svg) no-repeat center center;background-size:auto 100%}
+body.love-bg{background:#F7A3C9}
+.wrap.love{background:#F7A3C9;min-height:100%}
+.love_page{padding:230px 0 0 0;margin:0 auto;background-repeat:no-repeat;background-position:center 74px;background-size:auto 150px}
+.love_page .room{margin:0 20px;padding:24px;background:#FFF7FB;position:relative;text-align:center;border-radius:12px}
+.love_page .txt01{margin:20px 0;line-height:160%;font-size:90%;color:#2b3140}
+.love_page .txt02{margin:60px 0;line-height:160%;font-size:90%;color:#2b3140}
+.love_page .tribute{margin:32px 0;display:flex;align-items:center;justify-content:center;gap:10px}
+.love_page .tribute .crystal{margin:0}
+.love_page .tribute .cost{font-size:22px;font-weight:600;color:#2b3140}
+.wrap.love .tarotRoom{padding:170px 0 40px 0;margin:0 auto;background-repeat:no-repeat;background-position:center 26px;background-size:auto 130px}
+.wrap.love .tarotRoom .room{background:#FFF7FB}
+.wrap.love .tarotRoom .todaydate{background:#FBDDEB}
+.wrap.love .tarotRoom .result{flex-wrap:wrap;row-gap:46px;margin-bottom:34px}
+.wrap.love .tarotRoom .result span:not(.opened){background:#D65A9F url(./card_back_pink.svg) no-repeat center / 100% 100% !important}
+.wrap.love .tarotRoom .result span strong{letter-spacing:0}
+.wrap.love .tarotRoom .result span strong em,.wrap.love .tarotRoom .holytable h4 small{color:#C2418F}
+.wrap.love .tarotRoom .readcards a{background:#CC51B0}
+.wrap.love .tarotRoom .holytable h4{font-weight:600;color:#2b3140}
+.wrap.love .tarotRoom .holytable p strong{font-weight:700;color:#C2418F}
+.wrap.love .tarotRoom .holytable details{margin:10px 0 0 0}
+.wrap.love .tarotRoom .holytable summary{font-size:13px;color:#8a6680;cursor:pointer;padding:6px 0}
+.wrap.love .tarotRoom .holytable details p{margin:6px 0 0 0;font-size:14px;color:#5a4a58}
+.wrap.love .tarotRoom .synthesis{background:#FFE3F0}
+.wrap.love .tarotRoom .synthesis h4{color:#B0307F}
+.wrap.love .tarotRoom .synthesis p strong{color:#C2418F}
+.wrap.love .tarotRoom .synthesis .special h4{color:#2b3140}

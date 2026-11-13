@@ -6,7 +6,8 @@ import { CARDS } from './cards.js'
 import { REVERSED } from './reversed.js'
 import { LANGS, T } from './i18n.js'
 import * as G from './game.js'
-import { specials, synthesizeParts } from './synthesis.js'
+import { pairSpecial, specials, synthesizeParts } from './synthesis.js'
+import { LOVE_POS, loveLine, loveParts } from './love.js'
 
 const KEY = 'leelmell.v2'
 const FIREBASE_ON = !!import.meta.env.VITE_FIREBASE_API_KEY
@@ -63,9 +64,11 @@ const ROUTES = {
   lab: { cls: 'lab index', page: labPage, visitors: true },
   parking: { cls: 'parking index', page: () => '<div class="jardin_page"></div>', visitors: true },
   locker: { cls: 'locker index', page: lockerPage, visitors: true },
+  love: { cls: 'love index', page: lovePage },
+  lovecards: { cls: 'love cards', page: loveCardsPage, exit: '#depot' },
 }
 
-function frame(cls, inner) {
+function frame(cls, inner, exit = '#parking') {
   const nav = t('nav')
   const hrefs = ['#shop', '#lab', '#chambre', '#prayroom', '#parking']
   return `<div class="wrap ${cls}" data-lang="${S.lang}">
@@ -77,7 +80,7 @@ function frame(cls, inner) {
   <li class="setting"><a class="setting" href="#locker">SETTING</a></li>
   <li class="home"><a class="home" href="#home">HOME</a></li>
 </ul></div>
-<a class="goGarden" href="#parking" aria-label="exit"></a>
+<a class="goGarden" href="${exit}" aria-label="exit"></a>
 <nav class="navi"><ul>${nav.map((n, i) => `<li><a href="${hrefs[i]}">${n}</a></li>`).join('')}</ul></nav>
 <div id="whitewall"></div>
 <div class="pop01"><p class="pop_txt_01"></p><div class="pop_button"><a href="#" class="button"></a><a href="#" class="closeLayerPopup"></a></div></div>
@@ -116,7 +119,7 @@ function homePage() {
 // 1초마다: 다음 카드까지 남은 시간, 무료 보상 대기 시간 표시, 자정이 지나면 새로 그림
 let renderedDay = ''
 function tick() {
-  if (renderedDay && renderedDay !== day() && (route === 'home' || route === 'chambre' || route === 'cards')) return render()
+  if (renderedDay && renderedDay !== day() && ['home', 'chambre', 'cards', 'love', 'lovecards'].includes(route)) return render()
   const cd = $('#countdown')
   if (cd) {
     const now = new Date()
@@ -190,6 +193,44 @@ ${color && color.show ? `<div class="seeTodayColor" style="display:none">
 </div>`
 }
 
+// ---------- 율리움의 방: 연애 타로 6장 (한국어만) ----------
+function lovePage() {
+  const st = G.loveStatus(S.g, day())
+  const body = st === 'done'
+    ? `<p class="txt02">${t('loveDone')}</p>
+       <div class="btnEnter"><button type="button" data-act="againLove">${t('loveAgain')}</button></div>`
+    : `<p class="txt01">${t('loveNeed')}</p>
+       <div class="tribute"><span class="crystal"></span><b class="cost">${G.LOVE_COST}</b></div>
+       <div class="btnEnter"><button type="button" data-act="enterLove">${t('enter')}</button></div>`
+  return `<div class="love_page" style="background-image:url(assets/img/ic_sealion_pink_big_01.png)"><div class="room">${body}</div></div>`
+}
+
+// 자리 문장을 먼저 보여 주고, 카드의 긴 풀이는 눌렀을 때만 펼칩니다
+function loveMeaning(p, i) {
+  const c = CARDS[p.id]
+  const src = p.rev ? REVERSED[p.id] : c
+  const text = esc(src.text.ko).replace(/\n/g, '<br />')
+  const tags = src.tags.ko.map((x) => '#' + esc(x)).join(' ')
+  return `<li class="hidden">
+  <h4 class="${p.rev ? 'rev' : ''}" style="--img:url(${new URL(img(p.id), location.href).href})">${LOVE_POS[i]} · ${esc(c.name.ko)}${p.rev ? ` <small>${t('rev')}</small>` : ''}</h4>
+  <p>${bold(loveLine(p, i))}</p>
+  <details><summary>${t('loveDetail')}</summary><p>${text}<br /><br />${tags}</p></details>
+</li>`
+}
+
+function loveCardsPage() {
+  const cards = S.g.love[day()].cards
+  const pair = pairSpecial(cards[0], cards[1])
+  return `<div class="tarotRoom" style="background-image:url(assets/img/ic_sealion_pink_big_01.png)"><div class="room"><div class="card_table" style="display:block">
+  <p class="todaydate">${t('dateFmt')(new Date())}</p>
+  <div class="result">${cards.map((p, i) => `<span class="${p.rev ? 'rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${LOVE_POS[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
+  <p class="flipGuide"></p>
+  <div class="holytable"><ul>${cards.map(loveMeaning).join('')}</ul></div>
+  <p class="readcards" style="display:none"><a href="#" data-act="next"></a></p>
+  <div class="synthesis hidden"><h4>${t('loveSynTitle')}</h4>${loveParts(cards).map((x) => `<p>${bold(x)}</p>`).join('')}${pair ? `<div class="special ${pair.good ? 'good' : 'bad'}"><h4>${t('specialTitle')}</h4><p>${bold(pair.text)}</p></div>` : ''}</div>
+</div></div></div>`
+}
+
 function prayPage() {
   return `<div class="sec-pray">
   <div class="ready">
@@ -240,6 +281,7 @@ function depotPage() {
   <ul class="luxe2">${li('in0003')}${li('in0004')}</ul>
   <span class="objMonarisa"></span>
   <a class="door01" href="#shop" aria-label="shop"></a>
+  ${S.lang === 'ko' ? `<a class="door02" href="#love" aria-label="${t('loveDoor')}"></a>` : ''}
 </div></div>`
 }
 
@@ -317,8 +359,10 @@ function render() {
   let name = location.hash.replace('#', '') || (S.introSeen ? 'home' : 'intro')
   if (name !== 'intro' && !ROUTES[name]) name = 'home'
   if (name === 'cards' && !S.g.readings[day()]) name = 'chambre'
+  if ((name === 'love' || name === 'lovecards') && S.lang !== 'ko') name = 'depot' // 연애 타로는 한국어만
+  if (name === 'lovecards' && !S.g.love[day()]) name = 'love'
   route = name
-  document.body.className = ''
+  document.body.className = name === 'love' || name === 'lovecards' ? 'love-bg' : ''
   document.getElementById('css-intro').disabled = name !== 'intro'
   document.getElementById('css-base').disabled = name === 'intro'
   document.documentElement.lang = S.lang
@@ -332,12 +376,13 @@ function render() {
   }
   const r = ROUTES[name]
   const v = r.visitors ? G.rollVisitors(S.g, rng) : {}
-  app.innerHTML = frame(r.cls, r.page() + visitorsHtml(v))
+  app.innerHTML = frame(r.cls, r.page() + visitorsHtml(v), r.exit)
   renderedDay = day()
   updateGnb()
   tick()
   window.scrollTo(0, 0)
-  if (name === 'cards') {
+  if (FLOWS[name]) {
+    flow = FLOWS[name]()
     sizeCards()
     cardStep()
   }
@@ -425,7 +470,7 @@ let rps = null // 진행 중인 가위바위보 { ticket, step }
 // 누를 수 있는 것들. 안쪽 글자(span.obj 등)를 눌러도 바깥 요소를 찾도록 순서대로 봅니다
 const CLICKABLE = '#whitewall, .closeLayerPopup, .pop_button .button, .rpsgame span, .rpsgame_result .action, ' +
   '.seaurchin, .sealion, .sealionPink, .whitedimm, .popupSixNumbers span, .tarotRoom .result span[data-i], ' +
-  '[data-act], [data-lang], [data-item], [data-ex], a[href]'
+  '[data-act], button[data-lang], [data-item], [data-ex], a[href]'
 
 document.addEventListener('click', (e) => {
   const el = e.target.closest(CLICKABLE)
@@ -487,7 +532,7 @@ document.addEventListener('click', (e) => {
 
   // 카드 뒤집기
   if (el.matches('.tarotRoom .result span')) {
-    if (+el.dataset.i === opened && opened < 3) openCard()
+    if (+el.dataset.i === opened && opened < flow.n) openCard()
     return
   }
 
@@ -513,7 +558,13 @@ document.addEventListener('click', (e) => {
       save(); opened = 0; location.hash = '#cards'; return
     }
     case 'again': opened = 0; location.hash = '#cards'; return
-    case 'next': return opened < 3 ? openCard() : finishCards()
+    case 'next': return opened < flow.n ? openCard() : finishCards()
+    case 'enterLove': {
+      const r = G.drawLove(S.g, day(), rng)
+      if (!r.ok) return needPop(r.why)
+      save(); opened = 0; location.hash = '#lovecards'; return
+    }
+    case 'againLove': opened = 0; location.hash = '#lovecards'; return
     case 'color': {
       const r = G.seeColor(S.g, day())
       if (!r.ok) return pop02(t('noCrystal'), 'kimim')
@@ -560,12 +611,31 @@ document.addEventListener('click', (e) => {
   }
 })
 
-// ---------- 카드 한 장씩 보기 ----------
+// ---------- 카드 한 장씩 보기 (3장 타로 · 연애 타로 공통) ----------
+// flow: 지금 화면의 카드 장수와 문구, 끝까지 봤는지 기록하는 곳
+let flow = null
+const FLOWS = {
+  cards: () => ({
+    n: 3,
+    rec: () => S.g.colors[day()],
+    guide: (i) => t('flipGuide')[i],
+    next: (i) => t('nextCard')[i],
+    final: () => t(S.lang === 'ko' ? 'seeSynthesis' : 'seeAll'),
+  }),
+  lovecards: () => ({
+    n: 6,
+    rec: () => S.g.love[day()],
+    guide: (i) => t('loveGuide')(LOVE_POS[i]),
+    next: (i) => t('loveNext')(LOVE_POS[i]),
+    final: () => t('loveFinal'),
+  }),
+}
+
 // opened: 지금까지 뒤집은 장수. 이미 끝까지 본 날은 바로 마지막 화면을 보여 줍니다
 function cardStep() {
   const spans = $$('.tarotRoom .result span')
-  if (S.g.colors[day()]?.done) {
-    opened = 3
+  if (flow.rec()?.done) {
+    opened = flow.n
     spans.forEach((s) => s.classList.add('opened'))
     return finishCards()
   }
@@ -575,11 +645,11 @@ function cardStep() {
   })
   $$('.holytable li').forEach((li, i) => li.classList.toggle('hidden', i !== opened - 1))
   const guide = $('.flipGuide')
-  guide.textContent = opened < 3 ? t('flipGuide')[opened] : ''
+  guide.textContent = opened < flow.n ? flow.guide(opened) : ''
   guide.classList.toggle('hidden', opened > 0)
   const btn = $('.readcards')
   btn.style.display = opened > 0 ? 'block' : 'none'
-  $('a', btn).textContent = opened < 3 ? t('nextCard')[opened] : t(S.lang === 'ko' ? 'seeSynthesis' : 'seeAll')
+  $('a', btn).textContent = opened < flow.n ? flow.next(opened) : flow.final()
 }
 
 function openCard() {
@@ -595,7 +665,7 @@ function finishCards() {
   $('.flipGuide').classList.add('hidden')
   $('.readcards').style.display = 'none'
   if ($('.seeTodayColor')) $('.seeTodayColor').style.display = 'block'
-  const c = S.g.colors[day()]
+  const c = flow.rec()
   if (c && !c.done) {
     c.done = true
     save()

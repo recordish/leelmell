@@ -176,3 +176,18 @@ test('연애 타로 6장: 자리 문장과 종합 해설이 빠짐없이 만들�
     assert.ok(!parts.join(' ').includes('undefined'))
   }
 })
+
+test('율리움의 방: 크리스탈 3개로 하루 한 번, 서로 다른 6장', () => {
+  const s = G.newState()
+  assert.equal(G.loveStatus(s, D), 'needShop')
+  s.crystals = 2
+  assert.equal(G.loveStatus(s, D), 'lessShop')
+  s.crystals = 4
+  const r = G.drawLove(s, D, Math.random)
+  assert.ok(r.ok)
+  assert.equal(new Set(r.cards.map((c) => c.id)).size, 6)
+  assert.equal(s.crystals, 1)
+  assert.equal(G.drawLove(s, D, Math.random).why, 'done')
+  // 3장 타로와는 따로 셉니다
+  assert.equal(G.chambreStatus(s, D), 'ok')
+})
