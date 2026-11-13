@@ -1,5 +1,5 @@
 // 화면(HTML·JS·CSS)은 네트워크 우선, 카드 그림은 한 번 받으면 기기에 저장해 다시 씁니다.
-const CACHE = 'leelmell-v3';
+const CACHE = 'leelmell-v4';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {

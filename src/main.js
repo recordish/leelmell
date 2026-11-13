@@ -22,8 +22,6 @@ import { trimDays } from './merge.js';
       pickHint: '마음이 끌리는 카드를 눌러 보세요',
       resultTitle: '오늘의 리딩',
       readingOf: '의 리딩',
-      up: '정방향', rev: '역방향',
-      posLead: ['지나온 시간에는', '지금 이 순간에는', '다가올 시간에는'],
       share: '결과 공유하기',
       copied: '결과를 복사했어요',
       next: '다음 카드까지',
@@ -33,7 +31,6 @@ import { trimDays } from './merge.js';
       cardsTitle: '메이저 아르카나 22장',
       close: '닫기',
       today: '오늘',
-      langBtn: 'EN',
       account: '계정',
       signInDesc: 'Google 계정으로 로그인하면 타로 기록이 저장되어 다른 기기에서도 볼 수 있어요.',
       signIn: 'Google로 로그인',
@@ -56,8 +53,6 @@ import { trimDays } from './merge.js';
       pickHint: 'Tap the card that calls to you',
       resultTitle: "Today's reading",
       readingOf: ' reading',
-      up: 'Upright', rev: 'Reversed',
-      posLead: ['In the time behind you,', 'In this very moment,', 'In the time ahead,'],
       share: 'Share result',
       copied: 'Result copied',
       next: 'Next cards in',
@@ -67,7 +62,6 @@ import { trimDays } from './merge.js';
       cardsTitle: '22 Major Arcana',
       close: 'Close',
       today: 'Today',
-      langBtn: '한국어',
       account: 'Account',
       signInDesc: 'Sign in with Google to save your readings and see them on other devices.',
       signIn: 'Sign in with Google',
@@ -78,6 +72,37 @@ import { trimDays } from './merge.js';
       delConfirm: 'Delete your account and all readings saved on the server? This cannot be undone.',
       delDone: 'Account deleted',
       fail: 'Please try again later',
+    },
+    fr: {
+      tabToday: "Aujourd'hui", tabHistory: 'Historique', tabCards: 'Cartes',
+      introTitle: 'Le tarot du jour',
+      intro: 'Leelmell, une pieuvre extraterrestre aux pouvoirs mystérieux, vous montre les cartes du tarot.',
+      intro2: '3 cartes par jour ! Passé · Présent · Futur.',
+      start: 'Tirer les cartes',
+      pos: ['Passé', 'Présent', 'Futur'],
+      pick: ['Choisissez la carte du Passé', 'Choisissez la carte du Présent', 'Choisissez la carte du Futur'],
+      pickHint: 'Touchez la carte qui vous attire',
+      resultTitle: 'Le tirage du jour',
+      readingOf: ' · tirage',
+      share: 'Partager le résultat',
+      copied: 'Résultat copié',
+      next: 'Prochaines cartes dans',
+      back: "Retour à aujourd'hui",
+      historyEmpty: "Pas encore de tirage. Tirez vos cartes du jour.",
+      historyTitle: 'Tirages passés',
+      cardsTitle: '22 arcanes majeurs',
+      close: 'Fermer',
+      today: "Aujourd'hui",
+      account: 'Compte',
+      signInDesc: "Connectez-vous avec Google pour enregistrer vos tirages et les retrouver sur d'autres appareils.",
+      signIn: 'Se connecter avec Google',
+      signedInAs: 'Connecté en tant que',
+      synced: 'Vos tirages sont enregistrés dans votre compte.',
+      signOut: 'Se déconnecter',
+      del: 'Supprimer le compte et les tirages enregistrés',
+      delConfirm: 'Supprimer votre compte et tous les tirages enregistrés sur le serveur ? Cette action est irréversible.',
+      delDone: 'Compte supprimé',
+      fail: 'Veuillez réessayer plus tard',
     },
   };
 
@@ -95,8 +120,10 @@ import { trimDays } from './merge.js';
   }
 
   var state = load();
-  if (state.lang !== 'ko' && state.lang !== 'en') {
-    state.lang = /^ko/i.test(navigator.language || '') ? 'ko' : 'en';
+  var LANGS = ['ko', 'en', 'fr'];
+  if (LANGS.indexOf(state.lang) < 0) {
+    var nav = (navigator.language || '').slice(0, 2).toLowerCase();
+    state.lang = LANGS.indexOf(nav) < 0 ? 'en' : nav;
   }
   var tab = 'today';
   var picking = false;   // 뽑기 화면을 열었는지
@@ -123,9 +150,13 @@ import { trimDays } from './merge.js';
     }
     return Math.floor(Math.random() * n);
   }
-  // 영어는 앞 문구 뒤에 이어지므로 첫 글자를 소문자로
-  function lead(s) { return state.lang === 'en' ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
-  function cardName(c) { return state.lang === 'ko' ? c.ko : c.en; }
+  function cardName(c) { return c.name[state.lang]; }
+  function tagsHtml(c) {
+    return '<p class="kw">' + c.tags[state.lang].map(function (k) { return '<span>#' + esc(k) + '</span>'; }).join('') + '</p>';
+  }
+  function textHtml(c) {
+    return c.text[state.lang].split('\n').map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('');
+  }
   function img(c) { return 'assets/tr/tr' + c.id + '.jpg'; }
 
   var $view = document.getElementById('view');
@@ -139,7 +170,7 @@ import { trimDays } from './merge.js';
   function render() {
     clearInterval(timer);
     document.documentElement.lang = state.lang;
-    $lang.textContent = t('langBtn');
+    $lang.textContent = state.lang.toUpperCase();
     $acct.classList.toggle('hidden', !FIREBASE_ON);
     $acct.classList.toggle('on', !!user);
     $acct.setAttribute('aria-label', t('account'));
@@ -175,8 +206,8 @@ import { trimDays } from './merge.js';
       var inner;
       if (p) {
         var c = CARDS[p.id];
-        inner = '<button type="button" class="slotcard' + (i === flipIdx ? ' flip' : '') + '" data-card="' + c.id + '" data-rev="' + (p.rev ? 1 : 0) + '" data-pos="' + i + '">' +
-          '<img class="' + (p.rev ? 'rev' : '') + '" src="' + img(c) + '" alt="' + esc(cardName(c)) + '"></button>';
+        inner = '<button type="button" class="slotcard' + (i === flipIdx ? ' flip' : '') + '" data-card="' + c.id + '" data-pos="' + i + '">' +
+          '<img src="' + img(c) + '" alt="' + esc(cardName(c)) + '"></button>';
       } else {
         inner = '<span class="slotcard empty' + (i === picks.length ? ' next' : '') + '"></span>';
       }
@@ -202,14 +233,11 @@ import { trimDays } from './merge.js';
   function readingHtml(picks) {
     return picks.map(function (p, i) {
       var c = CARDS[p.id];
-      var kw = (p.rev ? c.kwRev : c.kw)[state.lang];
       return '<article class="read">' +
-        '<button type="button" class="thumb" data-card="' + c.id + '" data-rev="' + (p.rev ? 1 : 0) + '" data-pos="' + i + '">' +
-          '<img class="' + (p.rev ? 'rev' : '') + '" src="' + img(c) + '" alt=""></button>' +
-        '<div><em>' + t('pos')[i] + '</em>' +
-        '<h3>' + esc(cardName(c)) + ' <small>' + (p.rev ? t('rev') : t('up')) + '</small></h3>' +
-        '<p class="kw">' + kw.map(function (k) { return '<span>' + esc(k) + '</span>'; }).join('') + '</p>' +
-        '<p>' + t('posLead')[i] + ' ' + esc(lead((p.rev ? c.rev : c.up)[state.lang])) + '</p></div>' +
+        '<header><button type="button" class="thumb" data-card="' + c.id + '" data-pos="' + i + '">' +
+          '<img src="' + img(c) + '" alt=""></button>' +
+        '<div><em>' + t('pos')[i] + '</em><h3>' + esc(cardName(c)) + '</h3></div></header>' +
+        textHtml(c) + tagsHtml(c) +
       '</article>';
     }).join('');
   }
@@ -253,7 +281,7 @@ import { trimDays } from './merge.js';
       var picks = state.readings[d];
       return '<button type="button" class="day" data-day="' + d + '">' +
         '<span class="thumbs">' + picks.map(function (p) {
-          return '<img class="' + (p.rev ? 'rev' : '') + '" src="' + img(CARDS[p.id]) + '" alt="">';
+          return '<img src="' + img(CARDS[p.id]) + '" alt="">';
         }).join('') + '</span>' +
         '<span class="meta"><b>' + (d === dayKey() ? t('today') : d) + '</b>' +
         '<small>' + picks.map(function (p) { return esc(cardName(CARDS[p.id])); }).join(' · ') + '</small></span>' +
@@ -269,21 +297,15 @@ import { trimDays } from './merge.js';
   }
 
   // ---------- 카드 자세히 ----------
-  function openCard(id, rev, pos) {
+  function openCard(id, pos) {
     var c = CARDS[id];
-    var both = rev === null;
-    function block(isRev) {
-      return '<h4>' + (isRev ? t('rev') : t('up')) + '</h4>' +
-        '<p class="kw">' + (isRev ? c.kwRev : c.kw)[state.lang].map(function (k) { return '<span>' + esc(k) + '</span>'; }).join('') + '</p>' +
-        '<p>' + esc((isRev ? c.rev : c.up)[state.lang]) + '</p>';
-    }
     $modal.innerHTML =
       '<div class="sheet" role="dialog" aria-modal="true">' +
-        '<img class="big' + (rev ? ' rev' : '') + '" src="' + img(c) + '" alt="">' +
+        '<img class="big" src="' + img(c) + '" alt="">' +
         (pos !== null ? '<em>' + t('pos')[pos] + '</em>' : '') +
         '<h3>' + c.num + '. ' + esc(cardName(c)) + '</h3>' +
-        (state.lang === 'ko' ? '<p class="alt">' + esc(c.en) + '</p>' : '') +
-        (both ? block(false) + block(true) : block(rev)) +
+        (state.lang === 'ko' ? '<p class="alt">' + esc(c.name.en) + '</p>' : '') +
+        '<div class="body">' + textHtml(c) + '</div>' + tagsHtml(c) +
         '<button type="button" class="cta" data-act="close">' + t('close') + '</button>' +
       '</div>';
     $modal.classList.remove('hidden');
@@ -352,7 +374,8 @@ import { trimDays } from './merge.js';
     if (picks.length >= 3) return;
     var used = picks.map(function (p) { return p.id; });
     var rest = CARDS.filter(function (c) { return used.indexOf(c.id) < 0; });
-    picks.push({ id: rest[rand(rest.length)].id, rev: rand(10) < 3 });
+    // rev 는 예전 기록·보안 규칙과 모양을 맞추려고 남겨 둔 값입니다 (역방향은 쓰지 않음)
+    picks.push({ id: rest[rand(rest.length)].id, rev: false });
     save();
     syncNow();
     if (navigator.vibrate) navigator.vibrate(15);
@@ -364,7 +387,7 @@ import { trimDays } from './merge.js';
     var picks = state.readings[day] || [];
     var text = "Leelmell's Tarot · " + day + '\n' + picks.map(function (p, i) {
       var c = CARDS[p.id];
-      return t('pos')[i] + ': ' + cardName(c) + ' (' + (p.rev ? t('rev') : t('up')) + ') — ' + (p.rev ? c.rev : c.up)[state.lang];
+      return t('pos')[i] + ': ' + cardName(c) + ' ' + c.tags[state.lang].map(function (k) { return '#' + k; }).join(' ');
     }).join('\n');
     if (navigator.share) {
       navigator.share({ title: "Leelmell's Tarot", text: text }).catch(function () {});
@@ -396,15 +419,13 @@ import { trimDays } from './merge.js';
       }
     }
     else if (el.dataset.card) {
-      openCard(+el.dataset.card,
-        el.dataset.rev === undefined ? null : el.dataset.rev === '1',
-        el.dataset.pos === undefined ? null : +el.dataset.pos);
+      openCard(+el.dataset.card, el.dataset.pos === undefined ? null : +el.dataset.pos);
     } else if (el.dataset.day) { viewDay = el.dataset.day; render(); window.scrollTo(0, 0); }
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
   $acct.addEventListener('click', openAccount);
   $lang.addEventListener('click', function () {
-    state.lang = state.lang === 'ko' ? 'en' : 'ko';
+    state.lang = LANGS[(LANGS.indexOf(state.lang) + 1) % LANGS.length];
     save(); closeModal(); render();
   });
   document.addEventListener('visibilitychange', function () {

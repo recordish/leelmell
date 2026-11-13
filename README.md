@@ -2,7 +2,8 @@
 
 외계 문어 Leelmell이 보여주는 타로 웹앱. 하루 3장(과거 · 현재 · 미래), 메이저 아르카나 22장.
 
-- 화면: 오늘(카드 뽑기 → 리딩) · 기록(지난 리딩, 최근 90일) · 카드(22장 도감), 한국어/English
+- 화면: 오늘(카드 뽑기 → 리딩) · 기록(지난 리딩, 최근 90일) · 카드(22장 도감), 한국어/English/Français
+- 카드 풀이 글과 해시태그는 기존 앱의 원문입니다 (역방향 없음)
 - 기록은 기기(localStorage)에 저장되고, **Google로 로그인하면 Firestore에도 저장**되어 다른 기기에서도 보입니다
 - 로그인하지 않아도 모든 기능을 쓸 수 있습니다
 
@@ -28,7 +29,7 @@ npm run build    # dist/ 에 빌드
 
 ## 구조
 
-- `index.html` 화면 틀 · `src/main.js` 동작 · `src/cards.js` 카드 뜻(한/영, 정·역방향) · `src/style.css`
+- `index.html` 화면 틀 · `src/main.js` 동작 · `src/cards.js` 카드 풀이(한/영/불) · `src/style.css`
 - `src/sync.js` Firebase 로그인·동기화 (설정값이 있을 때만 불러옴) · `src/merge.js` 기기/서버 기록 합치기
 - 서버 데이터: `readings/{uid}` = `{ days: { 'YYYY-MM-DD': [{ id, rev }] }, updatedAt }` (본인만 읽기·쓰기)
 - `public/` 카드 그림 · 아이콘 · `manifest.webmanifest` · `sw.js`(PWA)
