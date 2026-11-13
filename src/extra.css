@@ -7,7 +7,11 @@
 .tarotRoom .result span.rev .face{transform:rotate(180deg)}
 .tarotRoom .result span strong em{display:none;position:absolute;top:100%;left:0;width:100%;font-size:85%;letter-spacing:0;color:#6D5AE3}
 .tarotRoom .result span.opened strong em{display:block}
-.tarotRoom .result{margin-bottom:18px}
+/* 카드 사이 간격 (기존 화면은 줄바꿈 공백으로 생기던 틈) */
+.tarotRoom .result{margin-bottom:18px;display:flex;justify-content:center;gap:2%}
+.tarotRoom .result span{flex:0 0 31%}
+/* 카드 뒷면: 피보나치 황금 나선 (기존 보라 #6A32AB 바탕, 위아래 대칭이라 역방향이 미리 드러나지 않음) */
+.tarotRoom .result span:not(.opened){background:#6A32AB url(./card_back.svg) no-repeat center / 100% 100% !important}
 
 /* 해석 목록의 작은 카드 그림 (역방향은 거꾸로) */
 .tarotRoom .holytable h4{position:relative;background:none !important}
@@ -55,7 +59,8 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 @keyframes deltaUp{0%{opacity:0;transform:translateY(6px)}15%{opacity:1;transform:translateY(0)}70%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
 
 /* 홈: 릴멜의 한마디, 오늘 상태, 무료 천연석 안내 */
-.home_page .home_talk{position:absolute;top:calc(10% - 8px);left:50%;transform:translateX(-50%);z-index:1;padding:9px 16px;background:#FFF;border-radius:18px;font-size:14px;font-weight:500;color:#2b3140;white-space:nowrap;box-shadow:0 4px 14px rgba(109,90,227,.18);animation:fadeOn 1.2s forwards}
+/* 말풍선 꼬리가 릴멜 머리 바로 위에 오도록: 배경 그림(home_visual)에서 머리 위치를 계산 */
+.home_page .home_talk{position:absolute;top:calc(35% - min(24.2vw, 116px) - 54px);left:50%;transform:translateX(-50%);z-index:1;padding:9px 16px;background:#FFF;border-radius:18px;font-size:14px;font-weight:500;color:#2b3140;white-space:nowrap;box-shadow:0 4px 14px rgba(109,90,227,.18);animation:fadeOn 1.2s forwards}
 .home_page .home_talk:after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;border:7px solid transparent;border-top-color:#FFF;border-bottom:0}
 .seeTodayCard .getTodayCard.done{padding-bottom:46px}
 .seeTodayCard .getTodayCard .next{position:absolute;left:0;bottom:12px;width:100%;font-size:13px;color:#616D87}
