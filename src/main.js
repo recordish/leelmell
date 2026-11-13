@@ -14,7 +14,7 @@ const rng = () => {
   return a[0] / 4294967296
 }
 
-// 기존 앱 카드 해석의 제목 (tb_dd.title). 프랑스어는 카드 이름을 씁니다
+// 기존 앱 카드 해석의 제목 (tb_dd.title). 일본어는 카드 이름을 씁니다
 const TITLES = ['Fool', 'Magician', 'High Priestess', 'Empress', 'Emperor', 'Hierophant', 'Lovers', 'Chariot', 'Strength', 'Hermit',
   'Wheel of Fortune', 'Justice', 'Hanged Man', 'Death', 'Temperance', 'Devil', 'Tower', 'Star', 'Moon', 'Sun', 'Judgement', 'World']
 
@@ -22,7 +22,7 @@ const TITLES = ['Fool', 'Magician', 'High Priestess', 'Empress', 'Emperor', 'Hie
 function load() {
   try {
     const s = JSON.parse(localStorage.getItem(KEY))
-    if (s && s.g) return { ...s, g: { ...G.newState(), ...s.g } }
+    if (s && s.g) return { ...s, lang: LANGS.includes(s.lang) ? s.lang : 'en', g: { ...G.newState(), ...s.g } }
   } catch { /* 저장소를 못 쓰면 메모리로만 */ }
   const nav = (navigator.language || '').slice(0, 2).toLowerCase()
   return { lang: LANGS.includes(nav) ? nav : 'en', introSeen: false, g: G.newState() }
@@ -110,7 +110,7 @@ function chambrePage() {
 function meaning(p) {
   const c = CARDS[p.id]
   const src = p.rev ? REVERSED[p.id] : c
-  const title = S.lang === 'fr' ? c.name.fr : TITLES[p.id]
+  const title = S.lang === 'ja' ? c.name.ja : TITLES[p.id]
   const bars = [0, 1, 2, 3].map((i) => `<span class="p${i + 1}" style="width:${G.randInt(rng, 1, 60)}px"></span>`).join('')
   const text = esc(src.text[S.lang]).replace(/\n/g, '<br />')
   const tags = src.tags[S.lang].map((x) => '#' + esc(x)).join(' ')
@@ -208,7 +208,7 @@ function lockerPage() {
   <div class="myinfo"><div class="email_pannel"><dl>
     ${acct}
     <dt>${t('language')}</dt>
-    <dd class="langs">${LANGS.map((l) => `<button type="button" class="com_btn_01${l === S.lang ? ' on' : ''}" data-lang="${l}">${{ ko: '한국어', en: 'English', fr: 'Français' }[l]}</button>`).join(' ')}</dd>
+    <dd class="langs">${LANGS.map((l) => `<button type="button" class="com_btn_01${l === S.lang ? ' on' : ''}" data-lang="${l}">${{ ko: '한국어', en: 'English', ja: '日本語' }[l]}</button>`).join(' ')}</dd>
   </dl></div></div>
   ${user ? `<div class="escape_way"><p><a href="#" data-act="signout">${t('signOut')}</a></p></div>
   <div class="escape_way"><p><a href="#" data-act="delete">${t('deleteAccount')}</a></p></div>` : ''}

@@ -13,7 +13,7 @@ test('카드 22장 모두 정방향·역방향 풀이가 세 언어로 있다', 
   assert.equal(REVERSED.length, 22)
   for (let i = 0; i < 22; i++) {
     assert.equal(REVERSED[i].id, i)
-    for (const l of ['ko', 'en', 'fr']) {
+    for (const l of ['ko', 'en', 'ja']) {
       assert.ok(CARDS[i].text[l].length > 100 && REVERSED[i].text[l].length > 100, `${i} ${l}`)
       assert.equal(REVERSED[i].tags[l].length, 5)
     }
