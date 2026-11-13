@@ -218,6 +218,60 @@ export const CLOSE = {
   '-': '릴멜이 본 당신의 앞길에는 넘어야 할 고개가 있습니다. 미리 알았으니 준비할 수 있습니다.',
 }
 
+// ---------- 특별한 조합 ----------
+// 타로에서 흔히 특별하게 읽는 짝. 두 카드가 모두 정방향일 때만 칩니다
+// 순서가 있는 조합(앞 자리 → 뒤 자리)
+export const SPECIAL_ORDERED = [
+  { ids: [16, 17], good: true, text: '**탑** 다음에 **별**이 나왔습니다. 무너진 자리에 치유가 찾아오는, 타로에서 가장 위로가 되는 흐름입니다. 잃은 것보다 앞으로 채워질 것을 바라보세요.' },
+  { ids: [13, 20], good: true, text: '**죽음** 다음에 **심판**이 나왔습니다. 끝난 것이 새로운 모습으로 다시 일어서는 부활의 흐름입니다. 정리한 만큼 새로 시작할 수 있습니다.' },
+  { ids: [13, 19], good: true, text: '**죽음** 다음에 **태양**이 나왔습니다. 긴 밤이 끝나고 새 아침이 밝는 흐름입니다. 끝맺음을 두려워하지 않아도 됩니다.' },
+  { ids: [15, 16], good: false, text: '**악마** 다음에 **탑**이 나왔습니다. 놓지 못하고 붙들던 것이 결국 터져 나오는 흐름입니다. 무너지기 전에 스스로 내려놓는 편이 덜 아픕니다.' },
+  { ids: [19, 16], good: false, text: '**태양** 다음에 **탑**이 나왔습니다. 가장 밝은 때에 찾아오는 급변을 뜻합니다. 순조로울수록 기초를 다시 살피고 방심하지 마세요.' },
+]
+
+// 순서와 상관없는 짝
+export const SPECIAL_PAIRS = [
+  { ids: [19, 21], good: true, text: '**태양**과 **세계**가 함께 나왔습니다. 22장 가운데 가장 큰 성취와 완성을 뜻하는 짝입니다. 바라던 일이 온전하게 이루어지는 흐름이니 마음껏 기뻐하세요.' },
+  { ids: [17, 19], good: true, text: '**별**과 **태양**이 함께 나왔습니다. 품어 온 희망이 현실이 되는 짝입니다. 회복의 시간이 기쁨으로 이어집니다.' },
+  { ids: [6, 19], good: true, text: '**연인**과 **태양**이 함께 나왔습니다. 사랑이 환하게 결실을 맺는 짝입니다. 숨김없이 마음을 나누어도 좋은 때입니다.' },
+  { ids: [3, 4], good: true, text: '**여황제**와 **황제**가 함께 나왔습니다. 서로를 채워 주는 한 쌍으로, 안정된 가정과 든든한 동반자를 뜻합니다. 따뜻함과 단단함이 균형을 이룹니다.' },
+  { ids: [3, 6], good: true, text: '**연인**과 **여황제**가 함께 나왔습니다. 사랑이 열매를 맺는 짝으로, 결혼이나 새 생명의 소식을 뜻하기도 합니다.' },
+  { ids: [1, 21], good: true, text: '**마법사**와 **세계**가 함께 나왔습니다. 구상한 일을 끝까지 이루어 내는 짝입니다. 시작한 것을 완성할 힘이 당신에게 있습니다.' },
+  { ids: [10, 19], good: true, text: '**운명의 수레바퀴**와 **태양**이 함께 나왔습니다. 행운이 돌아오는 전환점을 뜻하는 짝입니다. 찾아온 기회를 놓치지 마세요.' },
+  { ids: [0, 21], good: true, text: '**바보**와 **세계**가 함께 나왔습니다. 22장의 처음과 끝이 만난 짝입니다. 한 여정이 완성되고 새로운 여정이 시작됩니다.' },
+  { ids: [13, 16], good: false, text: '**탑**과 **죽음**이 함께 나왔습니다. 22장 가운데 가장 무거운 짝으로, 피할 수 없는 큰 변화를 뜻합니다. 붙잡기보다 받아들이고, 그 뒤에 올 새 시작을 준비하세요.' },
+  { ids: [15, 16], good: false, text: '**악마**와 **탑**이 함께 나왔습니다. 집착과 유혹이 무너짐을 부르는 짝입니다. 당신을 묶고 있는 것을 지금 돌아보세요.' },
+  { ids: [15, 18], good: false, text: '**달**과 **악마**가 함께 나왔습니다. 속임수와 자기기만을 경계하라는 짝입니다. 달콤하게 들리는 말일수록 사실을 확인하세요.' },
+  { ids: [6, 15], good: false, text: '**연인**과 **악마**가 함께 나왔습니다. 그림의 구도가 같은 두 카드로, 사랑이 집착으로 변하는 것을 경계하라는 짝입니다. 관계 안에서 서로의 자유를 지켜 주세요.' },
+  { ids: [16, 18], good: false, text: '**탑**과 **달**이 함께 나왔습니다. 혼란 속에서 흔들리는 짝입니다. 무엇이 사실인지 분명해질 때까지 큰 결정을 미루세요.' },
+  { ids: [12, 18], good: false, text: '**매달린 사람**과 **달**이 함께 나왔습니다. 멈춘 채로 길이 보이지 않는 짝입니다. 조급해하지 말고 안개가 걷히기를 기다리세요.' },
+]
+
+// 세 장 전체의 드문 모양
+export const SPECIAL_PATTERN = {
+  run: '세 장이 번호 순서대로 나란히 나왔습니다. 여정이 한 걸음씩 차례로 펼쳐지는 드문 배열입니다. 지금의 흐름은 우연이 아니라 이어진 한 줄기입니다.',
+  allRev: '세 장이 모두 거꾸로 나왔습니다. 드문 배열로, 밖으로 나아가기보다 안을 돌아보라는 뜻입니다. 속도를 늦추고 하나씩 바로 세우세요.',
+  allBright: '세 장이 모두 밝은 카드입니다. 과거에서 미래까지 좋은 기운이 끊기지 않는 드문 배열입니다.',
+  allTrial: '세 장이 모두 시련의 카드입니다. 드물게 무거운 배열이지만, 타로는 겁을 주려는 것이 아니라 미리 준비하라고 말합니다.',
+}
+
+// 이 리딩에 해당하는 특별한 조합들 → [{ good: true|false|null, text }] (최대 2개: 짝 하나 + 모양 하나)
+export function specials(cards) {
+  const out = []
+  const up = cards.map((c) => (c.rev ? -1 : c.id))
+  const pos = (id) => up.indexOf(id)
+  const ordered = SPECIAL_ORDERED.find((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) > pos(x.ids[0]))
+  const pair = ordered || SPECIAL_PAIRS.find((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) >= 0)
+  if (pair) out.push({ good: pair.good, text: pair.text })
+  const ids = cards.map((c) => c.id)
+  const tones = cards.map((c) => (c.rev ? SYN_REV : SYN)[c.id].tone).join('')
+  if (ids[1] === ids[0] + 1 && ids[2] === ids[1] + 1) out.push({ good: null, text: SPECIAL_PATTERN.run })
+  else if (cards.every((c) => c.rev)) out.push({ good: null, text: SPECIAL_PATTERN.allRev })
+  else if (tones === '+++') out.push({ good: true, text: SPECIAL_PATTERN.allBright })
+  else if (tones === '---') out.push({ good: false, text: SPECIAL_PATTERN.allTrial })
+  return out
+}
+
 // cards: [{ id, rev }] ×3 (과거·현재·미래) → 해설 문단 (카드 이름은 **굵게** 표시)
 export function synthesize(cards) {
   const [p, n, f] = cards.map((c) => (c.rev ? SYN_REV : SYN)[c.id])

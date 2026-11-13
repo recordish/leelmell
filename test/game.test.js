@@ -137,3 +137,19 @@ test('세 장 종합 해설: 정·역방향 모든 조합이 빠짐없이 만들
   }
   assert.equal(count, 73920)
 })
+
+test('특별한 조합: 정방향 짝·순서·모양을 찾는다', async () => {
+  const { specials, SPECIAL_PAIRS, SPECIAL_ORDERED } = await import('../src/synthesis.js')
+  const c = (...xs) => xs.map((x) => ({ id: Math.abs(x), rev: x < 0 || Object.is(x, -0) }))
+  for (const x of [...SPECIAL_PAIRS, ...SPECIAL_ORDERED]) for (const id of x.ids) assert.ok(x.text.includes('**' + CARDS[id].name.ko + '**'))
+  assert.ok(specials(c(19, 5, 21))[0].text.includes('가장 큰 성취'))
+  assert.ok(specials(c(21, 5, 19))[0].good)
+  assert.equal(specials(c(19, 5, -21)).length, 0) // 거꾸로면 치지 않음
+  assert.ok(specials(c(16, 5, 17))[0].text.includes('다음에')) // 순서 조합
+  assert.equal(specials(c(17, 5, 16)).length, 0)
+  assert.ok(specials(c(15, 16, 2))[0].text.includes('다음에')) // 순서가 맞으면 순서 문단
+  assert.ok(specials(c(16, 15, 2))[0].text.includes('함께')) // 아니면 짝 문단
+  assert.ok(specials(c(4, 5, 6)).some((s) => s.text.includes('번호 순서')))
+  assert.ok(specials(c(-4, -9, -6)).some((s) => s.text.includes('모두 거꾸로')))
+  assert.ok(specials(c(1, 2, 9)).length === 0)
+})
