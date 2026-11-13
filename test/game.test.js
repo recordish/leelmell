@@ -153,3 +153,26 @@ test('특별한 조합: 정방향 짝·순서·모양을 찾는다', async () =>
   assert.ok(specials(c(-4, -9, -6)).some((s) => s.text.includes('모두 거꾸로')))
   assert.ok(specials(c(1, 2, 9)).length === 0)
 })
+
+test('연애 타로 6장: 자리 문장과 종합 해설이 빠짐없이 만들어진다', async () => {
+  const L = await import('../src/love.js')
+  assert.equal(L.LOVE.length, 22)
+  assert.equal(L.LOVE_REV.length, 22)
+  for (const set of [L.LOVE, L.LOVE_REV]) for (const row of set) {
+    assert.equal(row.length, 3)
+    for (const s of row) assert.ok(s.length > 15 && s.endsWith('.'))
+  }
+  // 조사: 받침 있는 이름은 '이', 없는 이름은 '가'
+  assert.ok(L.loveLine({ id: 16, rev: false }, 0).startsWith('당신의 마음에는 **탑**이 있습니다.'))
+  assert.ok(L.loveLine({ id: 0, rev: true }, 1).startsWith('상대의 마음에는 거꾸로 선 **바보**가 있습니다.'))
+  assert.ok(L.loveLine({ id: 12, rev: false }, 4).startsWith('두 사람 사이를 가로막는 것은 **매달린 사람**입니다.'))
+  // 무작위 6장 조합 5,000개
+  for (let k = 0; k < 5000; k++) {
+    const deck = [...Array(22).keys()]
+    const cards = []
+    for (let i = 0; i < 6; i++) cards.push({ id: deck.splice(Math.floor(Math.random() * deck.length), 1)[0], rev: Math.random() < 0.3 })
+    const parts = L.loveParts(cards)
+    assert.equal(parts.length, 4)
+    assert.ok(!parts.join(' ').includes('undefined'))
+  }
+})
