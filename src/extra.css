@@ -1,0 +1,69 @@
+/* 기존 스타일(public/legacy/base.css) 위에 새로 더한 것만 둡니다 */
+
+/* 카드 앞면: 뒤집기 전에는 숨기고, 역방향은 거꾸로 */
+.tarotRoom .result span .face{position:absolute;inset:0;border-radius:8px;background-size:100% auto;background-repeat:no-repeat;display:none}
+.tarotRoom .result span.opened{background:none !important}
+.tarotRoom .result span.opened .face{display:block}
+.tarotRoom .result span.rev .face{transform:rotate(180deg)}
+.tarotRoom .result span strong em{display:none;position:absolute;top:100%;left:0;width:100%;font-size:85%;letter-spacing:0;color:#6D5AE3}
+.tarotRoom .result span.opened strong em{display:block}
+.tarotRoom .result{margin-bottom:18px}
+
+/* 해석 목록의 작은 카드 그림 (역방향은 거꾸로) */
+.tarotRoom .holytable h4{position:relative;background:none !important}
+.tarotRoom .holytable h4:before{content:"";position:absolute;left:0;top:50%;width:40px;height:69px;margin-top:-34px;background:var(--img) no-repeat;background-size:100% auto}
+.tarotRoom .holytable h4.rev:before{transform:rotate(180deg)}
+.tarotRoom .holytable h4 small{margin-left:6px;font-size:75%;color:#6D5AE3}
+
+/* 사물함(설정): 계정 · 언어 */
+.locker_page .myinfo dt{margin:0 0 6px 0;font-weight:bold}
+.locker_page .myinfo dd{margin:0 0 20px 0}
+.locker_page .myinfo .noti_txt{font-size:90%;color:#777}
+.locker_page .myinfo .acct_btn{margin:10px 0 0 0}
+.locker_page .myinfo .com_btn_01{padding:8px 12px;color:#444A56;border-radius:8px;font-size:85%;margin:0 4px 6px 0}
+.locker_page .myinfo .com_btn_01.on{background:#6D5AE3;border-color:#6D5AE3;color:#FFF}
+.locker_page .myinfo .acct_mail{word-break:break-all}
+.locker_page .escape_way{margin:10px 0}
+.locker_page .privacy_link{margin:30px 20px 140px;text-align:right;font-size:12px}
+.locker_page .privacy_link a{color:#616D87;text-decoration:underline}
+
+a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE3;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.01ms !important;transition:none !important}}
+
+/* 기존 페이지는 html·body·.wrap 높이 100% 에 맞춰져 있어 #app 도 이어 줍니다 */
+#app{height:100%}
+/* 카드 화면 (chambre/cards.php 의 인라인 스타일) */
+.wrap.cards .gnb,.wrap.cards .navi{display:none}
+.wrap.cards .goGarden{display:block}
+
+/* ---------- 디자인 개선 ---------- */
+/* 글꼴 통일: 한국어·영어·일본어 모두 Pretendard JP (기존 CSS 는 Roboto 를 지정만 하고 불러오지 않았음) */
+:root *{font-family:'Pretendard JP Variable','Pretendard JP',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Hiragino Sans','Noto Sans KR','Noto Sans JP','Malgun Gothic',sans-serif}
+
+/* 읽기 편의: 본문 글씨를 진하게, 풀이 글은 선택(복사)할 수 있게 */
+.tarotRoom .holytable p,.tarotRoom .holytable h4,.tarotRoom .todaydate,.tarotRoom .result span.opened strong,
+.chambre_page .txt01,.chambre_page .txt02,.sec-pray .txt01,.sec-pray .txt02,.sec-pray .stt,
+.pop01 .pop_txt_01,.locker_page .myinfo,.todayColorResult h4{color:#2b3140}
+.tarotRoom .holytable p{line-height:170%;user-select:text;-webkit-user-select:text}
+.locker_page .myinfo .noti_txt{color:#5a6272}
+
+/* 위쪽 잔고: 숫자를 키우고, 바뀔 때 +10 · -1 이 떠오름 */
+.gnb .ct,.gnb .rk{font-size:15px;font-weight:600}
+.gnb .delta{position:absolute;left:44px;top:26px;text-indent:0;font-size:14px;font-weight:700;pointer-events:none;animation:deltaUp 1.4s ease-out forwards}
+.gnb .delta.plus{color:#0a9a5a}
+.gnb .delta.minus{color:#d6336c}
+@keyframes deltaUp{0%{opacity:0;transform:translateY(6px)}15%{opacity:1;transform:translateY(0)}70%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+
+/* 홈: 릴멜의 한마디, 오늘 상태, 무료 천연석 안내 */
+.home_page .home_talk{position:absolute;top:calc(10% - 8px);left:50%;transform:translateX(-50%);z-index:1;padding:9px 16px;background:#FFF;border-radius:18px;font-size:14px;font-weight:500;color:#2b3140;white-space:nowrap;box-shadow:0 4px 14px rgba(109,90,227,.18);animation:fadeOn 1.2s forwards}
+.home_page .home_talk:after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;border:7px solid transparent;border-top-color:#FFF;border-bottom:0}
+.seeTodayCard .getTodayCard.done{padding-bottom:46px}
+.seeTodayCard .getTodayCard .next{position:absolute;left:0;bottom:12px;width:100%;font-size:13px;color:#616D87}
+.seeTodayCard .getTodayCard .next b{font-weight:600;color:#6D5AE3;font-variant-numeric:tabular-nums}
+.seeTodayCard .home_tip{margin:12px 0 0 0;text-align:center}
+.seeTodayCard .home_tip a{display:inline-block;padding:7px 14px;background:rgba(255,255,255,.75);border-radius:16px;font-size:13px;color:#4a3fc0}
+
+/* 무료 보상: 기다려야 할 때는 남은 시간을 보여 주고 흐리게 */
+.sec-shop li.waiting a .price{background:#8f93a3;font-weight:500;font-size:12px}
+.sec-shop li.waiting a .obj,.sec-shop li.waiting a{opacity:.85}
+.experiments li.waiting a span.per{font-size:11px}

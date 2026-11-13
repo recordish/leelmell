@@ -1,0 +1,701 @@
+/* 기존 앱(릴멜의 타로카드)의 스타일 그대로 (cc/css2309061549) */
+body,div,dl,dt,dd,th,td,ul,ol,li,h1,h2,h3,h4,h5,p,span,a,button,input,textarea{margin:0;padding:0;color:#555;font-family:Roboto}
+hr,legend {display:none;}img,fieldset{border:0 none;}
+ul,ol,li{list-style:none outside;}table {border-collapse:collapse;}.hidden{display:none !important;}em{font-style:normal}
+a:link,a:visited,a:active{color: #555;text-decoration:none;}a:hover{color:#555;text-decoration:none;}
+input{-webkit-appearance:none;vertical-align: middle;border: none;}
+button{-webkit-appearance:none;vertical-align: middle;border-radius: 1px;color:#FFF;;border:1px solid #CC51B0;padding:16px 24px;font-size:110%;background: #CC51B0;border-radius:12px;}
+textarea{-webkit-appearance:none;vertical-align: middle;line-height: 140%;background: #FFF;border-radius: 13px;border: 1px solid #ccc;padding:10px 2%;width:96%;height:64px;color:#555;font-size:100%;}
+input:focus,textarea:focus{outline: none;}
+body{background: #D6E1FF}
+html,body,.wrap{height:100%}
+*{user-select: none}
+
+/*
+html,body,.wrap,.comCont{height:100%}
+#DB5509#FFE2C8 #0D5ACB#E4EBFA #5D49CF#E7E3FF #009467#DAF4DE*/
+
+.mt10{margin:10px 0 0 0}.wd24{width:24px}.wd48{width:48px}.stt{margin:10px 0;}.centre{text-align:center}
+
+.com_inp_01{padding:5px;border-radius: 5px;border: 1px solid #ddd;}
+.com_btn_01{display:inline-block;padding:2px;border:1px solid #ddd;border-radius:2px;background:#ddd;font-size:80%}
+.wrap{margin:0 auto;max-width:480px;position:relative}
+.comNotice{padding:120px 0;width:100%;text-align:center}
+.gateway{margin:20px auto 0;width:300px;text-align:center;font-family:arial;letter-spacing:1px}
+.gateway input{padding:3px;width:110px;font-size:110%}
+.gateway button{padding:5px 35px}
+
+.userActions{margin:20px 0;text-align:center}
+.userActions a,
+.userActions button{display:inline-block;margin:0 5px;padding:10px 60px;}
+
+.comheader{margin:20px auto 110px;width:300px;text-align:center;font-family:arial;letter-spacing:1px;display:none}
+.comheader h1 a{display:inline-block;width:50%;background:url(../assets/img/mm_logo_01.png) no-repeat center center;background-size:50% auto;text-indent:-9999em}
+.rightTopButtons{position:absolute;top:10px;right:10px}
+.rightTopButtons a,
+.rightTopButtons button{display:inline-block;margin:0 5px;padding:5px 10px;background:#CC51B0;border-radius:3px;text-decoration:none;color:#FFF}
+
+.floortt{text-align:center}
+.floortt h4{display:inline-block;padding:10px;;text-align:center;font-size:100%;font-weight:bold;border:1px solid #111;}
+
+.wrap.shop .navi li:nth-child(1) a,
+.wrap.lab .navi li:nth-child(2) a,
+.wrap.chambre .navi li:nth-child(3) a,
+.wrap.prayroom .navi li:nth-child(4) a,
+.wrap.parking .navi li:nth-child(5) a
+{
+	text-indent:0;
+}
+.wrap.shop .navi li:nth-child(1) a:after,
+.wrap.lab .navi li:nth-child(2) a:after,
+.wrap.chambre .navi li:nth-child(3) a:after,
+.wrap.prayroom .navi li:nth-child(4) a:after,
+.wrap.parking .navi li:nth-child(5) a:after
+{
+	background: url(../assets/img/com_navi_03.png) no-repeat;
+    background-size: auto 140px;
+    width: 80px;height: 80px;
+    margin: 0 0 0 -40px;
+	top:-15px;
+}
+.wrap.shop .navi li:nth-child(1) a:after{background-position:10px -80px}
+.wrap.lab .navi li:nth-child(2) a:after{background-position:-480px -80px}
+.wrap.chambre .navi li:nth-child(3) a:after{background-position:-315px -78px}
+.wrap.prayroom .navi li:nth-child(4) a:after{background-position:-150px -80px}
+.wrap.parking .navi li:nth-child(5) a:after{background-position:-640px -80px}
+
+.gnb{position:absolute;top:15px;left:15px;}
+.gnb li{display:inline-block;vertical-align:top;}
+.gnb a{display:block;width:36px;height:36px;text-indent:-999em;background-size: 20px auto !important;border-radius:100%;}
+.gnb .home a{background: #FFF url(../assets/img/com_ico_home_01.png) no-repeat center center;}
+.gnb .setting{margin:0 0 0 5px;}
+.gnb .setting a{background: #FFF url(../assets/img/com_ico_setting_01.png) no-repeat center center;}
+.gnb .ct{position: relative;margin: 3px 10px 0 0;width: 108px;height: 32px;line-height: 32px;text-indent: 50px;font-size: 13px;color: #323540;background: #efefef;border-radius: 20px;}
+.gnb .ct:after{content: "";position: absolute;top: -4px;left: -2px;width: 38px;height: 38px;border-radius: 100%;border: 1px solid #ddd;background: #FFF url(../assets/img/com_ico_gem_01.png) no-repeat 5px 8px;background-size: 28px auto;}
+.gnb .rk{position: relative;margin: 3px 10px 0 0;width: 108px;height: 32px;line-height: 32px;text-indent: 50px;font-size: 13px;color: #323540;background: #efefef;border-radius: 20px;}
+.gnb .rk:after{content: "";position: absolute;top: -4px;left: -2px;width: 38px;height: 38px;border-radius: 100%;border: 1px solid #ddd;background: #FFF url(../assets/img/com_ico_gem_12.png) no-repeat 3px center;background-size: 28px auto;}
+
+.goGarden{position:fixed;top:10px;right:15px;width:42px;height:42px;background: #FFF url(../assets/svg/door_out_01.svg) no-repeat 12px center;background-size: 24px auto;border-radius:100%;display:none;z-index:1;border:1px solid #ddd}
+
+.navi{position:fixed;bottom:0;left:0;width:100%}
+.navi ul{word-spacing: -1ch;max-width:480px;margin:0 auto;background:#FFF;}
+.navi li{display:inline-block;vertical-align:top;width:20%;position:relative;height:80px}
+.navi li a{position:relative;width:80px;height:80px;text-align:center;font-weight: 350;font-size: 12px;line-height: 114px;color: #616D87;text-indent:-999em;user-select:none;-webkit-tap-highlight-color:rgba(0, 0, 0, .05);position:absolute;top:0;left:0;}
+.navi li a:after{content:"";position:absolute;top:10px;left:50%;width:40px;height:40px;margin:12px 0 0 -20px;}
+.navi li:nth-child(1) a:after{background:  url(../assets/img/com_navi_03.png) no-repeat 2px -38px;background-size: auto 72px;}
+.navi li:nth-child(4) a:after{background:  url(../assets/img/com_navi_03.png) no-repeat -80px -38px;background-size: auto 72px;}
+.navi li:nth-child(3) a:after{background:  url(../assets/img/com_navi_03.png) no-repeat -162px -38px;background-size: auto 72px;}
+.navi li:nth-child(2) a:after{background:  url(../assets/img/com_navi_03.png) no-repeat -247px -38px;background-size: auto 72px;}
+.navi li:nth-child(5) a:after{background:  url(../assets/img/com_navi_03.png) no-repeat -330px -38px;background-size: auto 72px;}
+.navi li a:active{transition: all 1s}
+
+.home_page{height:100%}
+.home_page ul {margin:0 auto 20px;width:300px;padding:12px;background:#F8F8F8}
+.home_page ul li{margin:2px 0;}
+.home_page ul li span{display:block;padding:11px;letter-spacing:1px;color:#CC51B0}
+.home_page ul li a{display:block;padding:11px;letter-spacing:1px;}
+.home_page ul li strong{font-weight:normal;font-size:70%}
+.home_page .home_visual{background: url(../assets/img/home_bg_objects_01.png) no-repeat center center;background-size: 100% auto;height: 50%;width: 80%;position: absolute;top: 10%;left: 50%;transform: translateX(-50%);text-indent:-999em;max-width:480px}
+
+.seeTodayCard{margin:40px 0;position:relative;animation-duration: 2s;animation-name: fadeOn;animation-fill-mode: forwards;position: absolute;width: 100%;bottom: 16%}
+.seeTodayCard .getTodayCard{position:relative;display:block;margin: 0 auto;padding: 15px 0 42px 0;border: 2px solid #e2e5ee;background:#FFF;border-radius:12px;font-size: 16px;color: #020a18;text-align: center;z-index: 1;width:48%;max-width:480px}
+.seeTodayCard .getTodayCard .ct{position:absolute;bottom:10px;left:50%;width:40px;height:24px;line-height:24px;border-radius:12px;color:#777;padding: 0 0 0 13px;background: url(../assets/img/com_ico_gem_01.png) no-repeat 0 1px;background-size: 24px auto;transform: translateX(-50%);font-size:15px}
+.seeTodayCard:before{content:"";position:absolute;top: -38px;right: 80px;width: 50px;height:100px;background:url(../assets/tr/tr17.jpg) no-repeat;background-size:100% auto;transform: rotate(15deg);}
+.seeTodayCard:after{content:"";position:absolute;top: -20px;right: 52px;width: 50px;height: 90px;background:url(../assets/tr/tr1.jpg) no-repeat;background-size:100% auto;transform: rotate(25deg);}
+
+.pay_good_page{padding:400px 0 0 0;background:url(../assets/img/intro/intro05_2_1.png) no-repeat center bottom;background-size:80% auto;text-align:center;}
+.chambre_page{padding: 220px 0 0 0;margin: 0 auto;background: url(../assets/img/mm01.png) no-repeat center 72px;background-size: auto 170px;}
+.chambre_page .room {margin:0 20px;padding:24px;background:#F8F8F8;position:relative;text-align:center;border-radius:12px;box-shadow: 0px 0px 60px 0px rgba(139, 144, 155, 0.12);}
+.chambre_page .tribute{margin:40px 0}
+.chambre_page .txt01{margin:20px 0;line-height:150%;font-size:90%}
+.chambre_page .txt02{margin:60px 0;line-height:150%;font-size:90%}
+
+.wrap.prayroom{background: #FDFADD}
+.btnEnter{text-align:center;margin:30px 0 20px 0}
+.btnEnter button{width:90%}
+
+.sec-pray{position:absolute;top:50%;transform:translateY(-50%);width:100%;height:100%;}
+.sec-pray .ready {margin:160px 20px 0 20px;padding:12px;background: #FFF9C0;border-radius: 80px 80px 10px 10px;position:relative;text-align:center}
+.sec-pray .ready:after{content: "";position: absolute;top: -40px;left: 50%;margin: 0 0 0 -40px;width: 80px;height: 120px;background: url(../assets/img/com_ico_prayer_01.png) no-repeat;background-size: 80px auto;display:none;}
+.sec-pray input{padding:3px;text-align:center;font-size:100%;}
+
+.sec-pray .txt01{margin:60px 0 30px 0;font-size:90%;line-height:150%}
+.sec-pray .txt02{margin:0 0 12px 0;font-size:90%;line-height:150%}
+.sec-pray .tribute{display:inline-block;padding: 32px 48px;background: #FFF;border-radius: 500px}
+.sec-pray .tribute span{display:inline-block;vertical-align:middle;margin:0 8px;}
+.sec-pray .tribute .amount{position:relative;}
+.sec-pray .tribute input{width:64px;height:32px;line-height:32px;font-size:120%;}
+.sec-pray .tribute .t_up{background:none;border:none;position:absolute;top:-30px;left:14px}
+.sec-pray .t_up:before{content:"";position:absolute;top: 11px;left: 6px;width: 16px;height:1px;transform: rotate(-36deg);background:#888}
+.sec-pray .t_up:after{content:"";position:absolute;top: 11px;left: 19px;width: 16px;height:1px;transform: rotate(36deg);background:#888}
+.sec-pray .tribute .t_down{background:none;border:none;position:absolute;bottom:-40px;left:14px}
+.sec-pray .t_down:before{content:"";position:absolute;top: 11px;left: 6px;width: 16px;height:1px;transform: rotate(36deg);background:#888}
+.sec-pray .t_down:after{content:"";position:absolute;top: 11px;left: 19px;width: 16px;height:1px;transform: rotate(-36deg);background:#888}
+.sec-pray .btnEnter{background:#6D5AE3;border:none;width:80%;max-width: 240px;display: block;margin: 40px auto;}
+
+.sec-pray .txt01{position:relative}
+.sec-pray .txt01:before{content: "";position: absolute;top: -140px;left: 50%;width: 120px;height: 120px;border-radius: 100%;margin: 0 0 0 -60px;background: rgba(255,255,255,.5);box-shadow: 0 0 40px 40px rgba(1, 1, 1, 0.01);}
+.sec-pray .txt01:after{content: "";position: absolute;top: -110px;left: 50%;width: 60px;height: 60px;border-radius: 100%;margin: 0 0 0 -30px;background: rgba(255,255,255,.99)}
+
+.sec-pray .praying{
+	width: 100%;height: 100%;background: #FFF9C0 url(../assets/img/mm01.png) no-repeat center 40px;background-size: auto 140px;z-index: 1;
+	animation-duration:1.5s;animation-name: slowShow;animation-fill-mode: forwards;
+}
+.sec-pray .praying .txt02{margin: 0 0 12px 0;padding: 200px 0 0 0;font-size: 14px;line-height: 140%;text-align: center;letter-spacing: -1px;}
+.sec-pray .praying .txtInp{width: 80%;font-size: 14px;padding: 15px;color: #444A56;letter-spacing: 1px;font-weight: 500;max-width:480px}
+.sec-pray .done {
+	position: absolute;top: 50%;left: 50%;transform: translateX(-50%) translateY(-50%);font-size: 14px;width: 300px;height: 300px;line-height: 300px;
+	background: #FFF9C0;border-radius: 100%;position:relative;text-align:center;animation-duration:2s;animation-name: slowShow;animation-fill-mode: forwards;
+}
+
+.begin-pray .gnb,
+.begin-pray .navi,
+.begin-pray .sec-pray .ready{display:none}
+
+.begin-pray .goGarden,
+.begin-pray .sec-pray .praying{display:block !important}
+
+.end-pray .gnb,
+.end-pray .navi,
+.end-pray .sec-pray .ready{display:none}
+.end-pray .sec-pray .praying{display:none}
+.end-pray .goGarden{display:block}
+
+.crystal{display:inline-block;margin:10px 0 0 0;width:48px;height:48px;background:url(../assets/img/com_ico_gem_01.png) no-repeat;background-size:100% auto}
+.x{display:inline-block;width:24px;height:48px;position:relative}
+.x:before{content:"";position:absolute;top:25px;left:0;width:24px;height:1px;transform: rotate(45deg);background:#888}
+.x:after{content:"";position:absolute;top:25px;left:0;width:24px;height:1px;transform: rotate(-45deg);background:#888}
+
+.wrap.chambre .tarotRoom{padding:220px 0 40px 0;margin:0 auto;background:url(../assets/img/mm01.png) no-repeat center 20px}
+.tarotRoom .room {margin:0 15px;border-radius:8px;padding:15px 10px 35px 10px;background:#F8F8F8;}
+
+.tarotRoom .txt01{margin:30px 0;font-size:90%;line-height:150%;text-align:center}
+
+.tarotRoom .todaydate{padding:9px;font-size:90%;text-align:center;background:#e2e5eb;border-radius:12px}
+.tarotRoom .card_table{display:none;}
+
+.tarotRoom .result{margin:20px 0 0 0;text-align:center}
+.tarotRoom .result span{display:inline-block;width:32%;background:#6A32AB;border-radius:8px;background-size:100% auto !important;position:relative}
+.tarotRoom .result span.opened{border-radius:inherit;}
+.tarotRoom .result span strong{position:absolute;top:50%;transform:translateY(-50%);left:0;width:100%;text-align:center;color:#FFF;opacity:.8;font-size:80%;letter-spacing:2px;font-weight:400}
+.tarotRoom .result span.opened strong{bottom: -30px;top: inherit;color: #000}
+
+.tarotRoom .meannings{margin:20px 0;width:100%;text-align:left;display:none}
+.tarotRoom .meannings h4{margin:0 0 5px 0}
+.tarotRoom .meannings{display:none}
+.tarotRoom .meannings li{display:none;border:1px solid #777;padding:10px;margin:-1px 0 0 0;border-radius:2px}
+
+.tarotRoom .readcards{padding:60px 0 0 0;text-align:center}
+.tarotRoom .readcards a{display: inline-block;padding: 16px 0;width:60%;background: #6D5AE3;border: none;border-radius: 12px;color: #FFF;font-size: 14px;}
+
+.tarotRoom .holytable{margin:20px 0 -20px 0;width:100%;text-align:left}
+.tarotRoom .holytable li{border-top: 1px solid #ccc;padding: 20px 0;margin: 0 10px;border-radius: 2px;position:relative}
+.tarotRoom .holytable h4{margin:0 0 10px 0;background-size: 40px auto !important;padding: 21px 0 21px 55px;font-weight: normal;font-size: 110%;}
+.tarotRoom .holytable .pp{
+    position: absolute;
+    top: 20px;
+    right: 0px;
+    width: 60px;
+    height: 60px;display:none;
+}
+.tarotRoom .holytable .pp > span{display:block;Height:10px}
+.tarotRoom .holytable .pp .p1{background:#94e5be;}
+.tarotRoom .holytable .pp .p2{background:#3358cf;margin:4px 0}
+.tarotRoom .holytable .pp .p3{background:#ffdb5b}
+.tarotRoom .holytable .pp .p4{background:#e8252d;margin:4px 0 0 0}
+
+
+.seeTodayColor{margin:20px 0;}
+.seeTodayColor .getTodayColor{width:calc(100% - 40px);display:block;margin:20px;padding:15px 15px 42px 15px;background:#FFF;border:1px solid #686e7a;background:#FFF;border-radius:12px;position:relative;font-size: 17px;font-weight: 500;color: #020a18;}
+.seeTodayColor .getTodayColor .ct{position:absolute;bottom:10px;left:50%;width:40px;height:24px;line-height:24px;margin:0 0 0 -30px;border-radius:12px;color:#777;padding:0 0 0 20px;background: url(../assets/img/com_ico_gem_01.png) no-repeat 7px 1px;background-size: 24px auto;}
+.todayColorResult{margin:15px;padding:25px;background:#FFF;border:1px solid #eee;background:#FFF;color:#555;border-radius:12px;font-size:15px;position:relative}
+.todayColorResult h4{font-weight:normal;color:#555;text-align:center}
+.todayColorResult .colorCode{margin:30px auto 10px;width:100px;height:100px;border-radius:12px;}
+
+.locker_page{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;}
+
+.locker_page .myinfo{line-height:160%;font-size:90%;margin:80px 20px 0 20px;padding:20px 20px 0 20px;background:#FFF;
+border-radius: 8px;}
+
+.email_pannel dd{margin:0 0 40px 0}
+.email_pannel .noti_txt{display:inline-block;width:calc( 100% - 94px );font-size:14px}
+.email_pannel .item{margin:10px 0 0 0}
+.email_pannel .com_inp_01{display:inline-block;height:42px;line-height:42px;width:calc( 100% - 114px );padding:0 10px}
+.email_pannel .com_btn_01{display:inline-block;height:44px;line-height:40px;width:80px;text-align:center;background:#E2E5EB;color:#04112A;border:none;font-size:14px;border-radius:8px;margin:0 0 0 5px}
+.email_pannel .panel{padding:10px 0;}
+
+.locker_page .myinfo .active_edit .normal{display:none}
+.locker_page .myinfo .active_edit .change{display:block !important}
+
+.locker_page .escape_way{text-align:right}
+.locker_page .escape_way a{display:inline-block;background:#E2E5EB;margin:0 20px;padding: 8px 12px;font-size:13px;letter-spacing:1px;color:#444A56;border-radius: 8px;border: 1px solid #B8BCC5;}
+
+.locker_page .expansion{margin:100px 20px 0 20px}
+.locker_page .expansion a{display:inline-block;background:#FFF;padding: 7px 12px;font-size:14px;letter-spacing:1px;color:#444A56;border-radius: 8px;border: 1px solid #B8BCC5;}
+
+.locker_page .notes{margin:100px 15px 0 15px}
+.locker_page .notes .notes_list{border-bottom:1px solid #ccc;padding:0 0 100px 0}
+.locker_page .notes .notes_list .article{margin:0 0 3px 0;border-top:1px solid #ccc;word-wrap: break-word;}
+.locker_page .notes .notes_list p{font-size:80%;line-height:150%}
+
+.wrap.shop{background:#7762F9}
+.wrap.shop.depot{background:#288bc5}
+.shop_page{position:relative;height:100%;}
+
+.experiments li a{border:1px solid #3096d1}
+
+.sec-shop{position: absolute;top: 50%;left: 50%;transform: translateY(-50%) translateX(-50%);width: 100%;height: 480px;max-width: 480px;}
+
+.shop.index .sec-shop .starfish{position: absolute;top: -20px;left: -30px;width: 200px;height: 200px;background: url(../assets/img/com_starfish_02.png) no-repeat;background-size: 160px auto}
+.shop.index .sec-shop .starfish:after{content: "Welcome!";position: absolute;top: -12px;left: 112px;border-radius: 100%;background: #FFF;font-size: 10px;letter-spacing:1px;width: 70px;height: 60px;line-height: 56px;text-align: center;z-index:1}
+
+.sec-shop .objBoxes{position: absolute;top: 90px;left: 56px;width: 80px;height: 80px;background: url(../assets/svg/boxes01.svg) no-repeat;background-size: 100% auto}
+.sec-shop .objCalc{position: absolute;top: 150px;left: 77px;width: 24px;height:24px;background: url(../assets/svg/calc01.svg) no-repeat;background-size: 100% auto;display:none}
+.sec-shop .objMonarisa{position: absolute;top: 0;right: 24px;width: 60px;height: 60px;background: url(../assets/svg/monalisa.svg) no-repeat;background-size: 100% auto}
+.sec-shop .door01{
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 100px;
+    background: url(../assets/svg/door01.svg) no-repeat center center;
+    background-size: auto 100%;
+}
+
+.sec-shop .div-free{position:absolute;top:0;right:10px;width: 200px;text-align: right;}
+.sec-shop .div-payant{position:absolute;top:200px;left: 10px;width: 200px;}
+
+.sec-shop li{display:inline-block;vertical-align:top;margin:4px 2px;text-align:center;}
+.sec-shop li a{display: block;width: 90px;padding: 59px 0 0 0;font-size: 12px;border-radius: 8px;position:relative;border:1px solid #3667bf;background: rgba(255, 255, 255, 0.15) !important}
+.sec-shop li a .obj{display:block;color: #FFF;height:28px;line-height:32px}
+.sec-shop li a .price{display:block;margin: 4px 5px;padding: 2px 0 3px 0;font-weight: 600;font-size: 14px;color: #FFF;text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25);background: #6452F8;border-radius: 12px;letter-spacing:.5px;font-family: sans-serif;}
+.sec-shop li a .per{position: absolute;top: -8px;left: -4px;font-size: 12px;color: #FFF;font-weight:bold;background: #db6af5; /*#F8D64A*/border-radius: 100%;width:30px;height: 30px;line-height: 30px;z-index:1}
+
+
+.sec-shop .luxe1{position:absolute;top:0;left:20px;width: 200px;}
+.sec-shop .luxe2{position:absolute;top: 140px;left: 50%;width: 200px;transform: translateX(-50%)}
+.shop.depot .sec-shop li a .price{background:#d99acc url(../assets/img/com_ico_gem_01.png) no-repeat 10px center;background-size: auto 72%;padding:2px 0 4px 12px;margin: 6px;}
+.shop.depot .sec-shop li a{border:1px solid #6197f7}
+
+.shop.depot .comCont.en .obj{line-height:14px;margin:6px 0 0 0}
+
+.sec-shop li a:after{content:"";position:absolute;top: 5px;left:0;width:100%;height:64px;background-position: center 5px;background-size:auto 52px;background-repeat:no-repeat}
+
+.sec-shop .free100stones a:after{background-image: url(../assets/img/ic_stone100_01.png)}
+.sec-shop .free10stones a:after{background-image: url(../assets/img/ic_stone10_06.png)}
+.sec-shop .free50stones a:after{background-image: url(../assets/img/ic_stone100_01.png)}
+.sec-shop .getPdt01 a:after{background-image: url(../assets/img/ic_crystal4_01.png)}
+.sec-shop .getPdt02 a:after{background-image: url(../assets/img/ic_crystal20_01.png)}
+.sec-shop .getPdt03 a:after{background-image: url(../assets/img/ic_stone100_01.png)}
+.sec-shop .getPdt04 a:after{background-image: url(../assets/img/ic_stone100_01.png)}
+.sec-shop .in0001 a:after{background-image: url(../assets/img/ic_in0001.png)}
+.sec-shop .in0002 a:after{background-image: url(../assets/img/ic_in0002.png)}
+.sec-shop .in0003 a:after{background-image: url(../assets/svg/key02.svg);background-size: 40px auto;background-position: center 10px}
+.sec-shop .in0004 a:after{background-image: url(../assets/svg/crown01.svg)}
+
+
+.intro_page .logo{height:400px;background:#EF8EBC url(../assets/img/mm_logo_01.png) no-repeat center center;background-size:50% auto;text-indent:-999em}
+.intro_page .text01{font-size:120%;color:#FFF;line-height:140%;font-weight:bold}
+
+.intro_page .story01{background:#EDACCC;padding:80px 20px}
+.intro_page .story01 .leelmell_pic{display:block;margin:0 auto;width:100%;height:180px;background:url(../assets/img/mm01.png) no-repeat center center;background-size:60% auto;position:relative}
+.intro_page .story01 .leelmell_pic:before{content:"안녕하세용..";position:absolute;top:30px;left:60px;color:#FFF;font-size:80%}
+
+.intro_page .story02{background:#ABC1E2;padding:50px 20px}
+.intro_page .story02 .crystal_pic{display:block;margin:0 auto;width:100%;height:140px;background:url(../assets/img/ic_crystal1_01.png) no-repeat center center;background-size:30% auto;position:relative}
+
+.seaurchin{position:fixed;bottom:112px;right:20px;width:64px;height:64px;background:url(../assets/img/ic_kimim100_01.png) no-repeat;background-size:100% auto;}
+.seaurchin.gone{animation-duration: 1s;animation-delay: 0.2s;animation-name: rightaway;animation-fill-mode: forwards}
+.sealion{position:fixed;bottom:126px;width:120px;height:82px;background:url(../assets/img/ic_sealion_01.png) no-repeat;background-size:100% auto;
+left:-15px;animation: sealionMoved .7s ease-out .5s alternate;animation-fill-mode: forwards;display:none;}
+
+@keyframes sealionMoved {
+  0%   {left:-10px}
+  99% {left:21px}
+  100% {left:20px}
+}
+
+.wrap.lab .sealion,
+.wrap.parking .sealion{display:block}
+.wrap.lab .seaurchin{display:none}
+
+.sealionPink{position:fixed;bottom:126px;left:20px;width:140px;height:98px;background:url(../assets/img/ic_sealion_pink_big_01.png) no-repeat;background-size:100% auto;display:none;}
+
+.wrap.parking .sealionPink{	display:block }
+
+.whitedimm{position:fixed;top:0;left:0;;width:100%;height:100%;background: rgba(0, 0, 0, 0.4);display:none;cursor:pointer;z-index:1}
+.whitedimm:before{content:"";position:absolute;top:30px;right:10px;width:52px;height:1px;background:#FFF;transform:rotate(45deg);border-radius:12px}
+.whitedimm:after{content:"";position:absolute;top:30px;right:10px;width:52px;height:1px;background:#FFF;transform:rotate(-45deg);border-radius:12px}
+
+.popupSixNumbers{position: fixed;top: 50%;transform: translateY(-70%);left:0;
+border-radius:12px;margin: 10px;padding: 50px 10px;width: calc(100% - 40px);z-index:1;
+background: #FFF url(../assets/img/ic_sealion_pink_big_01.png) no-repeat -390px 110px;
+background-size: auto 360px;height:100px;text-align:center;display: none;}
+
+.popupSixNumbers strong{
+	position:absolute;right:20px;bottom:20px;width:20px;height:30px;line-height:24px;
+	font-size:17px;padding:0 0 0 24px;background: url(../assets/img/com_ico_gem_01.png) no-repeat;background-size: 24px auto;font-weight:normal;
+}
+.popupSixNumbers span{
+display:inline-block;
+width:42px;height:42px;line-height:42px;border-radius:42px;
+border:1px solid #f8f8f8;margin:0 3px;font-size:20px;color:#eee;background:#eee;font-family:'Calibri';
+}
+
+.popupSixNumbers span:active{opacity:.3}
+.popupSixNumbers span.took{color:#020a18;background:#FFF;border:1px solid #020a18;}
+
+.popupSixNumbers span.yellow{background:#fbc400}
+.popupSixNumbers span.blue{background:#69c8f2}
+.popupSixNumbers span.red{background:#ff7272}
+.popupSixNumbers span.grey{background:#aaa}
+.popupSixNumbers span.green{background:#b0d840}
+
+.sealionPink.gone,
+.sealion.gone{animation-duration: 1s;animation-delay: 0.2s;animation-name: leftaway;animation-fill-mode: forwards}
+.experiments{margin: 120px 0 0 0;text-align:center;max-width:400px}
+
+.experiments li{display:inline-block;vertical-align:top;width:30%;margin:0 2px;position:relative}
+.experiments li a{display: block;height:90px;padding:70px 0 0 0;font-weight: 400;font-size: 14px;border-radius: 8px;background: rgba(255, 255, 255, 0.15) url(../assets/img/com_ico_gem_01.png) no-repeat center 48px;background-size: 40% auto}
+
+.experiments li a span.obj{display:block;margin:20px 0 0 0;color: #FFF;height:20px;}
+.experiments li a span.price{display: block;margin: 10px;height:26px;line-height:26px;padding: 0 0 0 30px;font-size: 14px;color: #52606D;font-weight: 600;border-radius: 16px;background: #EEE url(../assets/img/com_ico_gem_12.png) no-repeat 7px center;background-size: auto 70%;text-align:left}
+.experiments li a span.per{position: absolute;top: 9px;left: -4px;font-size: 12px;color: #FFF;background: #64C1CF; /*#F8D64A*/border-radius: 4px;padding: 0 8px;height: 26px;line-height: 26px}
+.experiments li a.exchange3{background-image:none;padding: 30px 0 0 0;height:130px}
+.experiments li a.exchange3 span.obj{font-size: 42px;height:60px}
+.experiments li a.exchange3 span.per{padding:0 16px}
+
+.wrap.parking{background:url(../assets/img/jardin_bg_01.png) no-repeat center bottom;background-size:100% auto;height: calc(100% - 70px);}
+
+.comCont{height:100%}
+.wrap.lab{background:#629EF9 url(../assets/img/lab_bg_03.png) no-repeat center bottom;background-size:100% auto;height:100%}
+.lab_page{position:relative;padding: 0 15px;height:100%;overflow:hidden}
+.lab_page:after{content: "";position: absolute;bottom: 120px;right: -40px;width: 160px;height: 180px;background: url(../assets/img/com_pew_512.png) no-repeat;background-size: 100% auto}
+
+.parking_page{position:relative;margin:20px 15px;padding:15px;background:#FFF;min-height:100px}
+.jellyfish{position:absolute;top: 200px;left: 50px;width: 120px;height: 120px;background:url(../assets/img/com_pew_512.png) no-repeat;background-size:100% auto;}
+
+#whitewall{position:fixed;top:0;left:0;;width:100%;height:100%;background: rgba(0, 0, 0, 0.4);display:none;cursor:pointer;z-index:1}
+#whitewall:before{content:"";position:absolute;top:30px;right:10px;width:52px;height:1px;background:#FFF;transform:rotate(45deg);border-radius:12px}
+#whitewall:after{content:"";position:absolute;top:30px;right:10px;width:52px;height:1px;background:#FFF;transform:rotate(-45deg);border-radius:12px}
+
+.pop01{position: fixed;top: 50%;transform: translateY(-70%);left:0;background: #FFF;background-repeat:no-repeat;background-position: center 100px;background-size: auto 110px;border-radius:12px;margin: 20px;padding: 30px;width: calc(100% - 100px);z-index:1;display: none}
+.pop01 .pop_txt_01{margin:20px 0 120px 0;font-weight: 400;font-size: 14px;line-height: 24px;text-align: center;color: #37474F}
+
+.pop01 .pop_button {text-align:center}
+.pop01 .pop_button .button{display:inline-block;width:162px;height:50px;line-height:50px;background: #6D5AE3;border-radius: 8px;font-weight: 500;font-size: 18px;text-align: center;color: #FFF}
+
+/*
+.pop01.clock{background:#FFF !important}
+.pop01.clock .pop_txt_01{padding: 40px 0 10px 0;margin: 0 !important;background: url(../assets/img/ic_clock_01.png) no-repeat center top;background-size: 32px auto}
+.pop01.clock .pop_button{display:none}
+*/
+.pop01.kimim{
+    background: #FFF url(../assets/svg/fish01.svg) no-repeat center 16px;
+    background-size: 60px auto;
+    padding: 60px 30px 4px 30px;
+}
+.pop01.pop03.kimim{
+    background: #FFF url(../assets/svg/fish01.svg) no-repeat center 16px;
+    background-size: 60px auto;
+    padding: 60px 30px 4px 30px;
+}
+.pop01.kimim .pop_txt_01{padding: 20px 0;margin: 0 !important;position:relative}
+.pop01.kimim .pop_button{display:none}
+
+.pop01.gone{
+    background: #FFF url(../assets/svg/fish02.svg) no-repeat center 12px;
+    background-size: 72px auto;
+    padding: 70px 30px 4px 30px;
+}
+.pop01.gone .pop_txt_01{padding: 20px 0;margin: 0 !important;position:relative}
+.pop01.gone .pop_button{display:none}
+
+.pop01.many{
+    background: #FFF url(../assets/svg/cupcake01.svg) no-repeat center 16px;
+    background-size: 60px auto;
+    padding: 70px 30px 4px 30px;
+}
+.pop01.many .pop_txt_01{padding: 20px 0;margin: 0 !important;position:relative}
+.pop01.many .pop_button{display:none}
+
+.pop01.tomorrow{
+    background: #FFF url(../assets/svg/balloon02.svg) no-repeat center 16px;
+    background-size: 64px auto;
+    padding: 70px 30px 4px 30px;
+}
+.pop01.tomorrow .pop_txt_01{padding: 20px 0;margin: 0 !important;position:relative}
+.pop01.tomorrow .pop_button{display:none}
+
+
+.pop01.clock{
+    background: #FFF url(../assets/img/ic_clock_01.png) no-repeat center 20px;
+    background-size: 36px auto;
+    padding: 48px 30px 4px 30px;
+}
+.pop01.clock .pop_txt_01{padding: 20px 0;margin: 0 !important;position:relative}
+.pop01.clock .pop_button{display:none}
+
+
+
+.pop01.stone01{height: 120px;background: #FFF url(../assets/img/popup_bg_02.png) no-repeat center 70px;background-size: auto 80px}
+.pop01.crystal01{height: 120px;background: #FFF url(../assets/img/popup_bg_03.png) no-repeat center 70px;background-size: auto 80px}
+.pop01.stone01 .pop_button{display:none}
+.pop01.crystal01 .pop_button{display:none}
+
+.pop01.stone01 .pop_txt_01{margin: 0}
+.pop01.crystal01 .pop_txt_01{margin: 0}
+
+.pop01.war01 .pop_txt_01{margin: 0}
+
+.pop01.war01{
+    background: #FFF url(../assets/img/ic_sealion_big_01.png) no-repeat -140px 90px;
+    background-size: auto 200px;
+	height:240px;
+}
+
+.pop01.war01 .pop_button .button{
+position: relative;position: absolute;top: 160px;right: 30px;padding: 12px 32px;
+border: 1px solid #b9bcc7;background: #FFF;border-radius: 12px;font-size: 17px;font-weight: 500;color: #020a18;
+width: auto;height: auto;line-height: initial}
+
+.pop01.war01 .pop_button .button .ct{
+	display:block;margin: 10px 0 0 10px;padding: 0 0 0 10px;
+    background: url(../assets/img/com_ico_gem_01.png) no-repeat;background-size: 24px auto;
+    line-height: 20px;font-weight: 300;font-size: 20px;text-indent: 14px;
+}
+.pop01.war02{
+    background: #FFF url(../assets/img/ic_sealion_big_01.png) no-repeat -270px 130px;
+    background-size: auto 260px;
+}
+.pop01.war02 .pop_button{
+	display:none;
+}
+.pop01.war01 .rpsgame {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+}
+.pop01.war01 .rpsgame span{
+	display:block;
+    width: 100px;
+    height: 64px;
+    margin: 0 0 8px 0;
+    background: url(../assets/img/ic_rps_01.png) no-repeat 0 8px;
+    background-size: 84px auto;
+}
+.pop01.war01 .rpsgame .s{background-position: 0 -152px}
+.pop01.war01 .rpsgame .p{background-position: 0 -74px}
+
+
+.pop01.war03{
+    background: #FFF;
+	overflow:hidden;
+}
+.pop01.war03 .rpsgame{
+	display:none;
+}
+
+.pop01.bye .action .ct{
+	display:none;
+}
+
+.pop03 .pop_button .button{background: #d99acc url(../assets/img/com_ico_gem_01.png) no-repeat 20px center;background-size: auto 24px;width: 60px;text-align: left;padding: 0 0 0 64px;font-size: 19px;height: 40px;line-height: 40px;}
+
+.pop03 .pop_txt_01{margin:20px 0;padding:40px 0 0 0;font-size:12px;text-align:left}
+.pop03.kimim .pop_txt_01{text-align:center}
+
+.pop03.in0001{
+    background: #FFF url(../assets/img/ic_in0001.png) no-repeat center 20px;
+    background-size: auto 60px;
+}
+.pop03.in0002{
+    background: #FFF url(../assets/img/ic_in0002.png) no-repeat center 20px;
+    background-size: auto 60px;
+}
+.pop03.in0003{
+    background: #FFF url(../assets/svg/key02.svg) no-repeat center 20px;
+    background-size: auto 60px;
+}
+.pop03.in0004{
+    background: #FFF url(../assets/svg/crown01.svg) no-repeat center 20px;
+    background-size: auto 60px;
+}
+
+.pop03 .pop_txt_01 strong{
+	display:block;text-align:center;margin:0 0 5px 0;
+    color: #020a18;letter-spacing: -1px;
+}
+.pop01.war01 .rpsgame_result{position:relative;padding:120px 0 0 0;text-align:center}
+
+.rpsgame_result:before {
+    content: "";position: absolute;
+		top: 0;
+		left: -120px;
+    width: 80px;height: 80px;background: url(../assets/img/ic_rps_02.png) no-repeat 0 -130px;background-size: 80px auto;
+	animation: leftPlayer .54s ease-in-out .1s;animation-fill-mode: forwards;
+}
+.rpsgame_result:after {
+    content: "";position: absolute;
+		top: 0;
+		right: -120px;
+    width: 80px;height: 80px;
+    background: url(../assets/img/ic_rps_01.png) no-repeat 0 -130px;background-size: 80px auto;
+	animation: rightPlayer .49s ease-in-out .3s;animation-fill-mode: forwards;
+}
+.rpsgame_result.r12:before{background-position:0 20px}
+.rpsgame_result.r13:before{background-position:0 -60px}
+
+.rpsgame_result.r21:after{background-position:0 22px}
+.rpsgame_result.r22:after{background-position:0 22px}
+.rpsgame_result.r22:before{background-position:0 22px}
+.rpsgame_result.r23:after{background-position:0 22px}
+.rpsgame_result.r23:before{background-position:0 -60px}
+
+.rpsgame_result.r31:after{background-position:0 -60px}
+.rpsgame_result.r32:after{background-position:0 -60px}
+.rpsgame_result.r32:before{background-position:0 22px}
+.rpsgame_result.r33:after{background-position:0 -60px}
+.rpsgame_result.r33:before{background-position:0 -60px}
+
+.pop01.war01 .rpsgame_result .action{
+    position: relative;
+	display:inline-block;
+    margin: 30px 0 0 0;
+    padding: 24px 36px;
+    border: 1px solid #b9bcc7;
+    background: #FFF;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 500;
+    color: #020a18;
+}
+.pop01.war01 .rpsgame_result .action .ct{
+    margin: 0 0 0 7px;
+    padding: 0 0 0 27px;
+    background: url(../assets/img/com_ico_gem_01.png) no-repeat;
+    background-size: 24px auto;
+    font-weight: 300;font-size: 20px;text-indent: 16px;
+}
+
+.pop01.war01.war03 .pop_txt_01{
+	animation: showWarResult .1s cubic-bezier(0.22, 0.61, 0.36, 1) 1s;
+	animation-fill-mode: forwards;
+	visibility:hidden;
+	font-size:100%;letter-spacing:1px;
+}
+.pop01.war01.war03 .rpsgame_result .action{
+	animation: showWarResult .1s cubic-bezier(0.22, 0.61, 0.36, 1) 1s;
+	animation-fill-mode: forwards;
+	visibility:hidden;
+}
+
+@keyframes leftPlayer {
+	100% {
+		top: 30px;
+		left: 20px;
+	}
+}
+@keyframes rightPlayer {
+	100% {
+		top: 30px;
+		right: 20px;
+	}
+}
+@keyframes showWarResult {
+	100% {
+		visibility:visible;
+	}
+}
+.closeLayerPopup{position:fixed;top:2px;right:2px;width:60px;height:60px;text-indent:-999em;opacity:.8;display:none;}
+.closeLayerPopup:before{content:"";position:absolute;top:20px;right:0;width:48px;height:2px;background:#FFF;transform:rotate(45deg);border-radius:12px}
+.closeLayerPopup:after{content:"";position:absolute;top:20px;right:0;width:48px;height:2px;background:#FFF;transform:rotate(-45deg);border-radius:12px}
+
+body.launch1:after {
+	content:"";
+	position:absolute;top:0;left:0;background:#EF8EBC url(../assets/img/mm_logo_01.png) no-repeat center 220px;background-size:50% auto;
+	width:100%;height:100%;
+	animation-duration: 2s;
+	animation-delay: 1.2s;
+	animation-name: slidein;animation-fill-mode: forwards;
+}
+body:after {
+	content:"";
+	position:absolute;top:0;left:0;background:#C2C7FB;
+	width:100%;height:100%;
+	animation-duration: 2s;
+	animation-name: slidein;animation-fill-mode: forwards;
+}
+
+@keyframes slidein {
+  0% {
+		opacity:1;
+  }
+  100% {
+		opacity:0;
+		z-index:-1;
+  }
+}
+@keyframes rightaway {
+  0% {
+  }
+  100% {
+		opacity:0;
+		right:-100px;
+  }
+}
+@keyframes leftaway {
+  0% {
+  }
+  100% {
+		opacity:0;
+		left:-100px;
+  }
+}
+@keyframes fadeOn {
+  0% {
+		opacity:0;
+  }
+  100% {
+		opacity:1;
+  }
+}
+
+@keyframes slowShow {
+  0% {
+		opacity:0;
+  }
+  20% {
+		opacity:.8;
+  }
+  100% {
+		opacity:1;
+  }
+}
+
+
+@media (min-width: 640px){
+
+.home_page .home_visual{
+    height: 60%;
+    width: 60%;
+}
+
+.sec-item{left: 10%;}
+
+.wrap.lab{
+    background-size: auto 70%;
+}
+
+.pop01{
+    max-width: 400px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+}

@@ -1,16 +1,29 @@
 {
-  "name": "Leelmell's Tarot cards",
-  "short_name": "Leelmell Tarot",
-  "description": "3 cards per day — past, present, future",
+  "name": "Leelmell's Tarotcards",
+  "short_name": "Leelmell",
+  "description": "매일 3장의 타로카드 · 과거 - 현재 - 미래",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1b0b36",
-  "theme_color": "#2a1250",
+  "background_color": "#D6E1FF",
+  "theme_color": "#D6E1FF",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

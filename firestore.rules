@@ -1,14 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 타로 기록: 로그인한 본인만 읽고 쓸 수 있습니다
-    match /readings/{uid} {
+    // 계정 데이터: 로그인한 본인만 읽고 쓰고 지울 수 있습니다
+    // (지금은 유료 상품이 없어 재화 계산을 앱에서 합니다. 결제를 붙일 때는 서버 함수로 옮겨야 합니다)
+    match /users/{uid} {
       allow read, delete: if request.auth != null && request.auth.uid == uid;
       allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['days', 'updatedAt'])
-        && request.resource.data.days is map
-        && request.resource.data.days.size() <= 100
-        && request.resource.data.updatedAt == request.time;
+        && request.resource.data.keys().hasOnly(['g', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time
+        && validGame(request.resource.data.g);
     }
+  }
+
+  function validGame(g) {
+    return g is map
+      && g.keys().hasOnly(['v', 'stones', 'crystals', 'readings', 'colors', 'prayers', 'items', 'free100Day', 'free10At', 'ex3At'])
+      && g.stones is int && g.stones >= 0 && g.stones <= 10000000
+      && g.crystals is int && g.crystals >= 0 && g.crystals <= 1000000
+      && g.readings is map && g.readings.size() <= 130
+      && g.colors is map && g.colors.size() <= 130
+      && g.prayers is list && g.prayers.size() <= 200
+      && g.items is list && g.items.size() <= 200;
   }
 }

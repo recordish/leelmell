@@ -3,30 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Leelmell's Tarot cards</title>
-<meta name="description" content="신비한 외계 문어 Leelmell이 보여주는 오늘의 타로 3장 — 과거 · 현재 · 미래">
-<meta name="theme-color" content="#2a1250">
+<title>Leelmell's Tarotcards</title>
+<meta name="description" content="신비한 능력을 지닌 외계문어 릴멜이 매일 3장의 타로카드로 과거 · 현재 · 미래를 보여줍니다.">
+<meta name="theme-color" content="#D6E1FF">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="120x120" href="assets/img/touch-icon-iphone-retina.png">
+<link rel="stylesheet" id="css-base" href="legacy/base.css?v=3">
+<link rel="stylesheet" id="css-intro" href="legacy/intro.css?v=3" disabled>
+<link rel="stylesheet" href="vendor/swiper.min.css">
 </head>
 <body>
-<div class="sky" aria-hidden="true"></div>
-<div class="app">
-  <header class="top">
-    <h1 class="logo"><img src="assets/img/mm_logo_01.png" alt="Leelmell's Tarot cards"></h1>
-    <div class="tools">
-      <button class="lang" id="lang" type="button"></button>
-      <button class="acct hidden" id="acct" type="button">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
-      </button>
-    </div>
-  </header>
-  <main id="view"></main>
-  <nav class="tabs" id="tabs"></nav>
-</div>
-<div class="modal hidden" id="modal"></div>
-<div class="toast hidden" id="toast"></div>
+<div id="app"></div>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>
