@@ -799,7 +799,7 @@ function useCoupon() {
     G.addReward(S.g, r.stones, r.crystals)
     save()
     $('#couponCode').value = ''
-    pop02(t('couponOk')(t('reward')(r.crystals, r.stones)), 'crystal01')
+    pop02(t('couponOk')(t('rewardOf')(r.crystals, r.stones)), 'crystal01')
   }))
 }
 
@@ -815,7 +815,7 @@ async function claimGifts() {
     let rk = 0
     for (const x of got) { ct += x.crystals; rk += x.stones; G.addReward(S.g, x.stones, x.crystals) }
     save()
-    if (ct > 0 || rk > 0) pop02(t('giftGot')(t('reward')(Math.max(0, ct), Math.max(0, rk))), 'crystal01')
+    if (ct > 0 || rk > 0) pop02(t('giftGot')(t('rewardOf')(Math.max(0, ct), Math.max(0, rk))), 'crystal01')
     else pop02(t('giftAdj'), 'kimim')
   } catch (e) {
     console.warn('gift claim failed', e)
@@ -866,7 +866,7 @@ function grant(b, id, quiet) {
   const p = b.PRODUCTS[id]
   G.addReward(S.g, p.stones, p.crystals)
   save()
-  if (!quiet) pop02(t('payOk')(t('reward')(p.crystals, p.stones)), p.crystals ? 'crystal01' : 'stone01')
+  if (!quiet) pop02(t('payOk')(t('rewardOf')(p.crystals, p.stones)), p.crystals ? 'crystal01' : 'stone01')
 }
 
 // 결제는 됐는데 지급 전에 앱이 꺼졌거나, 대기 중이던 결제가 끝난 것을 받아 줍니다
