@@ -191,3 +191,42 @@ test('율리움의 방: 크리스탈 3개로 하루 한 번, 서로 다른 6장'
   // 3장 타로와는 따로 셉니다
   assert.equal(G.chambreStatus(s, D), 'ok')
 })
+
+test('영어: 종합 해설 · 특별한 조합 · 연애 타로가 빠짐없이 만들어진다', async () => {
+  const { EN } = await import('../src/en.js')
+  const S2 = await import('../src/synthesis.js')
+  const L = await import('../src/love.js')
+  for (const k of ['syn', 'synRev', 'love', 'loveRev']) {
+    assert.equal(EN[k].length, 22, k)
+    for (const row of EN[k]) { assert.equal(row.length, 3); for (const x of row) assert.ok(x.length > 15 && x.endsWith('.')) }
+  }
+  assert.equal(EN.ordered.length, S2.SPECIAL_ORDERED.length)
+  assert.equal(EN.pairs.length, S2.SPECIAL_PAIRS.length)
+  S2.SPECIAL_ORDERED.forEach((x, i) => { for (const id of x.ids) assert.ok(EN.ordered[i].includes('**' + CARDS[id].name.en + '**'), 'ordered ' + i) })
+  S2.SPECIAL_PAIRS.forEach((x, i) => { for (const id of x.ids) assert.ok(EN.pairs[i].includes('**' + CARDS[id].name.en + '**'), 'pair ' + i) })
+  for (const t of [S2.LINK_PN, S2.LINK_NF]) for (const k of Object.keys(t)) assert.ok(EN.linkPN[k] && EN.linkNF[k] && EN.hearts[k])
+  let count = 0
+  for (let a = 0; a < 22; a++) for (let b = 0; b < 22; b++) for (let c = 0; c < 22; c++) {
+    if (a === b || b === c || a === c) continue
+    for (let r = 0; r < 8; r++) {
+      const cards = [{ id: a, rev: !!(r & 1) }, { id: b, rev: !!(r & 2) }, { id: c, rev: !!(r & 4) }]
+      const text = S2.synthesize(cards, 'en')
+      assert.ok(!text.includes('undefined') && !/[가-힣]/.test(text))
+      for (const s of S2.specials(cards, 'en')) assert.ok(s.text && !/[가-힣]/.test(s.text))
+      count++
+    }
+  }
+  assert.equal(count, 73920)
+  // 쉼표로 이어지면 뒤 문장은 소문자로 시작
+  const t = S2.synthesizeParts([{ id: 16, rev: false }, { id: 17, rev: false }, { id: 19, rev: false }], 'en')
+  assert.ok(t[1].startsWith('Having come through that hard time, now is the time of **The Star**.'))
+  assert.ok(t[0].startsWith('In your past stood **The Tower**.'))
+  for (let k = 0; k < 3000; k++) {
+    const deck = [...Array(22).keys()]
+    const cards = []
+    for (let i = 0; i < 6; i++) cards.push({ id: deck.splice(Math.floor(Math.random() * deck.length), 1)[0], rev: Math.random() < 0.3 })
+    const text = L.loveParts(cards, 'en').join(' ')
+    assert.ok(!text.includes('undefined') && !/[가-힣]/.test(text))
+  }
+  assert.ok(L.loveLine({ id: 6, rev: true }, 0, 'en').startsWith('In your heart is **The Lovers**, reversed.'))
+})

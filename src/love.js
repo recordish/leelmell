@@ -1,8 +1,9 @@
-// 연애 타로 6장 (한국어, 초안): 나의 마음 · 상대의 마음 · 과거 · 현재 · 장애 · 앞으로
+// 연애 타로 6장 (한국어. 영어 문장은 en.js): 나의 마음 · 상대의 마음 · 과거 · 현재 · 장애 · 앞으로
 // 과거·현재·앞으로는 synthesis.js 의 자리 문장을 그대로 쓰고, 여기에는 나머지 세 자리 문장을 둡니다.
 // 각 항목은 [나의 마음, 상대의 마음, 장애] 이고, 첫 문장("당신의 마음에는 **카드**가 있습니다.")은 자동으로 붙습니다.
 import { CARDS } from './cards.js'
-import { LINK_PN, SYN, SYN_REV } from './synthesis.js'
+import { EN } from './en.js'
+import { LINK_PN, joinLink, synLine, toneOf } from './synthesis.js'
 
 export const HOST = '율리움' // 이 방에서 연애운을 봐 주는 분홍 바다사자
 
@@ -84,31 +85,39 @@ export const CLOSE_LOVE = {
 }
 
 export const LOVE_POS = ['나의 마음', '상대의 마음', '과거', '현재', '장애', '앞으로']
+export const lovePos = (lang = 'ko') => (lang === 'en' ? EN.pos : LOVE_POS)
 
 // 받침이 있으면 '이', 없으면 '가'
 const iga = (word) => ((word.charCodeAt(word.length - 1) - 0xac00) % 28 ? '이' : '가')
-const label = (c) => `${c.rev ? '거꾸로 선 ' : ''}**${CARDS[c.id].name.ko}**`
 
 // 자리 문장 하나 (pos: 0 나의 마음 · 1 상대의 마음 · 2 과거 · 3 현재 · 4 장애 · 5 앞으로)
-export function loveLine(c, pos) {
-  const syn = (c.rev ? SYN_REV : SYN)[c.id]
-  const love = (c.rev ? LOVE_REV : LOVE)[c.id]
+export function loveLine(c, pos, lang = 'ko') {
+  if (pos === 2) return synLine(c, 'p', lang)
+  if (pos === 3) return synLine(c, 'n', lang)
+  if (pos === 5) return synLine(c, 'f', lang)
+  const k = pos === 4 ? 2 : pos
+  if (lang === 'en') {
+    const label = `**${CARDS[c.id].name.en}**${c.rev ? ', reversed' : ''}`
+    const lead = ['In your heart is', 'In their heart is', 'What stands between you is'][k]
+    return `${lead} ${label}. ${(c.rev ? EN.loveRev : EN.love)[c.id][k]}`
+  }
   const name = CARDS[c.id].name.ko
-  if (pos === 0) return `당신의 마음에는 ${label(c)}${iga(name)} 있습니다. ${love[0]}`
-  if (pos === 1) return `상대의 마음에는 ${label(c)}${iga(name)} 있습니다. ${love[1]}`
-  if (pos === 2) return syn.p
-  if (pos === 3) return syn.n
-  if (pos === 4) return `두 사람 사이를 가로막는 것은 ${label(c)}입니다. ${love[2]}`
-  return syn.f
+  const label = `${c.rev ? '거꾸로 선 ' : ''}**${name}**`
+  const text = (c.rev ? LOVE_REV : LOVE)[c.id][k]
+  if (k === 0) return `당신의 마음에는 ${label}${iga(name)} 있습니다. ${text}`
+  if (k === 1) return `상대의 마음에는 ${label}${iga(name)} 있습니다. ${text}`
+  return `두 사람 사이를 가로막는 것은 ${label}입니다. ${text}`
 }
 
 // cards: [{ id, rev }] ×6 → 종합 해설 문단들
-export function loveParts(cards) {
-  const tone = cards.map((c) => (c.rev ? SYN_REV : SYN)[c.id].tone)
+export function loveParts(cards, lang = 'ko') {
+  const en = lang === 'en'
+  const tone = cards.map(toneOf)
+  const L = (i) => loveLine(cards[i], i, lang)
   return [
-    loveLine(cards[0], 0) + ' ' + loveLine(cards[1], 1) + ' ' + LINK_HEARTS[tone[0] + tone[1]],
-    loveLine(cards[2], 2) + ' ' + LINK_PN[tone[2] + tone[3]] + ' ' + loveLine(cards[3], 3),
-    loveLine(cards[4], 4) + ' ' + LINK_BLOCK[tone[5]] + ' ' + loveLine(cards[5], 5),
-    CLOSE_LOVE[tone[5]],
+    L(0) + ' ' + L(1) + ' ' + (en ? EN.hearts : LINK_HEARTS)[tone[0] + tone[1]],
+    L(2) + ' ' + joinLink((en ? EN.linkPN : LINK_PN)[tone[2] + tone[3]], L(3)),
+    L(4) + ' ' + joinLink((en ? EN.block : LINK_BLOCK)[tone[5]], L(5)),
+    (en ? EN.closeLove : CLOSE_LOVE)[tone[5]],
   ]
 }
