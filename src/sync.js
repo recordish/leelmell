@@ -67,11 +67,14 @@ export async function saveRemote(uid, g) {
   const email = auth.currentUser?.email
   const data = { g, ...(email ? { email } : {}), updatedAt: serverTimestamp(), platform: PLATFORM }
   const ref = doc(db, 'users', uid)
-  if (firstSave) {
-    await setDoc(ref, { ...data, createdAt: serverTimestamp() })
+  try {
+    if (firstSave) await setDoc(ref, { ...data, createdAt: serverTimestamp() })
+    else await setDoc(ref, data, { mergeFields: Object.keys(data) })
     firstSave = false
-  } else {
-    await setDoc(ref, data, { mergeFields: Object.keys(data) })
+  } catch (e) {
+    // 새 규칙(createdAt · platform)이 아직 게시되지 않았으면 예전 형식으로 저장합니다
+    if (e.code !== 'permission-denied') throw e
+    await setDoc(ref, { g, ...(email ? { email } : {}), updatedAt: serverTimestamp() })
   }
 }
 
