@@ -48,6 +48,6 @@ npm run build    # dist/ 에 빌드
 
 ## Firebase 설정 (처음 한 번)
 
-1. Firebase 콘솔에서 프로젝트를 만들고 **웹 앱** 추가 → `firebaseConfig` 값을 `.env.production` 에 넣기 (비워 두면 로그인 없이 기기 저장만)
+1. Firebase 프로젝트: `leelmell-1a2ab` (설정값은 `.env.production`. 비우면 로그인 없이 기기 저장만)
 2. Authentication → 로그인 방법 → **Google** 사용, 승인된 도메인에 `recordishapp.com`
 3. Firestore Database 만들기 → 규칙에 `firestore.rules` 붙여 넣고 게시
