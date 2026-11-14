@@ -266,3 +266,6 @@ body.love-bg{background:#F7A3C9}
 .locker_page .foot_links{margin:22px 20px 140px;text-align:center;font-size:12px;color:#8a93a8}
 .locker_page .foot_links a{color:#616D87;text-decoration:underline}
 .locker_page .foot_links span{margin:0 8px}
+
+/* 행운의 번호 제목 */
+.popupSixNumbers .lotto_title{position:absolute;left:0;right:0;top:16px;margin:0;padding:0 12px;text-align:center;font-size:15px;font-weight:700;line-height:1.5;color:#2b3140}

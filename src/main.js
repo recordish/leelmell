@@ -384,7 +384,7 @@ function visitorsHtml(v) {
   if (v.kimim !== undefined) h += `<span class="seaurchin" data-point="${v.kimim}"></span>`
   if (v.lotto) {
     h += `<span class="sealionPink"></span><div class="whitedimm"></div>
-<div class="popupSixNumbers">${v.lotto.map((n) => `<span>${n}</span>`).join('')}<strong class="cnt">6</strong></div>`
+<div class="popupSixNumbers"><p class="lotto_title">${t('lottoTitle')}</p>${v.lotto.map((n) => `<span>${n}</span>`).join('')}<strong class="cnt">6</strong></div>`
   } else if (v.sealion) {
     h += `<span class="sealion" data-point="${v.sealion}"></span>`
   }
