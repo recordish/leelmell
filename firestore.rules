@@ -11,10 +11,32 @@ service cloud.firestore {
       allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
       allow delete: if signedIn() && request.auth.uid == uid;
       allow create, update: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['g', 'email', 'updatedAt'])
+        && request.resource.data.keys().hasOnly(['g', 'email', 'updatedAt', 'createdAt', 'platform'])
         && request.resource.data.updatedAt == request.time
+        && (!('platform' in request.resource.data) || request.resource.data.platform in ['app', 'web'])
+        && validCreatedAt()
         && (!('email' in request.resource.data) || request.resource.data.email == request.auth.token.email)
         && validGame(request.resource.data.g);
+    }
+
+    // 가입 시간: 처음 만들 때만 지금 시간으로 쓰고, 그 뒤로는 바꿀 수 없습니다 (예전 계정은 비어 있음)
+    function validCreatedAt() {
+      return resource == null
+        ? (!('createdAt' in request.resource.data) || request.resource.data.createdAt == request.time)
+        : (('createdAt' in resource.data && request.resource.data.get('createdAt', null) == resource.data.createdAt)
+          || (!('createdAt' in resource.data) && !('createdAt' in request.resource.data)));
+    }
+
+    // 하루 접속 수: 누구나 하루 한 번 app 또는 web 을 1씩만 올릴 수 있고, 읽기는 관리자만
+    match /visits/{day} {
+      allow read: if isAdmin();
+      allow create: if day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && ((request.resource.data.keys().hasOnly(['app']) && request.resource.data.app == 1)
+          || (request.resource.data.keys().hasOnly(['web']) && request.resource.data.web == 1));
+      allow update: if (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['app'])
+          && request.resource.data.app == resource.data.get('app', 0) + 1)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['web'])
+          && request.resource.data.web == resource.data.get('web', 0) + 1);
     }
 
     // 관리자 목록: 본인이 관리자인지만 확인할 수 있습니다

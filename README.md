@@ -52,15 +52,16 @@ npm run build    # dist/ 에 빌드
 2. Authentication → 로그인 방법 → **Google** 사용, 승인된 도메인에 `recordishapp.com`
 3. Firestore Database 만들기 → 규칙에 `firestore.rules` 붙여 넣고 게시
 
-## 관리자 페이지 (`#admin`)
+## 관리자 페이지 (https://trimarrai.github.io/admin/)
 
-메뉴에는 없고 `https://recordishapp.com/leelmell/#admin` 주소로만 들어갑니다.
+별도 저장소 `trimarrai/trimarrai.github.io` 의 `admin/` 에 있습니다 (같은 Firebase 프로젝트). 앱에는 들어가지 않고, 예전 `#admin` 주소는 새 주소로 안내만 합니다. 주소 끝에 `?demo` 를 붙이면 예시 데이터로 화면만 봅니다.
 
-- **통계**: 가입자, 최근 7일 접속, 오늘 3장·연애 타로, 오늘 기도 수, 30일 많이 나온 카드 (로그인한 사용자 기준. 기도 내용은 보이지 않습니다)
-- **사용자 찾기 · 재화 지급**: 이메일로 찾아 크리스탈·천연석을 보내거나(음수면 차감) 기록을 봅니다. 사용자가 다음에 앱을 열 때 `gifts` 에서 받아 갑니다
-- **쿠폰**: 코드·보상·최대 사용 수를 정해 만들고 멈출 수 있습니다. 사용자는 사물함에서 코드를 넣고, 한 사람당 한 번씩 받습니다
+- **접속**: 하루 접속 기기 수(로그인 안 한 사람 포함, 기기마다 하루 한 번 `visits/{날짜}` 의 app·web 을 +1), 최근 7일, 오늘 로그인 사용자, 앱·웹 비율, 14·30·90일 그래프, 최근 접속한 사용자
+- **가입**: 오늘·이번 달·전체 가입, 가입 7일 뒤에도 접속한 비율, 하루 가입 그래프, 새로 가입한 사용자 (`users/{uid}.createdAt`. 예전 계정은 처음 타로를 본 날로 추정)
+- **사용자**: 이용 통계, 이메일로 찾아 크리스탈·천연석 지급(음수면 차감) — 사용자가 다음에 앱을 열 때 `gifts` 에서 받아 감
+- **쿠폰**: 만들기, 멈추기·다시 켜기. 사용자는 사물함에서 코드를 넣고 한 사람당 한 번씩 받습니다
 
-관리자 등록 (한 번만): `firestore.rules` 를 콘솔에 게시한 뒤, 관리자 계정으로 로그인해 `#admin` 에 나오는 계정 ID를 복사 → Firestore 에 컬렉션 `admins`, 문서 ID = 계정 ID, 필드 `role` = `owner` 로 만듭니다.
+준비 (한 번만): Firebase 콘솔 → Authentication → 설정 → 승인된 도메인에 `trimarrai.github.io` 추가, `firestore.rules` 게시, Firestore 에 컬렉션 `admins` / 문서 ID = 관리자 계정 ID / 필드 `role` = `owner`.
 
 ## 안드로이드 앱 (Google Play `com.leelmell.app`)
 

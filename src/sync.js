@@ -1,5 +1,7 @@
 // Firebase: Google 로그인 + 계정 저장. 설정값(.env.production)이 있을 때만 main.js 가 불러옵니다.
-// 계정 데이터는 users/{uid} 문서 하나에 { g: 게임 상태, email, updatedAt } 로 저장합니다 (email 은 관리자 페이지에서 찾을 때 씀).
+// 계정 데이터는 users/{uid} 문서 하나에 { g: 게임 상태, email, updatedAt, createdAt, platform } 로 저장합니다
+// (email 은 관리자 페이지에서 찾을 때, createdAt 은 신규 가입 통계, platform 은 앱/웹 구분에 씀).
+// 관리자 페이지는 따로 있습니다: https://trimarrai.github.io/admin/
 import { Capacitor } from '@capacitor/core'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics, isSupported } from 'firebase/analytics'
@@ -9,7 +11,7 @@ import {
 } from 'firebase/auth'
 import {
   addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, runTransaction,
-  serverTimestamp, setDoc, updateDoc, where,
+  increment, serverTimestamp, setDoc, updateDoc, where,
 } from 'firebase/firestore/lite'
 
 const app = initializeApp({
@@ -51,14 +53,34 @@ export const signOutUser = async () => {
   return signOut(auth)
 }
 
+const PLATFORM = NATIVE ? 'app' : 'web'
+let firstSave = false // 계정 문서가 아직 없으면 처음 저장할 때 가입 시간을 남깁니다
+
 export async function loadRemote(uid) {
   const snap = await getDoc(doc(db, 'users', uid))
+  firstSave = !snap.exists()
   return snap.exists() ? snap.data().g : null
 }
 
-export function saveRemote(uid, g) {
+// 가입 시간(createdAt)은 처음 한 번만 쓰고, 그 뒤로는 나머지 필드만 바꿉니다
+export async function saveRemote(uid, g) {
   const email = auth.currentUser?.email
-  return setDoc(doc(db, 'users', uid), { g, ...(email ? { email } : {}), updatedAt: serverTimestamp() })
+  const data = { g, ...(email ? { email } : {}), updatedAt: serverTimestamp(), platform: PLATFORM }
+  const ref = doc(db, 'users', uid)
+  if (firstSave) {
+    await setDoc(ref, { ...data, createdAt: serverTimestamp() })
+    firstSave = false
+  } else {
+    await setDoc(ref, data, { mergeFields: Object.keys(data) })
+  }
+}
+
+// 하루 접속 수: 기기마다 하루 한 번, visits/{날짜} 의 app 또는 web 을 1 올립니다 (로그인하지 않아도)
+export async function countVisit(day) {
+  const KEY = 'leelmell.visit'
+  try { if (localStorage.getItem(KEY) === day) return } catch { return }
+  await setDoc(doc(db, 'visits', day), { [PLATFORM]: increment(1) }, { merge: true })
+  try { localStorage.setItem(KEY, day) } catch { /* 무시 */ }
 }
 
 // 계정 데이터와 로그인 계정을 지웁니다. Firebase 가 최근 로그인을 요구하면 한 번 더 로그인합니다
@@ -112,41 +134,4 @@ export async function redeemCoupon(code) {
     if (e.code === 'permission-denied') return { ok: false, why: 'none' }
     throw e
   }
-}
-
-// ---------- 관리자 ----------
-// admins/{uid} 문서가 있는 계정만 관리자입니다 (Firebase 콘솔에서 직접 만듭니다)
-export async function isAdmin(uid) {
-  try {
-    return (await getDoc(doc(db, 'admins', uid))).exists()
-  } catch {
-    return false
-  }
-}
-
-export async function adminUsers() {
-  const snap = await getDocs(collection(db, 'users'))
-  return snap.docs.map((d) => ({ uid: d.id, email: d.data().email || '', g: d.data().g || {}, updatedAt: d.data().updatedAt?.toDate?.() || null }))
-}
-
-export async function adminGift(uid, stones, crystals, note) {
-  await addDoc(collection(db, 'gifts'), { uid, stones, crystals, note: note || '', claimed: false, at: serverTimestamp(), by: auth.currentUser.uid })
-}
-
-export async function adminGifts(uid) {
-  const snap = await getDocs(query(collection(db, 'gifts'), where('uid', '==', uid)))
-  return snap.docs.map((d) => ({ id: d.id, ...d.data(), at: d.data().at?.toDate?.() || null })).sort((a, b) => (b.at || 0) - (a.at || 0))
-}
-
-export async function adminCoupons() {
-  const snap = await getDocs(collection(db, 'coupons'))
-  return snap.docs.map((d) => ({ code: d.id, ...d.data() })).sort((a, b) => a.code.localeCompare(b.code))
-}
-
-export async function adminSaveCoupon(code, v) {
-  await setDoc(doc(db, 'coupons', code), { stones: v.stones, crystals: v.crystals, maxUses: v.maxUses, uses: v.uses || 0, active: v.active })
-}
-
-export async function adminSetCouponActive(code, active) {
-  await updateDoc(doc(db, 'coupons', code), { active })
 }

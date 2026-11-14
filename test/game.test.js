@@ -241,22 +241,6 @@ test('쿠폰·운영자 지급: 더하고 빼되 0 밑으로 내려가지 않는
   assert.equal(s.crystals, 2)
 })
 
-test('관리자 통계: 오늘 · 30일 · 많이 나온 카드', async () => {
-  const { stats } = await import('../src/admin.js')
-  const now = Date.now()
-  const users = [
-    { g: { crystals: 2, stones: 10, readings: { [D]: [{ id: 1 }, { id: 2 }, { id: 3 }], '2026-11-12': [{ id: 1 }, { id: 4 }, { id: 5 }] }, love: { [D]: {} }, prayers: [{ at: new Date(D + 'T09:00:00').getTime() }] }, updatedAt: new Date(now) },
-    { g: { crystals: 0, stones: 5, readings: {} }, updatedAt: new Date(now - 30 * 86400000) },
-  ]
-  const s = stats(users, D)
-  assert.equal(s.users, 2)
-  assert.equal(s.active7, 1)
-  assert.equal(s.tarotToday, 1)
-  assert.equal(s.loveToday, 1)
-  assert.equal(s.prayToday, 1)
-  assert.equal(s.crystals, 2)
-  assert.equal(s.topCards[0].id, 1)
-})
 
 import { restOf, REST_KEYS, ICONS } from '../src/rest.js'
 import { T as I18N } from '../src/i18n.js'
