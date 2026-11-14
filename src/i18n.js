@@ -81,7 +81,7 @@ export const T = {
     payLogin: '구매한 상품을 계정에 안전하게 보관하려면 먼저 로그인해 주세요. 설정(사물함)에서 로그인할 수 있어요.',
     payPending: '결제가 확인되는 중입니다. 결제가 끝나면 앱을 다시 열 때 받을 수 있어요.',
     payFail: '결제를 진행하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
-    quickNeed: (n, k) => '크리스탈이 <b>' + n + '개</b> 부족해요.<br>지금 바로 채우고 ' + { chambre: '릴멜을 만나 볼까요?', love: '율리움을 만나 볼까요?', color: '오늘의 행운의 색상을 볼까요?' }[k],
+    quickNeed: (n, k) => '크리스탈이 <b>' + n + '개</b> 부족해요.<br>지금 바로 채우고 ' + { chambre: '릴멜을 만나 볼까요?', love: '율리움을 만나 볼까요?', color: '오늘의 행운의 색상을 볼까요?', rps: '율리움과 가위바위보를 할까요?', lotto: '행운의 번호를 열어 볼까요?' }[k],
     quickNote: '구매하면 바로 이어서 진행돼요',
     payOk: (r) => '구매해 주셔서 고맙습니다. ' + r + '을 받았습니다.',
     items: {
@@ -214,7 +214,7 @@ export const T = {
     payLogin: 'Please sign in first so your purchase is kept safe in your account. You can sign in from Settings (Locker).',
     payPending: 'Your payment is being confirmed. Once it completes, you will receive it the next time you open the app.',
     payFail: 'The payment could not be completed. Please try again in a moment.',
-    quickNeed: (n, k) => 'You need <b>' + n + ' more crystal' + (n > 1 ? 's' : '') + '</b>.<br>Top up now and ' + { chambre: 'meet Leelmell?', love: 'meet Ulyooum?', color: 'see your lucky color?' }[k],
+    quickNeed: (n, k) => 'You need <b>' + n + ' more crystal' + (n > 1 ? 's' : '') + '</b>.<br>Top up now and ' + { chambre: 'meet Leelmell?', love: 'meet Ulyooum?', color: 'see your lucky color?', rps: 'play rock-paper-scissors with Ulyooum?', lotto: 'open your lucky number?' }[k],
     quickNote: 'You will continue right after buying',
     payOk: (r) => 'Thank you for your purchase. You got ' + r + '.',
     items: {
@@ -347,7 +347,7 @@ export const T = {
     payLogin: '購入したアイテムをアカウントに安全に保管するため、先にログインしてください。設定（ロッカー）からログインできます。',
     payPending: '決済を確認しています。決済が完了したら、次にアプリを開いたときに受け取れます。',
     payFail: '決済を進められませんでした。しばらくしてからもう一度お試しください。',
-    quickNeed: (n, k) => 'クリスタルが<b>' + n + '個</b>足りません。<br>今すぐ補充して' + { chambre: 'リルメルに会いましょうか？', love: 'ユリウムに会いましょうか？', color: '今日のラッキーカラーを見ましょうか？' }[k],
+    quickNeed: (n, k) => 'クリスタルが<b>' + n + '個</b>足りません。<br>今すぐ補充して' + { chambre: 'リルメルに会いましょうか？', love: 'ユリウムに会いましょうか？', color: '今日のラッキーカラーを見ましょうか？', rps: 'ユリウムとじゃんけんしましょうか？', lotto: 'ラッキーナンバーを開けてみましょうか？' }[k],
     quickNote: '購入するとそのまま続けられます',
     payOk: (r) => 'ご購入ありがとうございます。' + r + 'を受け取りました。',
     items: {

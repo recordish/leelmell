@@ -531,11 +531,13 @@ function pop03(id, html, price) {
   openPop()
 }
 // 크리스탈이 모자랄 때: 앱에서는 그 자리에서 바로 사고 하던 일을 이어서 합니다
-const QUICK_COST = { chambre: 1, color: 1, love: G.LOVE_COST }
-function quickPop(kind) {
+const QUICK_COST = { chambre: 1, color: 1, love: G.LOVE_COST, lotto: 1 }
+let rpsPending = 0 // 바로 사는 창을 띄운 가위바위보의 크리스탈 수
+let lottoPending = null // 바로 사는 창을 띄운 행운의 번호 공
+function quickPop(kind, cost = QUICK_COST[kind]) {
   resetPop()
   const p = $('.pop01')
-  const need = Math.max(1, QUICK_COST[kind] - S.g.crystals)
+  const need = Math.max(1, cost - S.g.crystals)
   const pay = (id, img, name, price, extra) =>
     `<a href="#" data-act="pay" data-pdt="${id}">${extra}<img src="assets/img/${img}.webp" alt=""><span class="obj">${name}</span><span class="price">${playPrice[id] || price}</span></a>`
   p.classList.add('quick')
@@ -615,6 +617,7 @@ document.addEventListener('click', (e) => {
   }
   if (el.matches('.popupSixNumbers span') && !el.classList.contains('took')) {
     const r = G.lottoOpen(S.g)
+    if (!r.ok && NATIVE_APP) { lottoPending = el; return quickPop('lotto') }
     if (!r.ok) return pop02(t('noCrystal'), 'kimim')
     save()
     el.classList.add('took')
@@ -772,7 +775,25 @@ function seeColor() {
   const c = $('.todayColorResult')
   if (c) c.style.display = 'block'
 }
-const CONTINUE = { chambre: enterChambre, love: enterLove, color: seeColor }
+const CONTINUE = {
+  chambre: enterChambre,
+  love: enterLove,
+  color: seeColor,
+  // 가위바위보: 결투 신청 창을 다시 열고 바로 받아 줍니다
+  rps: () => {
+    if (!rpsPending) return
+    rps = { ticket: rpsPending, step: 'ask' }
+    rpsPending = 0
+    pop02(t('rpsAsk'), 'war01')
+    rpsAccept()
+  },
+  // 행운의 번호: 누른 공을 이어서 엽니다
+  lotto: () => {
+    const el = lottoPending
+    lottoPending = null
+    if (el && el.isConnected && !el.classList.contains('took')) el.click()
+  },
+}
 
 function buy(id) {
   const r = G.buyItem(S.g, id, Date.now())
@@ -792,7 +813,13 @@ function lab(kind) {
 
 function rpsAccept() {
   const r = G.rpsAccept(S.g, rps.ticket)
-  if (!r.ok) { rps = null; closePop(); return pop02(t('noCrystal'), 'kimim') }
+  if (!r.ok) {
+    const ticket = rps.ticket
+    rps = null
+    closePop()
+    if (NATIVE_APP) { rpsPending = ticket; return quickPop('rps', ticket) }
+    return pop02(t('noCrystal'), 'kimim')
+  }
   save()
   rps.step = 'choose'
   const p = $('.pop01')
