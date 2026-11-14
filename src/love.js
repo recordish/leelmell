@@ -3,7 +3,7 @@
 // 각 항목은 [나의 마음, 상대의 마음, 장애] 이고, 첫 문장("당신의 마음에는 **카드**가 있습니다.")은 자동으로 붙습니다.
 import { CARDS } from './cards.js'
 import { EN } from './en.js'
-import { LINK_PN, joinLink, synLine, toneOf } from './synthesis.js'
+import { LINK_PN, SEP, TR, joinLink, synLine, toneOf } from './synthesis.js'
 
 export const HOST = '율리움' // 이 방에서 연애운을 봐 주는 분홍 바다사자
 
@@ -85,7 +85,7 @@ export const CLOSE_LOVE = {
 }
 
 export const LOVE_POS = ['나의 마음', '상대의 마음', '과거', '현재', '장애', '앞으로']
-export const lovePos = (lang = 'ko') => (lang === 'en' ? EN.pos : LOVE_POS)
+export const lovePos = (lang = 'ko') => (TR[lang] ? TR[lang].pos : LOVE_POS)
 
 // 받침이 있으면 '이', 없으면 '가'
 const iga = (word) => ((word.charCodeAt(word.length - 1) - 0xac00) % 28 ? '이' : '가')
@@ -101,6 +101,11 @@ export function loveLine(c, pos, lang = 'ko') {
     const lead = ['In your heart is', 'In their heart is', 'What stands between you is'][k]
     return `${lead} ${label}. ${(c.rev ? EN.loveRev : EN.love)[c.id][k]}`
   }
+  if (lang === 'ja') {
+    const label = `**${CARDS[c.id].name.ja}**${c.rev ? '（逆位置）' : ''}`
+    const lead = [`あなたの心には${label}があります。`, `相手の心には${label}があります。`, `ふたりの間を隔てているのは${label}です。`][k]
+    return lead + (c.rev ? TR.ja.loveRev : TR.ja.love)[c.id][k]
+  }
   const name = CARDS[c.id].name.ko
   const label = `${c.rev ? '거꾸로 선 ' : ''}**${name}**`
   const text = (c.rev ? LOVE_REV : LOVE)[c.id][k]
@@ -111,13 +116,14 @@ export function loveLine(c, pos, lang = 'ko') {
 
 // cards: [{ id, rev }] ×6 → 종합 해설 문단들
 export function loveParts(cards, lang = 'ko') {
-  const en = lang === 'en'
+  const tr = TR[lang]
+  const s = SEP(lang)
   const tone = cards.map(toneOf)
   const L = (i) => loveLine(cards[i], i, lang)
   return [
-    L(0) + ' ' + L(1) + ' ' + (en ? EN.hearts : LINK_HEARTS)[tone[0] + tone[1]],
-    L(2) + ' ' + joinLink((en ? EN.linkPN : LINK_PN)[tone[2] + tone[3]], L(3)),
-    L(4) + ' ' + joinLink((en ? EN.block : LINK_BLOCK)[tone[5]], L(5)),
-    (en ? EN.closeLove : CLOSE_LOVE)[tone[5]],
+    L(0) + s + L(1) + s + (tr ? tr.hearts : LINK_HEARTS)[tone[0] + tone[1]],
+    L(2) + s + joinLink((tr ? tr.linkPN : LINK_PN)[tone[2] + tone[3]], L(3), lang),
+    L(4) + s + joinLink((tr ? tr.block : LINK_BLOCK)[tone[5]], L(5), lang),
+    (tr ? tr.closeLove : CLOSE_LOVE)[tone[5]],
   ]
 }

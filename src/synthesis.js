@@ -4,6 +4,7 @@
 
 import { CARDS } from './cards.js'
 import { EN } from './en.js'
+import { JA } from './ja.js'
 
 export const SYN = [
   { tone: '+', // 0 바보
@@ -260,7 +261,12 @@ export const SPECIAL_PATTERN = {
 
 // ---------- 언어별 조립 ----------
 // 종합 해설 문장이 준비된 언어
-export const SYN_LANGS = ['ko', 'en']
+export const SYN_LANGS = ['ko', 'en', 'ja']
+
+// 번역문 묶음 (한국어는 이 파일의 원문을 씁니다)
+export const TR = { en: EN, ja: JA }
+// 문장 사이 띄어쓰기: 일본어는 붙여 씁니다
+export const SEP = (lang) => (lang === 'ja' ? '' : ' ')
 
 const EN_LEAD = { p: 'In your past stood', n: 'Now is the time of', f: 'Ahead of you waits' }
 const EN_IDX = { p: 0, n: 1, f: 2 }
@@ -270,27 +276,33 @@ export function synLine(c, k, lang = 'ko') {
   if (lang === 'en') {
     return `${EN_LEAD[k]} **${CARDS[c.id].name.en}**${c.rev ? ', reversed' : ''}. ${(c.rev ? EN.synRev : EN.syn)[c.id][EN_IDX[k]]}`
   }
+  if (lang === 'ja') {
+    const card = `**${CARDS[c.id].name.ja}**${c.rev ? '（逆位置）' : ''}`
+    const lead = { p: `過去には${card}がありました。`, n: `今は${card}の時です。`, f: `この先には${card}が待っています。` }[k]
+    return lead + (c.rev ? JA.synRev : JA.syn)[c.id][EN_IDX[k]]
+  }
   return (c.rev ? SYN_REV : SYN)[c.id][k]
 }
 
 export const toneOf = (c) => (c.rev ? SYN_REV : SYN)[c.id].tone
 
 // 연결 문장 뒤에 문장을 붙입니다. 쉼표로 이어질 때는 뒤 문장의 첫 글자를 소문자로 (한글은 변화 없음)
-export function joinLink(link, sentence) {
+export function joinLink(link, sentence, lang) {
+  if (lang === 'ja') return link + sentence
   return link + ' ' + (link.endsWith('.') ? sentence : sentence.charAt(0).toLowerCase() + sentence.slice(1))
 }
 
 // 이 리딩에 해당하는 특별한 조합들 → [{ good: true|false|null, text }] (최대 2개: 짝 하나 + 모양 하나)
 export function specials(cards, lang = 'ko') {
-  const en = lang === 'en'
+  const tr = TR[lang]
   const out = []
   const up = cards.map((c) => (c.rev ? -1 : c.id))
   const pos = (id) => up.indexOf(id)
   const oi = SPECIAL_ORDERED.findIndex((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) > pos(x.ids[0]))
   const pi = SPECIAL_PAIRS.findIndex((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) >= 0)
-  if (oi >= 0) out.push({ good: SPECIAL_ORDERED[oi].good, text: en ? EN.ordered[oi] : SPECIAL_ORDERED[oi].text })
-  else if (pi >= 0) out.push({ good: SPECIAL_PAIRS[pi].good, text: en ? EN.pairs[pi] : SPECIAL_PAIRS[pi].text })
-  const pat = en ? EN.pattern : SPECIAL_PATTERN
+  if (oi >= 0) out.push({ good: SPECIAL_ORDERED[oi].good, text: tr ? tr.ordered[oi] : SPECIAL_ORDERED[oi].text })
+  else if (pi >= 0) out.push({ good: SPECIAL_PAIRS[pi].good, text: tr ? tr.pairs[pi] : SPECIAL_PAIRS[pi].text })
+  const pat = tr ? tr.pattern : SPECIAL_PATTERN
   const ids = cards.map((c) => c.id)
   const tones = cards.map(toneOf).join('')
   if (ids[1] === ids[0] + 1 && ids[2] === ids[1] + 1) out.push({ good: null, text: pat.run })
@@ -304,19 +316,19 @@ export function specials(cards, lang = 'ko') {
 export function pairSpecial(a, b, lang = 'ko') {
   if (a.rev || b.rev) return null
   const i = SPECIAL_PAIRS.findIndex((x) => x.ids.includes(a.id) && x.ids.includes(b.id))
-  return i < 0 ? null : { good: SPECIAL_PAIRS[i].good, text: lang === 'en' ? EN.pairs[i] : SPECIAL_PAIRS[i].text }
+  return i < 0 ? null : { good: SPECIAL_PAIRS[i].good, text: TR[lang] ? TR[lang].pairs[i] : SPECIAL_PAIRS[i].text }
 }
 
 // cards: [{ id, rev }] ×3 (과거·현재·미래) → 해설 문단 (카드 이름은 **굵게** 표시)
 export function synthesizeParts(cards, lang = 'ko') {
-  const en = lang === 'en'
+  const tr = TR[lang]
   const [p, n, f] = cards.map(toneOf)
   return [
     synLine(cards[0], 'p', lang),
-    joinLink((en ? EN.linkPN : LINK_PN)[p + n], synLine(cards[1], 'n', lang)),
-    joinLink((en ? EN.linkNF : LINK_NF)[n + f], synLine(cards[2], 'f', lang)),
-    (en ? EN.close : CLOSE)[f],
+    joinLink((tr ? tr.linkPN : LINK_PN)[p + n], synLine(cards[1], 'n', lang), lang),
+    joinLink((tr ? tr.linkNF : LINK_NF)[n + f], synLine(cards[2], 'f', lang), lang),
+    (tr ? tr.close : CLOSE)[f],
   ]
 }
 
-export const synthesize = (cards, lang = 'ko') => synthesizeParts(cards, lang).join(' ')
+export const synthesize = (cards, lang = 'ko') => synthesizeParts(cards, lang).join(SEP(lang))
