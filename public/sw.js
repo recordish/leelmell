@@ -1,5 +1,5 @@
 // 화면(HTML·JS·CSS)은 네트워크 우선, 그림(assets·icons·vendor)은 한 번 받으면 기기에 저장해 다시 씁니다.
-const CACHE = 'leelmell-v13'
+const CACHE = 'leelmell-v14'
 
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (e) => {

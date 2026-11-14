@@ -120,4 +120,9 @@ body.love-bg{background:#F7A3C9}
 
 /* 사물함 버튼: 기존 스타일의 고정 폭(80px)을 풀어 글자 길이에 맞춤 */
 .locker_page .myinfo .email_pannel .com_btn_01{width:auto;min-width:80px;height:auto;line-height:1.4;padding:12px 18px;white-space:nowrap}
-.locker_page .myinfo .acct_btn .com_btn_01{background:#FFF;border:1px solid #c9ccd6;color:#2b3140;font-weight:600}
+/* Google 로그인 버튼 (Google 브랜드 가이드: 흰 바탕 · #747775 테두리 · 4색 G 로고) */
+.locker_page .myinfo .acct_btn .gsi{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 14px 0 12px;background:#FFF;border:1px solid #747775;border-radius:20px;color:#1F1F1F;font-size:14px;font-weight:500;letter-spacing:.25px;cursor:pointer}
+.locker_page .myinfo .acct_btn .gsi:hover{background:#F8F9FA}
+.locker_page .myinfo .acct_btn .gsi:active{background:#EEF0F2}
+.locker_page .myinfo .acct_btn .gsi .g{flex:0 0 auto}
+.locker_page .myinfo .acct_btn .gsi span{color:#1F1F1F;white-space:nowrap}
