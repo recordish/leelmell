@@ -268,9 +268,9 @@ function shopPage() {
     <li class="free10stones"><a href="#" data-act="free10"><span class="obj">${t('stones10')}</span><span class="price">Free</span></a></li>
   </ul>
   <ul class="div-payant">
-    <li class="getPdt03"><a href="#" data-act="pay"><span class="obj">${t('stones100')}</span><span class="price">${t('price1100')}</span></a></li>
-    <li class="getPdt01"><a href="#" data-act="pay"><span class="obj">${t('crystal4')}</span><span class="price">${t('price3300')}</span><span class="per">+1</span></a></li>
-    <li class="getPdt02"><a href="#" data-act="pay"><span class="obj">${t('crystal20')}</span><span class="price">${t('price9900')}</span><span class="per">+10</span></a></li>
+    <li class="getPdt03"><a href="#" data-act="pay" data-pdt="pro03"><span class="obj">${t('stones100')}</span><span class="price">${playPrice.pro03 || t('price1100')}</span></a></li>
+    <li class="getPdt01"><a href="#" data-act="pay" data-pdt="pro01"><span class="obj">${t('crystal4')}</span><span class="price">${playPrice.pro01 || t('price3300')}</span><span class="per">+1</span></a></li>
+    <li class="getPdt02"><a href="#" data-act="pay" data-pdt="pro02"><span class="obj">${t('crystal20')}</span><span class="price">${playPrice.pro02 || t('price9900')}</span><span class="per">+10</span></a></li>
   </ul>
   <span class="objBoxes"></span><span class="objCalc"></span>
   <a class="door01" href="#depot" aria-label="depot"></a>
@@ -391,6 +391,7 @@ function render() {
   const v = r.visitors ? G.rollVisitors(S.g, rng) : {}
   app.innerHTML = frame(r.cls, r.page() + visitorsHtml(v), r.exit)
   if (name === 'admin') mountAdmin($('.admin_page'), sync, user)
+  if (name === 'shop' && NATIVE_APP) loadPrices()
   renderedDay = day()
   updateGnb()
   tick()
@@ -616,7 +617,7 @@ document.addEventListener('click', (e) => {
       if (r.ok) { save(); return pop02(t('got10'), 'stone01') }
       return pop02(t('waitMin')(r.minutes), 'clock')
     }
-    case 'pay': return pop02(t('paySoon'), 'kimim')
+    case 'pay': return purchase(el.dataset.pdt)
     case 'signin': return account(() => sync.signIn())
     case 'signout': return account(() => sync.signOutUser())
     case 'delete': return confirmDelete()
@@ -771,6 +772,74 @@ async function claimGifts() {
   }
 }
 
+// ---------- 유료 상품 (앱에서만) ----------
+// 웹에서는 안내만 하고, 앱에서는 Google Play 결제 → 바로 지급 → 계정에 저장 → 소비 처리
+let billing = null
+let playPrice = {}
+let buying = false
+function loadBilling() {
+  if (!NATIVE_APP) return Promise.resolve(null)
+  billing ||= import('./billing.js').catch((e) => { console.warn('billing load failed', e); billing = null; return null })
+  return billing
+}
+
+async function purchase(id) {
+  if (!NATIVE_APP) return pop02(t('payAppOnly'), 'kimim')
+  if (!user) return pop02(t('payLogin'), 'kimim')
+  if (buying) return
+  const b = await loadBilling()
+  if (!b || !b.PRODUCTS[id] || !(await b.supported())) return pop02(t('payFail'), 'kimim')
+  buying = true
+  try {
+    const r = await b.buy(id)
+    if (r.pending) return pop02(t('payPending'), 'clock')
+    grant(b, id)
+    await b.consume(r.token).catch((e) => console.warn('consume failed', e))
+  } catch (e) {
+    // 사용자가 결제창을 닫은 경우도 여기로 옵니다
+    console.warn('purchase failed', e)
+    if (!/cancel/i.test(String(e?.message || e?.code || e))) pop02(t('payFail'), 'kimim')
+  } finally {
+    buying = false
+  }
+}
+
+function grant(b, id) {
+  const p = b.PRODUCTS[id]
+  G.addReward(S.g, p.stones, p.crystals)
+  save()
+  pop02(t('payOk')(t('reward')(p.crystals, p.stones)), p.crystals ? 'crystal01' : 'stone01')
+}
+
+// 결제는 됐는데 지급 전에 앱이 꺼졌거나, 대기 중이던 결제가 끝난 것을 받아 줍니다
+let recovering = false
+async function recoverPurchases() {
+  if (!NATIVE_APP || recovering || buying) return
+  recovering = true
+  try {
+    const b = await loadBilling()
+    if (!b || !(await b.supported())) return
+    for (const tx of await b.unfinished()) {
+      grant(b, tx.productIdentifier)
+      await b.consume(tx.purchaseToken || tx.transactionId).catch((e) => console.warn('consume failed', e))
+    }
+  } catch (e) {
+    console.warn('purchase recovery failed', e)
+  } finally {
+    recovering = false
+  }
+}
+
+// 상점 가격을 Play 에 등록된 현지 가격으로
+async function loadPrices() {
+  const b = await loadBilling()
+  if (!b || Object.keys(playPrice).length) return
+  try {
+    playPrice = await b.prices()
+    if (route === 'shop') render()
+  } catch (e) { console.warn('price load failed', e) }
+}
+
 function account(fn) {
   if (!sync) return pop02(t('fail'), 'kimim')
   fn().catch((e) => {
@@ -815,13 +884,14 @@ window.addEventListener('resize', () => { if (route === 'cards') sizeCards() })
 document.addEventListener('visibilitychange', () => {
   // 자정이 지나 돌아오면 날짜가 바뀐 화면으로
   if (!document.hidden && (route === 'chambre' || route === 'home')) render()
-  if (!document.hidden) claimGifts()
+  if (!document.hidden) { claimGifts(); recoverPurchases() }
 })
 
 // 새로고침해도 예전 스크롤 위치로 돌아가지 않고 화면 맨 위부터 보여 줍니다
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 render()
 setInterval(tick, 1000)
+recoverPurchases()
 
 // 앱(안드로이드)은 파일을 앱 안에 담고 있어서 서비스 워커가 필요 없습니다
 if ('serviceWorker' in navigator && import.meta.env.PROD && !NATIVE_APP) {

@@ -70,3 +70,10 @@ Capacitor 로 웹앱(`dist`)을 앱 안에 담습니다. 웹을 고치면 앱도
 - 버전: 2.0.0, 버전 코드 = 200 + 실행 번호 (기존 1.1.8 = 118 보다 큼)
 - 서명: 업로드 키는 저장소 비밀값 `ANDROID_KEYSTORE_BASE64` · `ANDROID_KEYSTORE_PASSWORD` · `ANDROID_KEY_ALIAS` · `ANDROID_KEY_PASSWORD` (`.github/workflows/android.yml` 참고). 테스트 APK 는 저장소의 `android/app/debug.keystore` (비밀 아님)
 - Google 로그인: 앱에서는 기기 계정으로 로그인(Credential Manager) → Firebase. `.env.production` 의 `VITE_GOOGLE_WEB_CLIENT_ID` 와, Firebase 에 안드로이드 앱(`com.leelmell.app`) + SHA-1 등록이 필요합니다
+
+## 유료 상품 (앱에서만)
+
+- 상점의 천연석 100개(`pro03`) · 크리스탈 4+1개(`pro01`) · 크리스탈 20+10개(`pro02`). 상품 ID는 기존 앱에서 Play Console 에 등록한 것을 그대로 씁니다. 가격은 Play Console 에 적힌 가격이 그대로 보입니다
+- 웹에서는 "앱에서만 구매할 수 있어요" 안내만 나옵니다. 앱에서는 로그인해야 살 수 있습니다
+- 결제 확인 서버 없이 Play 가 구매 완료를 알려 주면 바로 지급하고 계정에 저장한 뒤 소비 처리합니다 (`src/billing.js`). 지급 전에 앱이 꺼진 구매는 다음에 앱을 열 때 받습니다
+- 서버 확인이 필요해지면 Firebase 를 Blaze 로 바꾸고 Cloud Functions 에서 구매 토큰을 확인해 `gifts` 로 지급하면 됩니다
