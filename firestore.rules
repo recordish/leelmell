@@ -39,6 +39,27 @@ service cloud.firestore {
           && request.resource.data.web == resource.data.get('web', 0) + 1);
     }
 
+    // 방문 기록: 누구나 한 줄씩 만들 수 있고(정해진 항목만), 본 화면 수(views)만 늘릴 수 있습니다. 읽기는 관리자만
+    match /hits/{id} {
+      allow read: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['ch', 'src', 'landing', 'country', 'lang', 'device', 'os', 'browser', 'first', 'views', 'at'])
+        && request.resource.data.ch in ['app', 'direct', 'search', 'sns', 'site']
+        && request.resource.data.src is string && request.resource.data.src.size() <= 60
+        && request.resource.data.landing is string && request.resource.data.landing.size() <= 20
+        && request.resource.data.country is string && request.resource.data.country.size() <= 3
+        && request.resource.data.lang is string && request.resource.data.lang.size() <= 20
+        && request.resource.data.device in ['phone', 'tablet', 'pc']
+        && request.resource.data.os is string && request.resource.data.os.size() <= 12
+        && request.resource.data.browser is string && request.resource.data.browser.size() <= 12
+        && request.resource.data.first is bool
+        && request.resource.data.views == 1
+        && request.resource.data.at == request.time;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+        && request.resource.data.views is int
+        && request.resource.data.views > resource.data.views
+        && request.resource.data.views <= 999;
+    }
+
     // 관리자 목록: 본인이 관리자인지만 확인할 수 있습니다
     match /admins/{uid} {
       allow get: if signedIn() && request.auth.uid == uid;
