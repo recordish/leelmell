@@ -671,7 +671,7 @@ document.addEventListener('click', (e) => {
     case 'pray': {
       const r = G.pray(S.g, +$('.tribute_amount').value, $('#pray_text').value, Date.now())
       if (!r.ok) return r.why === 'empty' ? pop02(t('prayEmpty'), 'kimim') : needPop(r.why)
-      save()
+      save(); stat('pray')
       document.body.classList.remove('begin-pray')
       document.body.classList.add('end-pray')
       $('.sec-pray .done').style.display = 'block'
@@ -759,16 +759,19 @@ function finishCards() {
   }
 }
 
+// 하루 합계에 1 더하기 (관리자 통계용, 실패해도 무시)
+const stat = (...fields) => { sync?.bump(fields).catch(() => {}) }
+
 function enterChambre() {
   const r = G.drawTarot(S.g, day(), rng)
   // 릴멜의 방은 천연석 수와 관계없이 실험실로 안내합니다 (바로 구매 창 없음)
   if (!r.ok) return r.why === 'done' || r.why === 'rest' ? render() : pop01(t('needLab'), t('goLab'), '#lab', 'popup_bg_03')
-  save(); opened = 0; location.hash = '#cards'
+  save(); stat('tarot'); opened = 0; location.hash = '#cards'
 }
 function enterLove() {
   const r = G.drawLove(S.g, day(), rng)
   if (!r.ok) return needPop(r.why, 'love')
-  save(); opened = 0; location.hash = '#lovecards'
+  save(); stat('love'); opened = 0; location.hash = '#lovecards'
 }
 function seeColor() {
   const r = G.seeColor(S.g, day())
@@ -912,10 +915,10 @@ async function purchase(id) {
     if (r.pending) return pop02(t('payPending'), 'clock')
     if (next && CONTINUE[next]) {
       // 바로 사는 창에서 샀으면 고맙다는 창 대신 하던 일을 이어서 합니다
-      grant(b, id, true)
+      grant(b, id, true, r.order)
       closePop()
       CONTINUE[next]()
-    } else grant(b, id)
+    } else grant(b, id, false, r.order)
     await b.consume(r.token).catch((e) => console.warn('consume failed', e))
   } catch (e) {
     // 사용자가 결제창을 닫은 경우도 여기로 옵니다
@@ -926,10 +929,12 @@ async function purchase(id) {
   }
 }
 
-function grant(b, id, quiet) {
+function grant(b, id, quiet, order) {
   const p = b.PRODUCTS[id]
   G.addReward(S.g, p.stones, p.crystals)
   save()
+  // 결제 기록 (관리자 매출). 실패해도 지급에는 영향 없음
+  b.priceOf(id).then((x) => sync?.logPurchase(id, x.price, x.currency, order)).catch((e) => console.warn('purchase log failed', e))
   if (!quiet) pop02(t('payOk')(t('rewardOf')(p.crystals, p.stones)), p.crystals ? 'crystal01' : 'stone01')
 }
 
@@ -942,7 +947,7 @@ async function recoverPurchases() {
     const b = await loadBilling()
     if (!b || !(await b.supported())) return
     for (const tx of await b.unfinished()) {
-      grant(b, tx.productIdentifier)
+      grant(b, tx.productIdentifier, false, tx.orderId)
       await b.consume(tx.purchaseToken || tx.transactionId).catch((e) => console.warn('consume failed', e))
     }
   } catch (e) {

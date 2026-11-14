@@ -54,6 +54,17 @@ export const signOutUser = async () => {
 }
 
 const PLATFORM = NATIVE ? 'app' : 'web'
+const pad2 = (n) => String(n).padStart(2, '0')
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}` }
+const key = (s) => String(s || '').replace(/[^A-Za-z0-9]/g, '_').slice(0, 60)
+
+// 하루 합계: daily/{날짜} 의 칸마다 1씩(금액은 그만큼) 더합니다. 관리자 페이지는 이 합계만 읽어 빨리 열립니다
+export function bump(fields, amounts = {}, day = today()) {
+  const data = {}
+  for (const f of fields) if (f) data[f] = increment(1)
+  for (const [f, n] of Object.entries(amounts)) if (f && n) data[f] = increment(n)
+  return setDoc(doc(db, 'daily', day), data, { merge: true })
+}
 let firstSave = false // 계정 문서가 아직 없으면 처음 저장할 때 가입 시간을 남깁니다
 
 export async function loadRemote(uid) {
@@ -68,8 +79,10 @@ export async function saveRemote(uid, g) {
   const data = { g, ...(email ? { email } : {}), updatedAt: serverTimestamp(), platform: PLATFORM }
   const ref = doc(db, 'users', uid)
   try {
-    if (firstSave) await setDoc(ref, { ...data, createdAt: serverTimestamp() })
-    else await setDoc(ref, data, { mergeFields: Object.keys(data) })
+    if (firstSave) {
+      await setDoc(ref, { ...data, createdAt: serverTimestamp() })
+      bump(['signup', 'signup_' + PLATFORM]).catch(() => {})
+    } else await setDoc(ref, data, { mergeFields: Object.keys(data) })
     firstSave = false
   } catch (e) {
     // 새 규칙(createdAt · platform)이 아직 게시되지 않았으면 예전 형식으로 저장합니다
@@ -81,6 +94,8 @@ export async function saveRemote(uid, g) {
 // 방문 기록: 앱을 열 때마다 hits 에 한 줄 (유입 채널 · 첫 화면 · 국가 추정 · 언어 · 기기). 본 화면 수는 views 로 올립니다
 export async function startHit(info) {
   const ref = await addDoc(collection(db, 'hits'), { ...info, views: 1, at: serverTimestamp() })
+  bump(['h', 'ch_' + info.ch, info.src ? 'src_' + key(info.ch + '_' + info.src) : '', 'c_' + (info.country || 'xx'),
+    'l_' + key(String(info.lang).slice(0, 2) || 'xx'), 'dv_' + (info.ch === 'app' ? 'app' : info.device), 'p_' + key(info.landing)]).catch(() => {})
   return ref.id
 }
 export const setHitViews = (id, views) => updateDoc(doc(db, 'hits', id), { views })
@@ -89,7 +104,7 @@ export const setHitViews = (id, views) => updateDoc(doc(db, 'hits', id), { views
 export async function countVisit(day) {
   const KEY = 'leelmell.visit'
   try { if (localStorage.getItem(KEY) === day) return } catch { return }
-  await setDoc(doc(db, 'visits', day), { [PLATFORM]: increment(1) }, { merge: true })
+  await bump(['v_' + PLATFORM], {}, day)
   try { localStorage.setItem(KEY, day) } catch { /* 무시 */ }
 }
 
@@ -144,4 +159,14 @@ export async function redeemCoupon(code) {
     if (e.code === 'permission-denied') return { ok: false, why: 'none' }
     throw e
   }
+}
+
+// 결제 기록: 앱에서 결제가 끝나면 purchases 에 한 줄 (상품 · Play 가 알려 준 가격 · 통화 · 주문번호). 매출 합계도 더합니다
+export async function logPurchase(product, price, currency, order) {
+  const u = auth.currentUser
+  if (!u) return
+  const p = Math.max(0, Math.round((Number(price) || 0) * 100) / 100)
+  const cur = String(currency || '').slice(0, 3).toUpperCase()
+  await addDoc(collection(db, 'purchases'), { uid: u.uid, ...(u.email ? { email: u.email } : {}), product, price: p, currency: cur, order: String(order || '').slice(0, 100), at: serverTimestamp() })
+  bump(['buy', 'buy_' + product], cur ? { ['rev_' + key(cur)]: p } : {}).catch(() => {})
 }
