@@ -230,3 +230,12 @@ body.love-bg{background:#F7A3C9}
 .shop2 .div-free li a .obj{font-size:12px}
 .shop2 .div-free li a .price{height:28px;line-height:28px;font-size:13px}
 .shop2 .div-free li .tag{top:6px;left:6px;font-size:10px}
+
+/* 릴멜이 쉬는 날 */
+.chambre_page.resting{background:none;padding-top:150px}
+.chambre_page .rest{padding:8px 0 10px}
+.chambre_page .rest .ico{width:128px;height:128px;margin:0 auto 14px}
+.chambre_page .rest .ico svg{width:100%;height:100%;display:block}
+.chambre_page .rest .badge{display:inline-block;margin:0 0 14px;padding:3px 12px;border-radius:12px;background:#6A32AB;color:#FFF;font-size:13px;font-weight:700}
+.chambre_page .rest .why{margin:0 0 14px;font-size:17px;font-weight:700;line-height:160%;color:#2b3140;word-break:keep-all}
+.chambre_page .rest .sub{margin:0;font-size:14px;color:#5a5f70}
