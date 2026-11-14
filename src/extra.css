@@ -174,7 +174,7 @@ body.love-bg{background:#F7A3C9}
 .shop2 .div-free li{flex:0 0 116px;width:116px}
 .shop2 .div-free li a{width:100% !important;height:170px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden}
 .shop2 .div-free li a .price{margin-top:auto}
-.shop2 .div-payant{top:276px;left:14px;right:14px;width:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.shop2 .div-payant{top:250px;left:14px;right:14px;width:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .shop2 li{display:block;margin:0}
 .shop2 li a{width:auto;padding:22px 6px 10px;border:0;border-radius:14px;background:#8B7CF3 !important;color:#FFF}
 .shop2 li a:after{display:none}
@@ -269,3 +269,8 @@ body.love-bg{background:#F7A3C9}
 
 /* 행운의 번호 제목 */
 .popupSixNumbers .lotto_title{position:absolute;left:0;right:0;top:16px;margin:0;padding:0 12px;text-align:center;font-size:15px;font-weight:700;line-height:1.5;color:#2b3140}
+
+/* 상점: 문을 살짝 작게, 짧은 화면에서는 무료 카드 아래 빈 곳으로 · 성게는 문 반대편(왼쪽 아래) */
+.shop2 .door01{transform:scale(.9);transform-origin:right bottom}
+@media (max-height:670px){.shop2 .door01{top:174px;bottom:auto;right:24px;transform:scale(.68);transform-origin:right top}}
+.wrap.shop .seaurchin{right:auto;left:20px}
