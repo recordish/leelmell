@@ -761,7 +761,8 @@ function finishCards() {
 
 function enterChambre() {
   const r = G.drawTarot(S.g, day(), rng)
-  if (!r.ok) return needPop(r.why, 'chambre')
+  // 릴멜의 방은 천연석 수와 관계없이 실험실로 안내합니다 (바로 구매 창 없음)
+  if (!r.ok) return r.why === 'done' || r.why === 'rest' ? render() : pop01(t('needLab'), t('goLab'), '#lab', 'popup_bg_03')
   save(); opened = 0; location.hash = '#cards'
 }
 function enterLove() {
