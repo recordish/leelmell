@@ -6,8 +6,8 @@ import { CARDS } from './cards.js'
 import { REVERSED } from './reversed.js'
 import { LANGS, T } from './i18n.js'
 import * as G from './game.js'
-import { pairSpecial, specials, synthesizeParts } from './synthesis.js'
-import { LOVE_POS, loveLine, loveParts } from './love.js'
+import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
+import { loveLine, lovePos, loveParts } from './love.js'
 
 const KEY = 'leelmell.v2'
 const FIREBASE_ON = !!import.meta.env.VITE_FIREBASE_API_KEY
@@ -165,12 +165,13 @@ function meaning(p) {
 </li>`
 }
 
-// 세 장의 연관성 해설 (지금은 한국어만 준비되어 있습니다)
+// 세 장의 연관성 해설과 연애 타로는 문장이 준비된 언어(한국어·영어)에서만 나옵니다
+const hasSyn = () => SYN_LANGS.includes(S.lang)
 const bold = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
 function synthesisHtml(cards) {
-  if (S.lang !== 'ko') return ''
-  const sp = specials(cards).map((x) => `<div class="special ${x.good === true ? 'good' : x.good === false ? 'bad' : 'rare'}"><h4>${t('specialTitle')}</h4><p>${bold(x.text)}</p></div>`).join('')
-  return `<div class="synthesis hidden"><h4>${t('synTitle')}</h4>${synthesizeParts(cards).map((x) => `<p>${bold(x)}</p>`).join('')}${sp}</div>`
+  if (!hasSyn()) return ''
+  const sp = specials(cards, S.lang).map((x) => `<div class="special ${x.good === true ? 'good' : x.good === false ? 'bad' : 'rare'}"><h4>${t('specialTitle')}</h4><p>${bold(x.text)}</p></div>`).join('')
+  return `<div class="synthesis hidden"><h4>${t('synTitle')}</h4>${synthesizeParts(cards, S.lang).map((x) => `<p>${bold(x)}</p>`).join('')}${sp}</div>`
 }
 
 // 카드 화면: 과거 → 현재 → 미래 순서로 한 장씩 뒤집어 해석을 보고, 마지막에 종합 해설
@@ -209,25 +210,26 @@ function lovePage() {
 function loveMeaning(p, i) {
   const c = CARDS[p.id]
   const src = p.rev ? REVERSED[p.id] : c
-  const text = esc(src.text.ko).replace(/\n/g, '<br />')
-  const tags = src.tags.ko.map((x) => '#' + esc(x)).join(' ')
+  const text = esc(src.text[S.lang]).replace(/\n/g, '<br />')
+  const tags = src.tags[S.lang].map((x) => '#' + esc(x)).join(' ')
   return `<li class="hidden">
-  <h4 class="${p.rev ? 'rev' : ''}" style="--img:url(${new URL(img(p.id), location.href).href})">${LOVE_POS[i]} · ${esc(c.name.ko)}${p.rev ? ` <small>${t('rev')}</small>` : ''}</h4>
-  <p>${bold(loveLine(p, i))}</p>
+  <h4 class="${p.rev ? 'rev' : ''}" style="--img:url(${new URL(img(p.id), location.href).href})">${lovePos(S.lang)[i]} · ${esc(c.name[S.lang])}${p.rev ? ` <small>${t('rev')}</small>` : ''}</h4>
+  <p>${bold(loveLine(p, i, S.lang))}</p>
   <details><summary>${t('loveDetail')}</summary><p>${text}<br /><br />${tags}</p></details>
 </li>`
 }
 
 function loveCardsPage() {
   const cards = S.g.love[day()].cards
-  const pair = pairSpecial(cards[0], cards[1])
+  const pair = pairSpecial(cards[0], cards[1], S.lang)
+  const pos = lovePos(S.lang)
   return `<div class="tarotRoom" style="background-image:url(assets/img/ic_sealion_pink_big_01.png)"><div class="room"><div class="card_table" style="display:block">
   <p class="todaydate">${t('dateFmt')(new Date())}</p>
-  <div class="result">${cards.map((p, i) => `<span class="${p.rev ? 'rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${LOVE_POS[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
+  <div class="result">${cards.map((p, i) => `<span class="${p.rev ? 'rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${pos[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
   <p class="flipGuide"></p>
   <div class="holytable"><ul>${cards.map(loveMeaning).join('')}</ul></div>
   <p class="readcards" style="display:none"><a href="#" data-act="next"></a></p>
-  <div class="synthesis hidden"><h4>${t('loveSynTitle')}</h4>${loveParts(cards).map((x) => `<p>${bold(x)}</p>`).join('')}${pair ? `<div class="special ${pair.good ? 'good' : 'bad'}"><h4>${t('specialTitle')}</h4><p>${bold(pair.text)}</p></div>` : ''}</div>
+  <div class="synthesis hidden"><h4>${t('loveSynTitle')}</h4>${loveParts(cards, S.lang).map((x) => `<p>${bold(x)}</p>`).join('')}${pair ? `<div class="special ${pair.good ? 'good' : 'bad'}"><h4>${t('specialTitle')}</h4><p>${bold(pair.text)}</p></div>` : ''}</div>
 </div></div></div>`
 }
 
@@ -281,7 +283,7 @@ function depotPage() {
   <ul class="luxe2">${li('in0003')}${li('in0004')}</ul>
   <span class="objMonarisa"></span>
   <a class="door01" href="#shop" aria-label="shop"></a>
-  ${S.lang === 'ko' ? `<a class="door02" href="#love" aria-label="${t('loveDoor')}"></a>` : ''}
+  ${hasSyn() ? `<a class="door02" href="#love" aria-label="${t('loveDoor')}"></a>` : ''}
 </div></div>`
 }
 
@@ -359,7 +361,7 @@ function render() {
   let name = location.hash.replace('#', '') || (S.introSeen ? 'home' : 'intro')
   if (name !== 'intro' && !ROUTES[name]) name = 'home'
   if (name === 'cards' && !S.g.readings[day()]) name = 'chambre'
-  if ((name === 'love' || name === 'lovecards') && S.lang !== 'ko') name = 'depot' // 연애 타로는 한국어만
+  if ((name === 'love' || name === 'lovecards') && !hasSyn()) name = 'depot' // 연애 타로는 한국어·영어만
   if (name === 'lovecards' && !S.g.love[day()]) name = 'love'
   route = name
   document.body.className = name === 'love' || name === 'lovecards' ? 'love-bg' : ''
@@ -620,13 +622,13 @@ const FLOWS = {
     rec: () => S.g.colors[day()],
     guide: (i) => t('flipGuide')[i],
     next: (i) => t('nextCard')[i],
-    final: () => t(S.lang === 'ko' ? 'seeSynthesis' : 'seeAll'),
+    final: () => t(hasSyn() ? 'seeSynthesis' : 'seeAll'),
   }),
   lovecards: () => ({
     n: 6,
     rec: () => S.g.love[day()],
-    guide: (i) => t('loveGuide')(LOVE_POS[i]),
-    next: (i) => t('loveNext')(LOVE_POS[i]),
+    guide: (i) => t('loveGuide')(lovePos(S.lang)[i]),
+    next: (i) => t('loveNext')(lovePos(S.lang)[i]),
     final: () => t('loveFinal'),
   }),
 }

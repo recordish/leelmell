@@ -1,6 +1,9 @@
-// 세 장의 연관성 해설 (한국어, 초안)
+// 세 장의 연관성 해설 (한국어. 영어 문장은 en.js)
 // 카드마다 정방향·역방향의 과거(p)·현재(n)·미래(f) 자리 문장을 직접 쓰고, 카드의 결(tone)에 따라 연결 문장으로 이어 붙입니다.
 // tone: '+' 밝음 · '0' 고요/전환 · '-' 시련
+
+import { CARDS } from './cards.js'
+import { EN } from './en.js'
 
 export const SYN = [
   { tone: '+', // 0 바보
@@ -255,38 +258,65 @@ export const SPECIAL_PATTERN = {
   allTrial: '세 장이 모두 시련의 카드입니다. 드물게 무거운 배열이지만, 타로는 겁을 주려는 것이 아니라 미리 준비하라고 말합니다.',
 }
 
+// ---------- 언어별 조립 ----------
+// 종합 해설 문장이 준비된 언어
+export const SYN_LANGS = ['ko', 'en']
+
+const EN_LEAD = { p: 'In your past stood', n: 'Now is the time of', f: 'Ahead of you waits' }
+const EN_IDX = { p: 0, n: 1, f: 2 }
+
+// 자리 문장 하나 (k: 'p' 과거 · 'n' 현재 · 'f' 미래)
+export function synLine(c, k, lang = 'ko') {
+  if (lang === 'en') {
+    return `${EN_LEAD[k]} **${CARDS[c.id].name.en}**${c.rev ? ', reversed' : ''}. ${(c.rev ? EN.synRev : EN.syn)[c.id][EN_IDX[k]]}`
+  }
+  return (c.rev ? SYN_REV : SYN)[c.id][k]
+}
+
+export const toneOf = (c) => (c.rev ? SYN_REV : SYN)[c.id].tone
+
+// 연결 문장 뒤에 문장을 붙입니다. 쉼표로 이어질 때는 뒤 문장의 첫 글자를 소문자로 (한글은 변화 없음)
+export function joinLink(link, sentence) {
+  return link + ' ' + (link.endsWith('.') ? sentence : sentence.charAt(0).toLowerCase() + sentence.slice(1))
+}
+
 // 이 리딩에 해당하는 특별한 조합들 → [{ good: true|false|null, text }] (최대 2개: 짝 하나 + 모양 하나)
-export function specials(cards) {
+export function specials(cards, lang = 'ko') {
+  const en = lang === 'en'
   const out = []
   const up = cards.map((c) => (c.rev ? -1 : c.id))
   const pos = (id) => up.indexOf(id)
-  const ordered = SPECIAL_ORDERED.find((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) > pos(x.ids[0]))
-  const pair = ordered || SPECIAL_PAIRS.find((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) >= 0)
-  if (pair) out.push({ good: pair.good, text: pair.text })
+  const oi = SPECIAL_ORDERED.findIndex((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) > pos(x.ids[0]))
+  const pi = SPECIAL_PAIRS.findIndex((x) => pos(x.ids[0]) >= 0 && pos(x.ids[1]) >= 0)
+  if (oi >= 0) out.push({ good: SPECIAL_ORDERED[oi].good, text: en ? EN.ordered[oi] : SPECIAL_ORDERED[oi].text })
+  else if (pi >= 0) out.push({ good: SPECIAL_PAIRS[pi].good, text: en ? EN.pairs[pi] : SPECIAL_PAIRS[pi].text })
+  const pat = en ? EN.pattern : SPECIAL_PATTERN
   const ids = cards.map((c) => c.id)
-  const tones = cards.map((c) => (c.rev ? SYN_REV : SYN)[c.id].tone).join('')
-  if (ids[1] === ids[0] + 1 && ids[2] === ids[1] + 1) out.push({ good: null, text: SPECIAL_PATTERN.run })
-  else if (cards.every((c) => c.rev)) out.push({ good: null, text: SPECIAL_PATTERN.allRev })
-  else if (tones === '+++') out.push({ good: true, text: SPECIAL_PATTERN.allBright })
-  else if (tones === '---') out.push({ good: false, text: SPECIAL_PATTERN.allTrial })
+  const tones = cards.map(toneOf).join('')
+  if (ids[1] === ids[0] + 1 && ids[2] === ids[1] + 1) out.push({ good: null, text: pat.run })
+  else if (cards.every((c) => c.rev)) out.push({ good: null, text: pat.allRev })
+  else if (tones === '+++') out.push({ good: true, text: pat.allBright })
+  else if (tones === '---') out.push({ good: false, text: pat.allTrial })
   return out
 }
 
 // 두 카드가 특별한 짝이면 그 문단 (둘 다 정방향일 때만). 연애 타로의 나의 마음 + 상대의 마음에 씁니다
-export function pairSpecial(a, b) {
+export function pairSpecial(a, b, lang = 'ko') {
   if (a.rev || b.rev) return null
-  return SPECIAL_PAIRS.find((x) => x.ids.includes(a.id) && x.ids.includes(b.id)) || null
+  const i = SPECIAL_PAIRS.findIndex((x) => x.ids.includes(a.id) && x.ids.includes(b.id))
+  return i < 0 ? null : { good: SPECIAL_PAIRS[i].good, text: lang === 'en' ? EN.pairs[i] : SPECIAL_PAIRS[i].text }
 }
 
 // cards: [{ id, rev }] ×3 (과거·현재·미래) → 해설 문단 (카드 이름은 **굵게** 표시)
-export function synthesizeParts(cards) {
-  const [p, n, f] = cards.map((c) => (c.rev ? SYN_REV : SYN)[c.id])
+export function synthesizeParts(cards, lang = 'ko') {
+  const en = lang === 'en'
+  const [p, n, f] = cards.map(toneOf)
   return [
-    p.p,
-    LINK_PN[p.tone + n.tone] + ' ' + n.n,
-    LINK_NF[n.tone + f.tone] + ' ' + f.f,
-    CLOSE[f.tone],
+    synLine(cards[0], 'p', lang),
+    joinLink((en ? EN.linkPN : LINK_PN)[p + n], synLine(cards[1], 'n', lang)),
+    joinLink((en ? EN.linkNF : LINK_NF)[n + f], synLine(cards[2], 'f', lang)),
+    (en ? EN.close : CLOSE)[f],
   ]
 }
 
-export const synthesize = (cards) => synthesizeParts(cards).join(' ')
+export const synthesize = (cards, lang = 'ko') => synthesizeParts(cards, lang).join(' ')
