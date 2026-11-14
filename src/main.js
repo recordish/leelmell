@@ -8,6 +8,7 @@ import { LANGS, T } from './i18n.js'
 import * as G from './game.js'
 import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
 import { loveLine, lovePos, loveParts } from './love.js'
+import { adminShell, mountAdmin } from './admin.js'
 
 const KEY = 'leelmell.v2'
 const FIREBASE_ON = !!import.meta.env.VITE_FIREBASE_API_KEY
@@ -66,6 +67,7 @@ const ROUTES = {
   locker: { cls: 'locker index', page: lockerPage, visitors: true },
   love: { cls: 'love index', page: lovePage },
   lovecards: { cls: 'love cards', page: loveCardsPage, exit: '#depot' },
+  admin: { cls: 'locker admin', page: adminShell }, // 메뉴에 없음. 주소로만
 }
 
 function frame(cls, inner, exit = '#parking') {
@@ -307,7 +309,9 @@ function lockerPage() {
     <dt>${t('language')}</dt>
     <dd class="langs">${LANGS.map((l) => `<button type="button" class="com_btn_01${l === S.lang ? ' on' : ''}" data-lang="${l}">${{ ko: '한국어', en: 'English', ja: '日本語' }[l]}</button>`).join(' ')}</dd>
   </dl></div></div>
-  ${user ? `<div class="escape_way"><p><a href="#" data-act="signout">${t('signOut')}</a></p></div>
+  ${user ? `<div class="myinfo coupon_pannel"><dl><dt>${t('coupon')}</dt>
+    <dd class="coupon_row"><input id="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="30" placeholder="${t('couponPh')}" /><button type="button" class="com_btn_01" data-act="coupon">${t('couponBtn')}</button></dd></dl></div>
+  <div class="escape_way"><p><a href="#" data-act="signout">${t('signOut')}</a></p></div>
   <div class="escape_way"><p><a href="#" data-act="delete">${t('deleteAccount')}</a></p></div>` : ''}
   <p class="privacy_link"><a href="privacy.html" target="_blank" rel="noopener">${t('privacy')}</a></p>
 </div>`
@@ -383,6 +387,7 @@ function render() {
   const r = ROUTES[name]
   const v = r.visitors ? G.rollVisitors(S.g, rng) : {}
   app.innerHTML = frame(r.cls, r.page() + visitorsHtml(v), r.exit)
+  if (name === 'admin') mountAdmin($('.admin_page'), sync, user)
   renderedDay = day()
   updateGnb()
   tick()
@@ -612,6 +617,7 @@ document.addEventListener('click', (e) => {
     case 'signin': return account(() => sync.signIn())
     case 'signout': return account(() => sync.signOutUser())
     case 'delete': return confirmDelete()
+    case 'coupon': return useCoupon()
   }
 })
 
@@ -728,6 +734,40 @@ function rpsChoose(mine) {
 }
 
 // ---------- 계정 (Firebase) ----------
+// 쿠폰: 코드마다 한 사람 한 번. 받은 만큼 바로 더하고 계정에 저장합니다
+function useCoupon() {
+  const code = ($('#couponCode')?.value || '').trim().toUpperCase()
+  if (!code) return pop02(t('couponEmpty'), 'kimim')
+  account(() => sync.redeemCoupon(code).then((r) => {
+    if (!r.ok) return pop02(t('coupon_' + r.why), 'kimim')
+    G.addReward(S.g, r.stones, r.crystals)
+    save()
+    $('#couponCode').value = ''
+    pop02(t('couponOk')(t('reward')(r.crystals, r.stones)), 'crystal01')
+  }))
+}
+
+// 운영자가 보낸 선물(gifts)을 받아 갑니다: 로그인했을 때와 앱으로 돌아왔을 때
+let claiming = false
+async function claimGifts() {
+  if (!sync || !user || claiming) return
+  claiming = true
+  try {
+    const got = await sync.claimGifts(user.uid)
+    if (!got.length) return
+    let ct = 0
+    let rk = 0
+    for (const x of got) { ct += x.crystals; rk += x.stones; G.addReward(S.g, x.stones, x.crystals) }
+    save()
+    if (ct > 0 || rk > 0) pop02(t('giftGot')(t('reward')(Math.max(0, ct), Math.max(0, rk))), 'crystal01')
+    else pop02(t('giftAdj'), 'kimim')
+  } catch (e) {
+    console.warn('gift claim failed', e)
+  } finally {
+    claiming = false
+  }
+}
+
 function account(fn) {
   if (!sync) return pop02(t('fail'), 'kimim')
   fn().catch((e) => {
@@ -754,13 +794,14 @@ if (FIREBASE_ON) {
           if (remote) S.g = G.mergeIntoRemote(S.g, remote)
           save()
           await m.saveRemote(u.uid, S.g)
+          await claimGifts()
         } catch (e) { console.warn('sync failed', e) }
       } else if (was) {
         // 로그아웃하면 이 기기에는 새 손님 상태로 시작합니다 (계정 재화를 다른 계정으로 옮기지 못하게)
         S.g = G.newState()
         save()
       }
-      if (route === 'locker' || !u) render()
+      if (route === 'locker' || route === 'admin' || !u) render()
       else updateGnb()
     })
   }).catch((e) => console.warn('firebase load failed', e))
@@ -771,6 +812,7 @@ window.addEventListener('resize', () => { if (route === 'cards') sizeCards() })
 document.addEventListener('visibilitychange', () => {
   // 자정이 지나 돌아오면 날짜가 바뀐 화면으로
   if (!document.hidden && (route === 'chambre' || route === 'home')) render()
+  if (!document.hidden) claimGifts()
 })
 
 // 새로고침해도 예전 스크롤 위치로 돌아가지 않고 화면 맨 위부터 보여 줍니다

@@ -126,3 +126,40 @@ body.love-bg{background:#F7A3C9}
 .locker_page .myinfo .acct_btn .gsi:active{background:#EEF0F2}
 .locker_page .myinfo .acct_btn .gsi .g{flex:0 0 auto}
 .locker_page .myinfo .acct_btn .gsi span{color:#1F1F1F;white-space:nowrap}
+
+/* ---------- 쿠폰 (사물함) ---------- */
+.locker_page .coupon_pannel{margin-top:16px;padding-bottom:6px}
+.locker_page .coupon_row{display:flex;gap:8px;align-items:center}
+.locker_page .coupon_row input{flex:1;min-width:0;height:44px;padding:0 12px;border:1px solid #c9ccd6;border-radius:8px;font-size:15px;text-transform:uppercase;user-select:text;-webkit-user-select:text}
+.locker_page .coupon_row .com_btn_01{width:auto;height:44px;line-height:44px;padding:0 16px;margin:0;border-radius:8px;background:#E2E5EB;color:#04112A;border:none;font-size:14px}
+
+/* ---------- 관리자 페이지 (#admin) ---------- */
+.wrap.admin .comCont{padding-top:130px}
+.admin_page{margin:0 16px 140px;padding:20px;background:#FFF;border-radius:12px;color:#2b3140;font-size:14px;line-height:1.6}
+.admin_page *{user-select:text;-webkit-user-select:text}
+.admin_page h2{font-size:20px;margin:0 0 12px}
+.admin_page h3{font-size:16px;margin:24px 0 10px;padding-top:16px;border-top:1px solid #e5e7ee}
+.admin_page h3 small{font-size:12px;font-weight:400;color:#7a8092;margin-left:6px}
+.admin_page p,.admin_page li{color:#2b3140;margin:0 0 6px}
+.admin_page .dim{color:#6b7284;font-size:13px}
+.admin_page code{font-size:12px;background:#f1f2f6;padding:1px 5px;border-radius:4px;word-break:break-all}
+.admin_page .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.admin_page .tiles div{background:#f4f5fa;border-radius:10px;padding:10px;text-align:center}
+.admin_page .tiles b{display:block;font-size:22px;font-variant-numeric:tabular-nums;color:#2b3140}
+.admin_page .tiles span{font-size:12px;color:#6b7284}
+.admin_page .row{display:flex;gap:8px}
+.admin_page input{min-width:0;height:40px;padding:0 10px;border:1px solid #c9ccd6;border-radius:8px;font-size:14px;background:#FFF;width:100%}
+.admin_page .row input{flex:1}
+.admin_page button{padding:0 14px;height:40px;border-radius:8px;border:none;background:#6D5AE3;color:#FFF;font-size:14px;cursor:pointer}
+.admin_page button:disabled{opacity:.5}
+.admin_page .box{margin-top:12px;padding:14px;background:#f8f8fb;border:1px solid #e5e7ee;border-radius:10px}
+.admin_page .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.admin_page .grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#6b7284}
+.admin_page .grid .wide{grid-column:1 / -1}
+.admin_page .msg{color:#6D5AE3;font-weight:600}
+.admin_page .uid{margin:10px 0}
+.admin_page ol{padding-left:18px;margin:8px 0}
+.admin_page ol li{list-style:decimal}
+.admin_page .ctable{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px;display:block;overflow-x:auto}
+.admin_page .ctable th,.admin_page .ctable td{padding:6px;border-bottom:1px solid #e5e7ee;text-align:left;white-space:nowrap}
+.admin_page .ctable button{height:30px;padding:0 10px;font-size:12px;background:#E2E5EB;color:#2b3140}
