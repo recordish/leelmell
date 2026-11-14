@@ -50,6 +50,7 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 .pop01 .pop_txt_01,.locker_page .myinfo,.todayColorResult h4{color:#2b3140}
 .tarotRoom .holytable p{line-height:170%;user-select:text;-webkit-user-select:text}
 .locker_page .myinfo .noti_txt{color:#5a6272}
+.locker_page .myinfo .email_pannel .noti_txt{display:block;width:auto;line-height:1.6}
 
 /* 위쪽 잔고: 숫자를 키우고, 바뀔 때 +10 · -1 이 떠오름 */
 .gnb .ct,.gnb .rk{font-size:15px;font-weight:600}
