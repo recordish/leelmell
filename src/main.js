@@ -319,7 +319,6 @@ function shopPage() {
     <li class="free100stones"><a href="#" data-act="free100"><span class="tag">${t('tagDaily')}</span><span class="art boxed">${BOX_BACK}<img src="assets/img/ic_stone10_06.webp" alt="">${BOX_FRONT}</span><span class="obj">${t('stones100')}</span><span class="price">${t('freeGet')}</span></a></li>
     <li class="free10stones"><a href="#" data-act="free10"><span class="tag">${t('tagHourly')}</span><img class="art" src="assets/img/ic_stone10_06.webp" alt=""><span class="obj">${t('stones10')}</span><span class="price">${t('freeGet')}</span></a></li>
   </ul>
-  <h3 class="shop_title">${t('shopItems')}</h3>
   <ul class="div-payant">
     ${pay('getPdt03', 'pro03', 'ic_stone100_01', t('stones100'), t('price1100'))}
     ${pay('getPdt01', 'pro01', 'ic_crystal4_01', t('crystal4'), t('price3300'), `<span class="bonus">${t('bonus')(1)}</span>`)}
