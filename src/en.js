@@ -77,9 +77,9 @@ const linkNF = {
 }
 
 const close = {
-  '+': 'Leelmell sees your path turning toward the good. Trust the steps you are taking.',
-  '0': 'Leelmell sees your path quietly choosing its direction. There is no need to hurry.',
-  '-': 'Leelmell sees a hill ahead that you must climb. Knowing it now, you can prepare.',
+  '+': 'Leelmell sees your path turning toward the good. The time behind you was not wasted, and what you build now will become the ground for what comes next. Rather than getting carried away, keep calm and trust the steps you are taking. Good fortune stays longer with those who are ready.',
+  '0': 'Leelmell sees your path quietly choosing its direction. It is all right if the answer is not clear yet. Just as muddy water clears when left still, the way will show itself once your heart settles. There is no need to hurry; start with one small thing you can do today.',
+  '-': 'Leelmell sees a hill ahead that you must climb. But knowing it now, you can prepare. Rather than forcing your way through, save your strength, and it is fine to ask the people beside you for help. Once you are over the hill, you will find a stronger version of yourself.',
 }
 
 // SPECIAL_ORDERED 와 같은 순서
