@@ -1,3 +1,4 @@
+import { restOf } from './rest.js'
 // 기존 앱의 규칙을 그대로 옮긴 순수 함수들 (저장·화면과 분리해서 테스트합니다)
 // 상태는 함수가 직접 바꾸고, 결과는 { ok, why, ... } 로 돌려줍니다.
 
@@ -30,6 +31,7 @@ export const randInt = (rng, min, max) => min + Math.floor(rng() * (max - min + 
 // 입장 조건: 오늘 아직 안 뽑았고 크리스탈 1개 이상
 export function chambreStatus(s, day) {
   if (s.readings[day]) return 'done'
+  if (restOf(day)) return 'rest'
   if (s.crystals >= 1) return 'ok'
   return s.stones > 99 ? 'needLab' : 'needShop'
 }

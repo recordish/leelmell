@@ -6,6 +6,7 @@ import { CARDS } from './cards.js'
 import { REVERSED } from './reversed.js'
 import { LANGS, T } from './i18n.js'
 import * as G from './game.js'
+import { ICONS as REST_ICONS, restOf } from './rest.js'
 import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
 import { loveLine, lovePos, loveParts } from './love.js'
 import { adminShell, mountAdmin } from './admin.js'
@@ -109,15 +110,16 @@ function updateGnb() {
 // ---------- 화면별 내용 ----------
 function homePage() {
   const done = !!S.g.readings[day()]
+  const rest = !done && restOf(day())
   let tip = ''
   if (G.free100Status(S.g, day()) === 'ok') tip = t('tipFree100')
   else if (!G.free10Wait(S.g, Date.now())) tip = t('tipFree10')
-  const btn = done
-    ? `<div class="getTodayCard done">${t('homeDone')}<span class="next">${t('nextIn')} <b id="countdown"></b></span></div>`
+  const btn = done || rest
+    ? `<div class="getTodayCard done">${t(rest ? 'homeRest' : 'homeDone')}<span class="next">${t('nextIn')} <b id="countdown"></b></span></div>`
     : `<a href="#chambre" class="getTodayCard">${t('home')}<span class="ct">1</span></a>`
   return `<div class="home_page">
   <p class="home_visual">Welcome to Leelmell's</p>
-  <p class="home_talk">${t(done ? 'talkDone' : 'talkReady')}</p>
+  <p class="home_talk">${t(done ? 'talkDone' : rest ? 'talkRest' : 'talkReady')}</p>
   <div class="seeTodayCard">${btn}${tip ? `<p class="home_tip"><a href="#shop">${tip}</a></p>` : ''}</div>
 </div>`
 }
@@ -155,6 +157,13 @@ function tick() {
 
 function chambrePage() {
   const st = G.chambreStatus(S.g, day())
+  if (st === 'rest') {
+    const k = restOf(day())
+    return `<div class="chambre_page resting"><div class="room"><div class="rest">
+  <div class="ico">${REST_ICONS[k]}</div><span class="badge">${t('restBadge')}</span>
+  <p class="why">${t('restWhy')[k]}</p><p class="sub">${t('restSub')}</p>
+</div></div></div>`
+  }
   const body = st === 'done'
     ? `<p class="txt02">${t('chambreDone')}</p>`
     : `<p class="txt01">${t('chambreNeed')}</p>

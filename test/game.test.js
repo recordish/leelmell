@@ -6,7 +6,7 @@ import { REVERSED } from '../src/reversed.js'
 
 // 정해진 순서로 값을 돌려주는 가짜 난수
 const seq = (...xs) => { let i = 0; return () => xs[i++ % xs.length] }
-const D = '2026-11-13'
+const D = '2026-11-14' // 릴멜이 쉬지 않는 날
 
 test('카드 22장 모두 정방향·역방향 풀이가 세 언어로 있다', () => {
   assert.equal(CARDS.length, 22)
@@ -43,7 +43,7 @@ test('상점: 천연석 100개는 하루 한 번, 가진 게 적을 때만', () 
   assert.ok(G.free100(s, D).ok)
   assert.equal(s.stones, 110)
   assert.equal(G.free100(s, D).why, 'tomorrow')
-  assert.equal(G.free100(s, '2026-11-14').why, 'rich')
+  assert.equal(G.free100(s, '2026-11-15').why, 'rich')
 })
 
 test('상점: 천연석 10개는 60분마다', () => {
@@ -256,4 +256,34 @@ test('관리자 통계: 오늘 · 30일 · 많이 나온 카드', async () => {
   assert.equal(s.prayToday, 1)
   assert.equal(s.crystals, 2)
   assert.equal(s.topCards[0].id, 1)
+})
+
+import { restOf, REST_KEYS, ICONS } from '../src/rest.js'
+import { T as I18N } from '../src/i18n.js'
+
+const addDays = (key, n) => { const d = new Date(key + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10) }
+
+test('릴멜은 한 주(월~일)에 딱 하루 쉬고, 이유는 9주 동안 9가지가 모두 나온다', () => {
+  const seen = new Set()
+  let mon = '2026-11-16' // 월요일
+  for (let w = 0; w < 52; w++, mon = addDays(mon, 7)) {
+    const off = [...Array(7).keys()].map((i) => restOf(addDays(mon, i))).filter(Boolean)
+    assert.equal(off.length, 1, mon)
+    if (w < 9) seen.add(off[0])
+  }
+  assert.equal(seen.size, REST_KEYS.length)
+  for (const k of REST_KEYS) assert.ok(ICONS[k].startsWith('<svg'), k)
+})
+
+test('쉬는 날에는 릴멜의 방에 못 들어가고 크리스탈도 그대로', () => {
+  let d = '2026-11-16'
+  while (!restOf(d)) d = addDays(d, 1)
+  const s = { ...G.newState(), crystals: 3 }
+  assert.equal(G.chambreStatus(s, d), 'rest')
+  assert.deepEqual(G.drawTarot(s, d, Math.random), { ok: false, why: 'rest' })
+  assert.equal(s.crystals, 3)
+})
+
+test('쉬는 날 문구가 세 언어 모두 9가지 있다', () => {
+  for (const l of ['ko', 'en', 'ja']) for (const k of REST_KEYS) assert.ok(I18N[l].restWhy[k], l + k)
 })
