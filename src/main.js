@@ -132,16 +132,23 @@ function tick() {
     const p2 = (n) => String(n).padStart(2, '0')
     cd.textContent = `${p2(Math.floor(sec / 3600))}:${p2(Math.floor(sec / 60) % 60)}:${p2(sec % 60)}`
   }
-  const label = (sel, wait, normal) => {
+  const label = (sel, wait, normal, off = !!wait) => {
     const el = $(sel)
     if (!el) return
     el.textContent = wait || normal
-    el.closest('li').classList.toggle('waiting', !!wait)
+    el.closest('li').classList.toggle('waiting', off)
   }
   const now = Date.now()
   const min = (m) => (m ? t('lblMin')(m) : '')
-  label('.free100stones .price', G.free100Status(S.g, day()) === 'tomorrow' ? t('lblTomorrow') : '', 'Free')
-  label('.free10stones .price', min(G.free10Wait(S.g, now)), 'Free')
+  const st100 = G.free100Status(S.g, day())
+  const left10 = G.free10Wait(S.g, now)
+  // 10개: 남은 시간을 분:초로 (60분 기준)
+  const p2 = (n) => String(n).padStart(2, '0')
+  const sec10 = left10 ? Math.max(0, Math.ceil((S.g.free10At + 3600000 - now) / 1000)) : 0
+  label('.free100stones .price', st100 === 'tomorrow' ? t('lblTomorrowAgain') : '', t('freeGet'), st100 !== 'ok')
+  label('.free10stones .price', sec10 ? `${p2(Math.floor(sec10 / 60))}:${p2(sec10 % 60)}` : '', t('freeGet'))
+  // 받을 무료가 있으면 아래 메뉴의 상점에 빨간 점
+  $('.navi li:first-child')?.classList.toggle('has-free', st100 === 'ok' || !left10)
   label('.exchange3 .per', min(G.ex3Wait(S.g, now)), '?')
 }
 
@@ -260,19 +267,26 @@ function prayPage() {
 </div>`
 }
 
+// 열린 상자 그림: 뒤 날개 → 천연석 → 앞면 순서로 겹쳐 천연석이 상자 안에 담긴 것처럼 보입니다
+const BOX_BACK = '<svg class="box back" viewBox="0 0 120 70" aria-hidden="true"><path d="M8 18 L30 4 L60 16 L38 30Z" fill="#D9B27C"/><path d="M112 18 L90 4 L60 16 L82 30Z" fill="#C99E66"/><path d="M14 26 L60 40 L106 26 L60 14Z" fill="#6E5032"/></svg>'
+const BOX_FRONT = '<svg class="box front" viewBox="0 0 120 70" aria-hidden="true"><path d="M14 26 L60 40 L60 70 L14 56Z" fill="#C69C6D"/><path d="M106 26 L60 40 L60 70 L106 56Z" fill="#A87F52"/></svg>'
+
 function shopPage() {
-  return `<div class="shop_page"><div class="sec-shop">
-  <span class="starfish"></span>
+  const pay = (cls, id, img, name, price, extra = '') =>
+    `<li class="${cls}"><a href="#" data-act="pay" data-pdt="${id}">${extra}<img class="art" src="assets/img/${img}.webp" alt=""><span class="obj">${name}</span><span class="price">${playPrice[id] || price}</span></a></li>`
+  return `<div class="shop_page"><div class="sec-shop shop2">
+  <span class="starfish" data-say="${t('shopHello')}"></span>
+  <span class="objBoxes"></span>
   <ul class="div-free">
-    <li class="free100stones"><a href="#" data-act="free100"><span class="obj">${t('stones100')}</span><span class="price">Free</span></a></li>
-    <li class="free10stones"><a href="#" data-act="free10"><span class="obj">${t('stones10')}</span><span class="price">Free</span></a></li>
+    <li class="free100stones"><a href="#" data-act="free100"><span class="tag">${t('tagDaily')}</span><span class="art boxed">${BOX_BACK}<img src="assets/img/ic_stone10_06.webp" alt="">${BOX_FRONT}</span><span class="obj">${t('stones100')}</span><span class="price">${t('freeGet')}</span></a></li>
+    <li class="free10stones"><a href="#" data-act="free10"><span class="tag">${t('tagHourly')}</span><img class="art" src="assets/img/ic_stone10_06.webp" alt=""><span class="obj">${t('stones10')}</span><span class="price">${t('freeGet')}</span></a></li>
   </ul>
+  <h3 class="shop_title">${t('shopItems')}</h3>
   <ul class="div-payant">
-    <li class="getPdt03"><a href="#" data-act="pay" data-pdt="pro03"><span class="obj">${t('stones100')}</span><span class="price">${playPrice.pro03 || t('price1100')}</span></a></li>
-    <li class="getPdt01"><a href="#" data-act="pay" data-pdt="pro01"><span class="obj">${t('crystal4')}</span><span class="price">${playPrice.pro01 || t('price3300')}</span><span class="per">+1</span></a></li>
-    <li class="getPdt02"><a href="#" data-act="pay" data-pdt="pro02"><span class="obj">${t('crystal20')}</span><span class="price">${playPrice.pro02 || t('price9900')}</span><span class="per">+10</span></a></li>
+    ${pay('getPdt03', 'pro03', 'ic_stone100_01', t('stones100'), t('price1100'))}
+    ${pay('getPdt01', 'pro01', 'ic_crystal4_01', t('crystal4'), t('price3300'), `<span class="bonus">${t('bonus')(1)}</span>`)}
+    ${pay('getPdt02', 'pro02', 'ic_crystal20_01', t('crystal20'), t('price9900'), `<span class="bonus">${t('bonus')(10)}</span><span class="best">BEST</span>`)}
   </ul>
-  <span class="objBoxes"></span><span class="objCalc"></span>
   <a class="door01" href="#depot" aria-label="depot"></a>
 </div></div>`
 }

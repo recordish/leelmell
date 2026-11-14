@@ -164,3 +164,35 @@ body.love-bg{background:#F7A3C9}
 .admin_page .ctable{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px;display:block;overflow-x:auto}
 .admin_page .ctable th,.admin_page .ctable td{padding:6px;border-bottom:1px solid #e5e7ee;text-align:left;white-space:nowrap}
 .admin_page .ctable button{height:30px;padding:0 10px;font-size:12px;background:#E2E5EB;color:#2b3140}
+
+/* ---------- 상점 (새 배치): 무료 2칸 · 상품 3칸, 플랫 ---------- */
+.shop.index .sec-shop.shop2{top:84px;transform:translateX(-50%);height:calc(100% - 84px - 84px);max-width:480px}
+.shop2 .starfish{top:6px !important;left:-30px !important;width:200px !important;height:200px !important;background-size:180px auto !important}
+.shop.index .shop2 .starfish:after{content:attr(data-say);top:-24px;left:70px;width:auto;height:auto;line-height:1.4;border-radius:14px;padding:6px 12px;font-size:13px;font-weight:600;letter-spacing:0;color:#2b3140;white-space:nowrap}
+.shop2 .objBoxes{top:150px;left:44px;width:84px;height:84px}
+.shop2 .div-free{top:20px;right:14px;width:auto;display:flex;gap:10px;text-align:center;align-items:stretch}
+.shop2 .div-free li a{height:170px;box-sizing:border-box;display:flex;flex-direction:column}
+.shop2 .div-free li a .price{margin-top:auto}
+.shop2 .div-payant{top:276px;left:14px;right:14px;width:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.shop2 li{display:block;margin:0}
+.shop2 li a{width:auto;padding:22px 6px 10px;border:0;border-radius:14px;background:#8B7CF3 !important;color:#FFF}
+.shop2 li a:after{display:none}
+.shop2 li a .art{display:block;height:58px;margin:0 auto 6px;object-fit:contain;max-width:100%}
+.shop2 li a .obj{height:auto;line-height:1.3;font-size:13px}
+.shop2 li a .price{margin:8px 0 0;height:32px;line-height:32px;padding:0;border-radius:16px;background:#5B4DE8;text-shadow:none;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;font-family:inherit}
+.shop2 .div-free li a{width:104px;padding-top:26px;background:#FFE07A !important;color:#3b2f00}
+.shop2 .div-free li a .obj{color:#3b2f00;font-weight:700}
+.shop2 .div-free li.waiting a,.shop2 .div-free li.waiting a .obj{background:#E9E5FB !important;color:#5a5680;opacity:1}
+.shop2 .div-free li.waiting a .price{background:#B9B4D6;color:#FFF;font-size:14px;font-weight:600}
+.shop2 li .tag{position:absolute;top:8px;left:8px;background:#5B4DE8;color:#FFF;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;line-height:1.5}
+.shop2 .div-free .art{height:70px}
+.shop2 .div-free .art.boxed{position:relative;width:84px;margin:0 auto}
+.shop2 .art.boxed .box{position:absolute;left:0;bottom:0;width:84px}
+.shop2 .art.boxed .box.front{z-index:2}
+.shop2 .art.boxed img{position:absolute;left:50%;bottom:10px;height:52px;transform:translateX(-50%);z-index:1}
+.shop2 .free10stones .art{height:70px;margin:0 auto 6px}
+.shop2 .bonus{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#DB6AF5;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;white-space:nowrap;line-height:1.5;z-index:1}
+.shop2 .best{position:absolute;top:16px;right:6px;background:#FFE07A;color:#3b2f00;font-size:10px;font-weight:800;border-radius:5px;padding:0 5px;line-height:1.5}
+.shop2 .shop_title{position:absolute;top:246px;left:18px;margin:0;font-size:15px;color:#FFF}
+.shop2 .door01{left:auto;right:30px;transform:none;bottom:6px}
+.navi li.has-free a::before{content:"";position:absolute;top:20px;left:50%;margin-left:10px;width:10px;height:10px;border-radius:50%;background:#F25C5C;border:2px solid #FFF;z-index:2}
