@@ -171,7 +171,8 @@ body.love-bg{background:#F7A3C9}
 .shop.index .shop2 .starfish:after{content:attr(data-say);top:-24px;left:70px;width:auto;height:auto;line-height:1.4;border-radius:14px;padding:6px 12px;font-size:13px;font-weight:600;letter-spacing:0;color:#2b3140;white-space:nowrap}
 .shop2 .objBoxes{top:150px;left:44px;width:84px;height:84px}
 .shop2 .div-free{top:20px;right:14px;width:auto;display:flex;gap:10px;text-align:center;align-items:stretch}
-.shop2 .div-free li a{height:170px;box-sizing:border-box;display:flex;flex-direction:column}
+.shop2 .div-free li{flex:0 0 116px;width:116px}
+.shop2 .div-free li a{width:100% !important;height:170px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden}
 .shop2 .div-free li a .price{margin-top:auto}
 .shop2 .div-payant{top:276px;left:14px;right:14px;width:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .shop2 li{display:block;margin:0}
@@ -186,12 +187,12 @@ body.love-bg{background:#F7A3C9}
 .shop2 .div-free li.waiting a .price{background:#B9B4D6;color:#FFF;font-size:14px;font-weight:600}
 .shop2 li .tag{position:absolute;top:8px;left:8px;background:#5B4DE8;color:#FFF;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;line-height:1.5}
 .shop2 .div-free .art{height:70px}
-.shop2 .div-free .art.boxed{position:relative;width:84px;margin:0 auto}
+.shop2 .div-free .art.boxed{position:relative;width:84px;margin:0 auto 6px}
 .shop2 .art.boxed .box{position:absolute;left:0;bottom:0;width:84px}
 .shop2 .art.boxed .box.front{z-index:2}
 .shop2 .art.boxed img{position:absolute;left:50%;bottom:10px;height:52px;transform:translateX(-50%);z-index:1}
 .shop2 .free10stones .art{height:70px;margin:0 auto 6px}
-.shop2 .bonus{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#DB6AF5;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;white-space:nowrap;line-height:1.5;z-index:1}
+.shop2 .bonus{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#DB6AF5;color:#FFF !important;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;white-space:nowrap;line-height:1.5;z-index:1}
 .shop2 .best{position:absolute;top:16px;right:6px;background:#FFE07A;color:#3b2f00;font-size:10px;font-weight:800;border-radius:5px;padding:0 5px;line-height:1.5}
 .shop2 .shop_title{position:absolute;top:246px;left:18px;margin:0;font-size:15px;color:#FFF}
 .shop2 .door01{left:auto;right:30px;transform:none;bottom:6px}
