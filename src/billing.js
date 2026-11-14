@@ -5,8 +5,8 @@ import { NativePurchases, PURCHASE_TYPE } from '@capgo/native-purchases'
 
 export const PRODUCTS = {
   pro03: { stones: 100, crystals: 0 },
-  pro01: { stones: 0, crystals: 5 }, // 크리스탈 4개 + 보너스 1
-  pro02: { stones: 0, crystals: 30 }, // 크리스탈 20개 + 보너스 10
+  pro01: { stones: 0, crystals: 4 }, // 크리스탈 4개 (3개 가격 + 보너스 1)
+  pro02: { stones: 0, crystals: 20 }, // 크리스탈 20개 (10개 가격 + 보너스 10)
 }
 
 const IDS = Object.keys(PRODUCTS)
