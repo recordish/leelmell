@@ -246,3 +246,12 @@ body.love-bg{background:#F7A3C9}
 .wrap.love .tarotRoom .synthesis .blk2{background:#FFF;border:2px solid #C2418F}
 .wrap.love .tarotRoom .synthesis .blk2 .lbl{background:#C2418F;color:#FFF}
 .wrap.love .tarotRoom .synthesis .blk2 p,.wrap.love .tarotRoom .synthesis .blk2 p strong{color:#D46BA6}
+
+/* 상단 숫자 촤라락 */
+.gnb .ct.rolling,.gnb .rk.rolling{text-indent:0}
+.gnb .odo{display:inline-flex;margin:3px 0 0 50px;height:1.25em;line-height:1.25em;overflow:hidden;vertical-align:middle;text-indent:0;font-variant-numeric:tabular-nums}
+.gnb .odo .d{display:inline-block;width:.62em;text-align:center;text-indent:0}
+.gnb .odo .d > span{display:block}
+.gnb .odo .d i{display:block;height:1.25em;font-style:normal}
+.gnb .ct.bump,.gnb .rk.bump{animation:gnbBump .5s ease-out}
+@keyframes gnbBump{30%{transform:scale(1.08)}100%{transform:scale(1)}}
