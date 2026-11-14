@@ -9,7 +9,6 @@ import * as G from './game.js'
 import { ICONS as REST_ICONS, restOf } from './rest.js'
 import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
 import { loveLine, lovePos, loveParts } from './love.js'
-import { adminShell, mountAdmin } from './admin.js'
 import { Capacitor } from '@capacitor/core'
 
 const NATIVE_APP = Capacitor.isNativePlatform()
@@ -72,7 +71,7 @@ const ROUTES = {
   locker: { cls: 'locker index', page: lockerPage, visitors: true },
   love: { cls: 'love index', page: lovePage },
   lovecards: { cls: 'love cards', page: loveCardsPage, exit: '#depot' },
-  admin: { cls: 'locker admin', page: adminShell }, // 메뉴에 없음. 주소로만
+  admin: { cls: 'locker admin', page: () => '<div class="admin_page"><h2>관리자</h2><p>관리자 페이지가 옮겨졌습니다.</p><p><a href="https://trimarrai.github.io/admin/">trimarrai.github.io/admin</a></p></div>' }, // 예전 주소 안내
 }
 
 function frame(cls, inner, exit = '#parking') {
@@ -416,7 +415,6 @@ function render() {
   const r = ROUTES[name]
   const v = r.visitors ? G.rollVisitors(S.g, rng) : {}
   app.innerHTML = frame(r.cls, r.page() + visitorsHtml(v), r.exit)
-  if (name === 'admin') mountAdmin($('.admin_page'), sync, user)
   if (name === 'shop' && NATIVE_APP) loadPrices()
   renderedDay = day()
   updateGnb()
@@ -917,6 +915,7 @@ function confirmDelete() {
 if (FIREBASE_ON) {
   import('./sync.js').then((m) => {
     sync = m
+    m.countVisit(day()).catch((e) => console.warn('visit count failed', e))
     m.watchUser(async (u) => {
       const was = user
       user = u
@@ -933,7 +932,7 @@ if (FIREBASE_ON) {
         S.g = G.newState()
         save()
       }
-      if (route === 'locker' || route === 'admin' || !u) render()
+      if (route === 'locker' || !u) render()
       else updateGnb()
     })
   }).catch((e) => console.warn('firebase load failed', e))
@@ -944,7 +943,7 @@ window.addEventListener('resize', () => { if (route === 'cards') sizeCards() })
 document.addEventListener('visibilitychange', () => {
   // 자정이 지나 돌아오면 날짜가 바뀐 화면으로
   if (!document.hidden && (route === 'chambre' || route === 'home')) render()
-  if (!document.hidden) { claimGifts(); recoverPurchases() }
+  if (!document.hidden) { claimGifts(); recoverPurchases(); sync?.countVisit(day()).catch(() => {}) }
 })
 
 // 새로고침해도 예전 스크롤 위치로 돌아가지 않고 화면 맨 위부터 보여 줍니다
