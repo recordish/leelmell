@@ -251,7 +251,7 @@ function loveCardsPage() {
   <p class="flipGuide"></p>
   <div class="holytable"><ul>${cards.map(loveMeaning).join('')}</ul></div>
   <p class="readcards" style="display:none"><a href="#" data-act="next"></a></p>
-  <div class="synthesis hidden"><h4>${t('loveSynTitle')}</h4>${loveParts(cards, S.lang).map((x) => `<p>${bold(x)}</p>`).join('')}${pair ? `<div class="special ${pair.good ? 'good' : 'bad'}"><h4>${t('specialTitle')}</h4><p>${bold(pair.text)}</p></div>` : ''}</div>
+  <div class="synthesis split hidden">${((ps) => `<div class="blk1"><h4>${t('loveSynTitle')}</h4>${ps.slice(0, -1).join('')}</div><div class="blk2"><span class="lbl">${t('loveClose')}</span>${ps.at(-1)}</div>`)(loveParts(cards, S.lang).map((x) => `<p>${bold(x)}</p>`))}${pair ? `<div class="special ${pair.good ? 'good' : 'bad'}"><h4>${t('specialTitle')}</h4><p>${bold(pair.text)}</p></div>` : ''}</div>
 </div></div></div>`
 }
 

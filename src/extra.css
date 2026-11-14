@@ -239,3 +239,10 @@ body.love-bg{background:#F7A3C9}
 .chambre_page .rest .badge{display:inline-block;margin:0 0 14px;padding:3px 12px;border-radius:12px;background:#6A32AB;color:#FFF;font-size:13px;font-weight:700}
 .chambre_page .rest .why{margin:0 0 14px;font-size:17px;font-weight:700;line-height:160%;color:#2b3140;word-break:keep-all}
 .chambre_page .rest .sub{margin:0;font-size:14px;color:#5a5f70}
+
+/* 율리움의 종합 해설: 두 블럭, 아래 한마디는 흰 바탕 · 핑크 테두리 */
+.wrap.love .tarotRoom .synthesis.split{padding:0;background:none}
+.wrap.love .tarotRoom .synthesis .blk1{background:#FFE3F0}
+.wrap.love .tarotRoom .synthesis .blk2{background:#FFF;border:2px solid #C2418F}
+.wrap.love .tarotRoom .synthesis .blk2 .lbl{background:#C2418F;color:#FFF}
+.wrap.love .tarotRoom .synthesis .blk2 p,.wrap.love .tarotRoom .synthesis .blk2 p strong{color:#D46BA6}

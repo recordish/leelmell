@@ -186,9 +186,9 @@ const block = {
 }
 
 const closeLove = {
-  '+': 'Ulyooum sees the two of you heading somewhere warm. Tell them honestly how you feel.',
-  '0': 'Ulyooum sees the two of you still choosing a direction. Do not hurry; keep talking.',
-  '-': 'Ulyooum sees a hill ahead for the two of you. Do not guess alone; talk it through together.',
+  '+': 'Ulyooum sees the two of you heading somewhere warm. Your hearts are ready to meet, so rather than hesitating, tell them honestly how you feel. A small word and a kind gesture will bring you closer. A good bond grows stronger the more you cherish and show it.',
+  '0': 'Ulyooum sees the two of you still choosing a direction. It is not a lack of feeling; you are carefully reading each other. Instead of rushing or pressing for an answer, keep the conversation easy and open. Trust built slowly will show you clearly where to go together.',
+  '-': 'Ulyooum sees a hill ahead for the two of you. But now that you know, you can prepare for it together. Rather than guessing alone and feeling hurt, open up and talk it through. Once you cross this hill together, you will understand each other more deeply.',
 }
 
 const pos = ['My heart', 'Their heart', 'Past', 'Present', 'Obstacle', 'Ahead']
