@@ -53,7 +53,7 @@ function save() {
 const t = (k) => T[S.lang][k]
 const day = () => G.dayKey()
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
-const img = (id) => `assets/tr/tr${id}.jpg`
+const img = (id) => `assets/tr/tr${id}.webp`
 const $ = (sel, el = document) => el.querySelector(sel)
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)]
 
@@ -206,7 +206,7 @@ function lovePage() {
     : `<p class="txt01">${t('loveNeed')}</p>
        <div class="tribute"><span class="crystal"></span><b class="cost">${G.LOVE_COST}</b></div>
        <div class="btnEnter"><button type="button" data-act="enterLove">${t('enter')}</button></div>`
-  return `<div class="love_page" style="background-image:url(assets/img/ic_sealion_pink_big_01.png)"><div class="room">${body}</div></div>`
+  return `<div class="love_page" style="background-image:url(assets/img/ic_sealion_pink_big_01.webp)"><div class="room">${body}</div></div>`
 }
 
 // 자리 문장을 먼저 보여 주고, 카드의 긴 풀이는 눌렀을 때만 펼칩니다
@@ -226,7 +226,7 @@ function loveCardsPage() {
   const cards = S.g.love[day()].cards
   const pair = pairSpecial(cards[0], cards[1], S.lang)
   const pos = lovePos(S.lang)
-  return `<div class="tarotRoom" style="background-image:url(assets/img/ic_sealion_pink_big_01.png)"><div class="room"><div class="card_table" style="display:block">
+  return `<div class="tarotRoom" style="background-image:url(assets/img/ic_sealion_pink_big_01.webp)"><div class="room"><div class="card_table" style="display:block">
   <p class="todaydate">${t('dateFmt')(new Date())}</p>
   <div class="result">${cards.map((p, i) => `<span class="${p.rev ? 'rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${pos[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
   <p class="flipGuide"></p>
@@ -447,7 +447,7 @@ function pop01(msg, btn, url, design) {
     b.dataset.go = url
   } else b.style.display = 'none'
   if (design) {
-    p.style.backgroundImage = `url(assets/img/${design}.png)`
+    p.style.backgroundImage = `url(assets/img/${design}.webp)`
     $('.pop_txt_01', p).style.margin = '0 0 140px 0'
   } else {
     p.style.backgroundImage = 'none'

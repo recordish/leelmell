@@ -65,12 +65,12 @@ body{background: #D6E1FF}
 }
 
 
-.intro_page .r01{background:url(../assets/img/intro/intro01_2.png) no-repeat left center}
-.intro_page .r02{background:url(../assets/img/intro/intro02_3.png) no-repeat left center}
-.intro_page .r03{background:url(../assets/img/intro/intro03_2.png) no-repeat left center}
-.intro_page .r04{background:url(../assets/img/intro/intro04.png) no-repeat left center}
+.intro_page .r01{background:url(../assets/img/intro/intro01_2.webp) no-repeat left center}
+.intro_page .r02{background:url(../assets/img/intro/intro02_3.webp) no-repeat left center}
+.intro_page .r03{background:url(../assets/img/intro/intro03_2.webp) no-repeat left center}
+.intro_page .r04{background:url(../assets/img/intro/intro04.webp) no-repeat left center}
 .intro_page .r05{background:#FFE6A5}
-.intro_page .r06{background:url(../assets/img/intro/intro06.png) no-repeat left center}
+.intro_page .r06{background:url(../assets/img/intro/intro06.webp) no-repeat left center}
 
 
 .intro_page .txt{line-height:160%}
@@ -96,7 +96,7 @@ body{background: #D6E1FF}
     height: 110px;
     text-align: center;
     line-height: 100px;
-    background: url(../assets/img/intro/intro03_2_2.png) no-repeat;
+    background: url(../assets/img/intro/intro03_2_2.webp) no-repeat;
     background-size: 290px auto;
 }
 .intro_page .r04 .txt{
@@ -104,14 +104,14 @@ body{background: #D6E1FF}
 }
 .intro_page .r05 .txt{
     text-align: center;
-    background: url(../assets/img/intro/intro05_2_1.png) no-repeat center top;
+    background: url(../assets/img/intro/intro05_2_1.webp) no-repeat center top;
     background-size: 260px auto;
     padding: 220px 0 0 0;
     margin: 10% 0 0 0;
 }
 .intro_page .r05 .txt02{
     text-align: center;
-    background: url(../assets/img/intro/intro05_2_2.png) no-repeat center top;
+    background: url(../assets/img/intro/intro05_2_2.webp) no-repeat center top;
     background-size: 140px auto;
     padding: 190px 0 0 0;
     margin: 50px 0 0 0;
