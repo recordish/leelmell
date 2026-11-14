@@ -30,10 +30,25 @@ jobs:
 
       - name: Install & test & build
         # Firebase 설정값은 저장소의 .env.production 에서 읽습니다.
+        # WEB_VERSION ('YYYYMMDDHHMM-커밋') 은 앱 라이브 업데이트가 새 버전인지 볼 때 씁니다
         run: |
+          V="$(date -u +%Y%m%d%H%M)-${GITHUB_SHA::7}"
+          echo "$V" > web-version.txt
           npm ci
           npm test
-          npm run build
+          WEB_VERSION="$V" npm run build
+
+      # 앱 라이브 업데이트용: 웹 파일 묶음(zip)과 latest.json 을 함께 올립니다 (src/updater.js)
+      - name: Live update bundle
+        run: |
+          V=$(cat web-version.txt)
+          (cd dist && zip -qr ../bundle.zip .)
+          mkdir -p dist/update
+          mv bundle.zip "dist/update/bundle-$V.zip"
+          MIN=$(node -p "require('./package.json').liveUpdate.minBuild")
+          printf '{"version":"%s","url":"bundle-%s.zip","minBuild":%s}\n' "$V" "$V" "$MIN" > dist/update/latest.json
+          cat dist/update/latest.json
+          ls -la dist/update
 
       - uses: actions/configure-pages@v5
 

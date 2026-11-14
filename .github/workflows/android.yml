@@ -33,7 +33,7 @@ jobs:
 
       - run: npm ci
       - run: npm test
-      - run: npm run build
+      - run: WEB_VERSION="$(date -u +%Y%m%d%H%M)-${GITHUB_SHA::7}" npm run build
       - run: npx cap sync android
 
       - name: Upload key

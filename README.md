@@ -65,6 +65,13 @@ npm run build    # dist/ 에 빌드
 
 ## 안드로이드 앱 (Google Play `com.leelmell.app`)
 
+### 라이브 업데이트 (앱을 Play 에 다시 올리지 않고 웹 변경 반영)
+
+- main 에 병합하면 웹 배포와 함께 `update/latest.json` · `update/bundle-<버전>.zip` 이 GitHub Pages 에 올라갑니다 (`deploy.yml`)
+- 앱은 열릴 때 `latest.json` 을 보고 더 새 버전이면 받아 두었다가, 앱을 나갔다 다시 열 때 적용합니다 (`src/updater.js`, `@capgo/capacitor-updater`, 외부 서버 없음)
+- 새 버전이 제대로 뜨지 않으면 이전 버전으로 자동으로 돌아갑니다
+- 플러그인 추가처럼 **안드로이드 쪽이 바뀌면** Play 업데이트가 필요합니다. 그때는 `package.json` 의 `liveUpdate.minBuild` 를 그 빌드의 버전 코드로 올려, 옛 앱이 새 웹을 받지 않게 합니다
+
 Capacitor 로 웹앱(`dist`)을 앱 안에 담습니다. 웹을 고치면 앱도 다시 빌드해 Play 에 올려야 반영됩니다.
 
 - 빌드: GitHub → Actions → **Android app** → Run workflow → 결과물(Artifacts)에서 `leelmell-test-apk`(폰에 바로 설치) · `leelmell-play-aab`(Play 업로드)

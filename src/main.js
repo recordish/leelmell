@@ -1041,6 +1041,14 @@ render()
 setInterval(tick, 1000)
 recoverPurchases()
 
+// 앱 라이브 업데이트: 잘 떴다고 바로 알리고, 조금 뒤 새 웹 버전이 있는지 봅니다 (적용은 다음에 열 때)
+if (NATIVE_APP) {
+  import('./updater.js').then((u) => {
+    u.ready().catch(() => {})
+    setTimeout(() => u.checkUpdate(__WEB_VERSION__).catch((e) => console.warn('update check failed', e)), 4000)
+  }).catch((e) => console.warn('updater load failed', e))
+}
+
 // 앱(안드로이드)은 파일을 앱 안에 담고 있어서 서비스 워커가 필요 없습니다
 if ('serviceWorker' in navigator && import.meta.env.PROD && !NATIVE_APP) {
   navigator.serviceWorker.register('sw.js').catch(() => {})
