@@ -271,3 +271,10 @@ test('쉬는 날에는 릴멜의 방에 못 들어가고 크리스탈도 그대�
 test('쉬는 날 문구가 세 언어 모두 9가지 있다', () => {
   for (const l of ['ko', 'en', 'ja']) for (const k of REST_KEYS) assert.ok(I18N[l].restWhy[k], l + k)
 })
+
+test('문구 이름이 겹치지 않는다 (가위바위보 보상 버튼 · 보상 문구)', () => {
+  for (const l of ['ko', 'en', 'ja']) {
+    assert.equal(typeof I18N[l].reward, 'string', l)
+    assert.equal(typeof I18N[l].rewardOf, 'function', l)
+  }
+})
