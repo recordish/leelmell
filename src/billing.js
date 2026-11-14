@@ -20,10 +20,16 @@ export async function supported() {
   }
 }
 
-// Play 에 등록된 현지 가격 ({ pro01: '₩3,300', ... })
+// Play 에 등록된 현지 가격 ({ pro01: '₩3,300', ... }). 숫자 가격과 통화는 결제 기록용으로 따로 보관합니다
+const PRICE = {}
 export async function prices() {
   const { products } = await NativePurchases.getProducts({ productIdentifiers: IDS, productType: INAPP })
+  for (const p of products) if (IDS.includes(p.identifier)) PRICE[p.identifier] = { price: p.price, currency: p.currencyCode }
   return Object.fromEntries(products.filter((p) => IDS.includes(p.identifier)).map((p) => [p.identifier, p.priceString]))
+}
+export async function priceOf(id) {
+  if (!PRICE[id]) await prices().catch(() => {})
+  return PRICE[id] || { price: 0, currency: '' }
 }
 
 // 결과: { ok: true, token } 구매 완료 / { pending: true } 결제 대기(편의점 결제 등) / 취소·실패는 예외
@@ -36,7 +42,7 @@ export async function buy(id) {
     autoAcknowledgePurchases: false,
   })
   if (tx.purchaseState && tx.purchaseState !== '1') return { pending: true }
-  return { ok: true, token: tx.purchaseToken || tx.transactionId }
+  return { ok: true, token: tx.purchaseToken || tx.transactionId, order: tx.orderId || '' }
 }
 
 // 지급했으면 소비 처리 (같은 상품을 다시 살 수 있게 되고, 3일 안에 처리하지 않으면 Play 가 자동 환불합니다)
