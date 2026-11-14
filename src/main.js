@@ -38,6 +38,7 @@ let S = load()
 let user = null
 let sync = null
 let saveTimer = null
+let afterBuy = null // 바로 사는 창에서 결제가 끝나면 이어서 할 일 ('chambre' | 'color' | 'love')
 
 function save() {
   G.trim(S.g)
@@ -430,7 +431,8 @@ function resetPop() {
   p.className = 'pop01'
   p.removeAttribute('style')
   $('.pop_txt_01', p).removeAttribute('style')
-  $$('.rpsgame, .rpsgame_result', p).forEach((e) => e.remove())
+  $$('.rpsgame, .rpsgame_result, .qbuy, .qnote', p).forEach((e) => e.remove())
+  afterBuy = null
   const b = $('.pop_button .button', p)
   b.innerHTML = ''
   b.removeAttribute('style')
@@ -486,7 +488,28 @@ function pop03(id, html, price) {
   p.classList.add('pop03', id)
   openPop()
 }
-const needPop = (why) => {
+// 크리스탈이 모자랄 때: 앱에서는 그 자리에서 바로 사고 하던 일을 이어서 합니다
+const QUICK_COST = { chambre: 1, color: 1, love: G.LOVE_COST }
+function quickPop(kind) {
+  resetPop()
+  const p = $('.pop01')
+  const need = Math.max(1, QUICK_COST[kind] - S.g.crystals)
+  const pay = (id, img, name, price, extra) =>
+    `<a href="#" data-act="pay" data-pdt="${id}">${extra}<img src="assets/img/${img}.webp" alt=""><span class="obj">${name}</span><span class="price">${playPrice[id] || price}</span></a>`
+  p.classList.add('quick')
+  p.style.backgroundImage = 'url(assets/img/popup_bg_01.webp)'
+  $('.pop_txt_01', p).innerHTML = t('quickNeed')(need, kind)
+  $('.pop_button .button', p).style.display = 'none'
+  $('.pop_button', p).insertAdjacentHTML('beforebegin', `<div class="qbuy">
+    ${pay('pro01', 'ic_crystal4_01', t('crystal4'), t('price3300'), `<span class="bonus">${t('bonus')(1)}</span>`)}
+    ${pay('pro02', 'ic_crystal20_01', t('crystal20'), t('price9900'), `<span class="bonus">${t('bonus')(10)}</span><span class="best">BEST</span>`)}
+  </div><p class="qnote">${t('quickNote')}</p>`)
+  afterBuy = kind
+  openPop()
+  loadPrices()
+}
+const needPop = (why, kind) => {
+  if (kind && NATIVE_APP && why !== 'done') return quickPop(kind)
   if (why === 'needLab') pop01(t('needLab'), t('goLab'), '#lab', 'popup_bg_03')
   else if (why === 'lessShop') pop01(t('lessShop'), t('goShop'), '#shop', 'popup_bg_01')
   else pop01(t('needShop'), t('goShop'), '#shop', 'popup_bg_01')
@@ -581,25 +604,10 @@ document.addEventListener('click', (e) => {
 
   switch (act) {
     case 'enterApp': S.introSeen = true; save(); location.hash = '#home'; return render()
-    case 'enterChambre': {
-      const r = G.drawTarot(S.g, day(), rng)
-      if (!r.ok) return needPop(r.why)
-      save(); opened = 0; location.hash = '#cards'; return
-    }
+    case 'enterChambre': return enterChambre()
     case 'next': return opened < flow.n ? openCard() : finishCards()
-    case 'enterLove': {
-      const r = G.drawLove(S.g, day(), rng)
-      if (!r.ok) return needPop(r.why)
-      save(); opened = 0; location.hash = '#lovecards'; return
-    }
-    case 'color': {
-      const r = G.seeColor(S.g, day())
-      if (!r.ok) return pop02(t('noCrystal'), 'kimim')
-      save()
-      el.style.display = 'none'
-      $('.todayColorResult').style.display = 'block'
-      return
-    }
+    case 'enterLove': return enterLove()
+    case 'color': return seeColor()
     case 'up': case 'down': {
       const inp = $('.tribute_amount')
       inp.value = Math.max(1, Math.min(99, +inp.value + (act === 'up' ? 1 : -1)))
@@ -703,6 +711,27 @@ function finishCards() {
   }
 }
 
+function enterChambre() {
+  const r = G.drawTarot(S.g, day(), rng)
+  if (!r.ok) return needPop(r.why, 'chambre')
+  save(); opened = 0; location.hash = '#cards'
+}
+function enterLove() {
+  const r = G.drawLove(S.g, day(), rng)
+  if (!r.ok) return needPop(r.why, 'love')
+  save(); opened = 0; location.hash = '#lovecards'
+}
+function seeColor() {
+  const r = G.seeColor(S.g, day())
+  if (!r.ok) return NATIVE_APP ? quickPop('color') : pop02(t('noCrystal'), 'kimim')
+  save()
+  const b = $('.getTodayColor')
+  if (b) b.style.display = 'none'
+  const c = $('.todayColorResult')
+  if (c) c.style.display = 'block'
+}
+const CONTINUE = { chambre: enterChambre, love: enterLove, color: seeColor }
+
 function buy(id) {
   const r = G.buyItem(S.g, id, Date.now())
   if (!r.ok) return pop02(t('noCrystal'), 'kimim')
@@ -803,11 +832,17 @@ async function purchase(id) {
   if (buying) return
   const b = await loadBilling()
   if (!b || !b.PRODUCTS[id] || !(await b.supported())) return pop02(t('payFail'), 'kimim')
+  const next = afterBuy
   buying = true
   try {
     const r = await b.buy(id)
     if (r.pending) return pop02(t('payPending'), 'clock')
-    grant(b, id)
+    if (next && CONTINUE[next]) {
+      // 바로 사는 창에서 샀으면 고맙다는 창 대신 하던 일을 이어서 합니다
+      grant(b, id, true)
+      closePop()
+      CONTINUE[next]()
+    } else grant(b, id)
     await b.consume(r.token).catch((e) => console.warn('consume failed', e))
   } catch (e) {
     // 사용자가 결제창을 닫은 경우도 여기로 옵니다
@@ -818,11 +853,11 @@ async function purchase(id) {
   }
 }
 
-function grant(b, id) {
+function grant(b, id, quiet) {
   const p = b.PRODUCTS[id]
   G.addReward(S.g, p.stones, p.crystals)
   save()
-  pop02(t('payOk')(t('reward')(p.crystals, p.stones)), p.crystals ? 'crystal01' : 'stone01')
+  if (!quiet) pop02(t('payOk')(t('reward')(p.crystals, p.stones)), p.crystals ? 'crystal01' : 'stone01')
 }
 
 // 결제는 됐는데 지급 전에 앱이 꺼졌거나, 대기 중이던 결제가 끝난 것을 받아 줍니다
