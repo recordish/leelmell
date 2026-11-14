@@ -61,3 +61,12 @@ npm run build    # dist/ 에 빌드
 - **쿠폰**: 코드·보상·최대 사용 수를 정해 만들고 멈출 수 있습니다. 사용자는 사물함에서 코드를 넣고, 한 사람당 한 번씩 받습니다
 
 관리자 등록 (한 번만): `firestore.rules` 를 콘솔에 게시한 뒤, 관리자 계정으로 로그인해 `#admin` 에 나오는 계정 ID를 복사 → Firestore 에 컬렉션 `admins`, 문서 ID = 계정 ID, 필드 `role` = `owner` 로 만듭니다.
+
+## 안드로이드 앱 (Google Play `com.leelmell.app`)
+
+Capacitor 로 웹앱(`dist`)을 앱 안에 담습니다. 웹을 고치면 앱도 다시 빌드해 Play 에 올려야 반영됩니다.
+
+- 빌드: GitHub → Actions → **Android app** → Run workflow → 결과물(Artifacts)에서 `leelmell-test-apk`(폰에 바로 설치) · `leelmell-play-aab`(Play 업로드)
+- 버전: 2.0.0, 버전 코드 = 200 + 실행 번호 (기존 1.1.8 = 118 보다 큼)
+- 서명: 업로드 키는 저장소 비밀값 `ANDROID_KEYSTORE_BASE64` · `ANDROID_KEYSTORE_PASSWORD` · `ANDROID_KEY_ALIAS` · `ANDROID_KEY_PASSWORD` (`.github/workflows/android.yml` 참고). 테스트 APK 는 저장소의 `android/app/debug.keystore` (비밀 아님)
+- Google 로그인: 앱에서는 기기 계정으로 로그인(Credential Manager) → Firebase. `.env.production` 의 `VITE_GOOGLE_WEB_CLIENT_ID` 와, Firebase 에 안드로이드 앱(`com.leelmell.app`) + SHA-1 등록이 필요합니다

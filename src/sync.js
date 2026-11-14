@@ -1,10 +1,11 @@
 // Firebase: Google 로그인 + 계정 저장. 설정값(.env.production)이 있을 때만 main.js 가 불러옵니다.
 // 계정 데이터는 users/{uid} 문서 하나에 { g: 게임 상태, email, updatedAt } 로 저장합니다 (email 은 관리자 페이지에서 찾을 때 씀).
+import { Capacitor } from '@capacitor/core'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics, isSupported } from 'firebase/analytics'
 import {
   GoogleAuthProvider, deleteUser, getAuth, onAuthStateChanged,
-  reauthenticateWithPopup, signInWithPopup, signOut,
+  reauthenticateWithCredential, reauthenticateWithPopup, signInWithCredential, signInWithPopup, signOut,
 } from 'firebase/auth'
 import {
   addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, runTransaction,
@@ -29,8 +30,26 @@ if (import.meta.env.PROD && import.meta.env.VITE_FIREBASE_MEASUREMENT_ID) {
 }
 
 export const watchUser = (cb) => onAuthStateChanged(auth, cb)
-export const signIn = () => signInWithPopup(auth, new GoogleAuthProvider())
-export const signOutUser = () => signOut(auth)
+// 안드로이드 앱(WebView)에서는 Google 팝업 로그인이 막혀 있어서, 기기의 Google 계정으로 로그인한 뒤
+// 받은 ID 토큰으로 Firebase 에 로그인합니다. 웹에서는 지금처럼 팝업을 씁니다
+const NATIVE = Capacitor.isNativePlatform()
+let social = null
+async function nativeCredential() {
+  if (!social) {
+    const { SocialLogin } = await import('@capgo/capacitor-social-login')
+    await SocialLogin.initialize({ google: { webClientId: import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID, skipAuthOnlyAuthorizationAfterSignIn: true } })
+    social = SocialLogin
+  }
+  const res = await social.login({ provider: 'google', options: {} })
+  const idToken = res?.result?.idToken
+  if (!idToken) throw new Error('no id token')
+  return GoogleAuthProvider.credential(idToken)
+}
+export const signIn = async () => (NATIVE ? signInWithCredential(auth, await nativeCredential()) : signInWithPopup(auth, new GoogleAuthProvider()))
+export const signOutUser = async () => {
+  if (NATIVE && social) await social.logout({ provider: 'google' }).catch(() => {})
+  return signOut(auth)
+}
 
 export async function loadRemote(uid) {
   const snap = await getDoc(doc(db, 'users', uid))
@@ -51,7 +70,8 @@ export async function deleteAccount() {
     await deleteUser(u)
   } catch (e) {
     if (e.code !== 'auth/requires-recent-login') throw e
-    await reauthenticateWithPopup(u, new GoogleAuthProvider())
+    if (NATIVE) await reauthenticateWithCredential(u, await nativeCredential())
+    else await reauthenticateWithPopup(u, new GoogleAuthProvider())
     await deleteUser(u)
   }
 }

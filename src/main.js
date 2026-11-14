@@ -9,6 +9,9 @@ import * as G from './game.js'
 import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
 import { loveLine, lovePos, loveParts } from './love.js'
 import { adminShell, mountAdmin } from './admin.js'
+import { Capacitor } from '@capacitor/core'
+
+const NATIVE_APP = Capacitor.isNativePlatform()
 
 const KEY = 'leelmell.v2'
 const FIREBASE_ON = !!import.meta.env.VITE_FIREBASE_API_KEY
@@ -313,7 +316,7 @@ function lockerPage() {
     <dd class="coupon_row"><input id="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="30" placeholder="${t('couponPh')}" /><button type="button" class="com_btn_01" data-act="coupon">${t('couponBtn')}</button></dd></dl></div>
   <div class="escape_way"><p><a href="#" data-act="signout">${t('signOut')}</a></p></div>
   <div class="escape_way"><p><a href="#" data-act="delete">${t('deleteAccount')}</a></p></div>` : ''}
-  <p class="privacy_link"><a href="privacy.html" target="_blank" rel="noopener">${t('privacy')}</a></p>
+  <p class="privacy_link"><a href="privacy.html"${NATIVE_APP ? '' : ' target="_blank" rel="noopener"'}>${t('privacy')}</a></p>
 </div>`
 }
 
@@ -820,6 +823,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 render()
 setInterval(tick, 1000)
 
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+// 앱(안드로이드)은 파일을 앱 안에 담고 있어서 서비스 워커가 필요 없습니다
+if ('serviceWorker' in navigator && import.meta.env.PROD && !NATIVE_APP) {
   navigator.serviceWorker.register('sw.js').catch(() => {})
 }

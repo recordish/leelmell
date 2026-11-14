@@ -1,0 +1,12 @@
+{
+  "appId": "com.leelmell.app",
+  "appName": "Leelmell's Tarotcards",
+  "webDir": "dist",
+  "android": { "backgroundColor": "#D6E1FF" },
+  "plugins": {
+    "SocialLogin": {
+      "providers": { "google": true, "facebook": false, "apple": false, "twitter": false },
+      "logLevel": 1
+    }
+  }
+}
