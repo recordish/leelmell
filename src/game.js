@@ -203,6 +203,12 @@ export function rollVisitors(s, rng) {
   return out
 }
 
+// 쿠폰·운영자 지급: 더하거나 빼되 0 밑으로는 내려가지 않습니다
+export function addReward(s, stones, crystals) {
+  s.stones = Math.max(0, s.stones + (Math.trunc(stones) || 0))
+  s.crystals = Math.max(0, s.crystals + (Math.trunc(crystals) || 0))
+}
+
 export function takeKimim(s, n) {
   if (n > 0) s.stones += n
 }

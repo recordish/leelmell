@@ -51,3 +51,13 @@ npm run build    # dist/ 에 빌드
 1. Firebase 프로젝트: `leelmell-1a2ab` (설정값은 `.env.production`. 비우면 로그인 없이 기기 저장만)
 2. Authentication → 로그인 방법 → **Google** 사용, 승인된 도메인에 `recordishapp.com`
 3. Firestore Database 만들기 → 규칙에 `firestore.rules` 붙여 넣고 게시
+
+## 관리자 페이지 (`#admin`)
+
+메뉴에는 없고 `https://recordishapp.com/leelmell/#admin` 주소로만 들어갑니다.
+
+- **통계**: 가입자, 최근 7일 접속, 오늘 3장·연애 타로, 오늘 기도 수, 30일 많이 나온 카드 (로그인한 사용자 기준. 기도 내용은 보이지 않습니다)
+- **사용자 찾기 · 재화 지급**: 이메일로 찾아 크리스탈·천연석을 보내거나(음수면 차감) 기록을 봅니다. 사용자가 다음에 앱을 열 때 `gifts` 에서 받아 갑니다
+- **쿠폰**: 코드·보상·최대 사용 수를 정해 만들고 멈출 수 있습니다. 사용자는 사물함에서 코드를 넣고, 한 사람당 한 번씩 받습니다
+
+관리자 등록 (한 번만): `firestore.rules` 를 콘솔에 게시한 뒤, 관리자 계정으로 로그인해 `#admin` 에 나오는 계정 ID를 복사 → Firestore 에 컬렉션 `admins`, 문서 ID = 계정 ID, 필드 `role` = `owner` 로 만듭니다.

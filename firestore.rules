@@ -1,15 +1,79 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 계정 데이터: 로그인한 본인만 읽고 쓰고 지울 수 있습니다
+    function signedIn() { return request.auth != null; }
+    // 관리자: admins/{uid} 문서가 있는 계정 (Firebase 콘솔에서 직접 만듭니다. 앱에서는 만들 수 없음)
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+
+    // 계정 데이터: 본인만 쓰고 지울 수 있고, 읽기는 본인과 관리자
     // (지금은 유료 상품이 없어 재화 계산을 앱에서 합니다. 결제를 붙일 때는 서버 함수로 옮겨야 합니다)
     match /users/{uid} {
-      allow read, delete: if request.auth != null && request.auth.uid == uid;
-      allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['g', 'updatedAt'])
+      allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+      allow delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['g', 'email', 'updatedAt'])
         && request.resource.data.updatedAt == request.time
+        && (!('email' in request.resource.data) || request.resource.data.email == request.auth.token.email)
         && validGame(request.resource.data.g);
     }
+
+    // 관리자 목록: 본인이 관리자인지만 확인할 수 있습니다
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+    }
+
+    // 운영자 지급: 관리자가 만들고, 받는 사람은 '받음'으로 바꾸기만 할 수 있습니다
+    match /gifts/{id} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['uid', 'stones', 'crystals', 'note', 'claimed', 'at', 'by'])
+        && request.resource.data.uid is string
+        && request.resource.data.stones is int && request.resource.data.stones >= -1000000 && request.resource.data.stones <= 1000000
+        && request.resource.data.crystals is int && request.resource.data.crystals >= -100000 && request.resource.data.crystals <= 100000
+        && request.resource.data.note is string && request.resource.data.note.size() <= 100
+        && request.resource.data.claimed == false
+        && request.resource.data.at == request.time
+        && request.resource.data.by == request.auth.uid;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid && resource.data.claimed == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed', 'claimedAt'])
+        && request.resource.data.claimed == true
+        && request.resource.data.claimedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
+    // 쿠폰: 관리자가 만들고, 사용자는 코드마다 한 번만 (사용 수 +1 과 받은 기록을 함께 써야 함)
+    match /coupons/{code} {
+      allow get: if signedIn();
+      allow list: if isAdmin();
+      allow create: if isAdmin() && validCoupon(request.resource.data) && request.resource.data.uses == 0;
+      allow update: if (isAdmin() && validCoupon(request.resource.data))
+        || (signedIn()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uses'])
+          && request.resource.data.uses == resource.data.uses + 1
+          && resource.data.active == true
+          && resource.data.uses < resource.data.maxUses
+          && !exists(/databases/$(database)/documents/coupons/$(code)/redeemed/$(request.auth.uid))
+          && existsAfter(/databases/$(database)/documents/coupons/$(code)/redeemed/$(request.auth.uid)));
+      allow delete: if isAdmin();
+
+      match /redeemed/{uid} {
+        allow get: if signedIn() && request.auth.uid == uid;
+        allow list: if isAdmin();
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['at'])
+          && request.resource.data.at == request.time
+          && getAfter(/databases/$(database)/documents/coupons/$(code)).data.uses == get(/databases/$(database)/documents/coupons/$(code)).data.uses + 1;
+      }
+    }
+  }
+
+  function validCoupon(c) {
+    return c.keys().hasOnly(['stones', 'crystals', 'maxUses', 'uses', 'active'])
+      && c.stones is int && c.stones >= 0 && c.stones <= 1000000
+      && c.crystals is int && c.crystals >= 0 && c.crystals <= 100000
+      && c.maxUses is int && c.maxUses >= 1 && c.maxUses <= 1000000
+      && c.uses is int && c.uses >= 0
+      && c.active is bool;
   }
 
   function validGame(g) {
