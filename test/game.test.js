@@ -278,3 +278,24 @@ test('문구 이름이 겹치지 않는다 (가위바위보 보상 버튼 · 보
     assert.equal(typeof I18N[l].rewardOf, 'function', l)
   }
 })
+
+test('방문 기록: 유입 채널 · 국가 추정 · 기기', async () => {
+  const V = await import('../src/visit.js')
+  assert.deepEqual(V.channelOf('', 'recordishapp.com', true), { ch: 'app', src: '' })
+  assert.deepEqual(V.channelOf('', 'recordishapp.com', false), { ch: 'direct', src: '' })
+  assert.deepEqual(V.channelOf('https://www.google.co.kr/', 'recordishapp.com', false), { ch: 'search', src: 'Google' })
+  assert.deepEqual(V.channelOf('https://search.naver.com/x', 'recordishapp.com', false), { ch: 'search', src: 'Naver' })
+  assert.deepEqual(V.channelOf('https://l.instagram.com/', 'recordishapp.com', false), { ch: 'sns', src: 'Instagram' })
+  assert.deepEqual(V.channelOf('https://recordishapp.com/leelmell/', 'recordishapp.com', false), { ch: 'direct', src: '' })
+  assert.deepEqual(V.channelOf('https://blog.example.com/a', 'recordishapp.com', false), { ch: 'site', src: 'blog.example.com' })
+  assert.equal(V.countryOf('Asia/Seoul', 'en-US'), 'KR')
+  assert.equal(V.countryOf('Etc/UTC', 'ja-JP'), 'JP')
+  assert.equal(V.countryOf('', 'ko'), '')
+  const iphone = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
+  const android = 'Mozilla/5.0 (Linux; Android 14; SM-S918N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36'
+  const win = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
+  assert.deepEqual([V.deviceOf(iphone), V.osOf(iphone), V.browserOf(iphone)], ['phone', 'iOS', 'Safari'])
+  assert.deepEqual([V.deviceOf(android), V.osOf(android), V.browserOf(android)], ['phone', 'Android', 'Chrome'])
+  assert.deepEqual([V.deviceOf(win), V.osOf(win), V.browserOf(win)], ['pc', 'Windows', 'Chrome'])
+  assert.equal(V.browserOf(android, true), 'app')
+})

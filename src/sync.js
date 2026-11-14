@@ -78,6 +78,13 @@ export async function saveRemote(uid, g) {
   }
 }
 
+// 방문 기록: 앱을 열 때마다 hits 에 한 줄 (유입 채널 · 첫 화면 · 국가 추정 · 언어 · 기기). 본 화면 수는 views 로 올립니다
+export async function startHit(info) {
+  const ref = await addDoc(collection(db, 'hits'), { ...info, views: 1, at: serverTimestamp() })
+  return ref.id
+}
+export const setHitViews = (id, views) => updateDoc(doc(db, 'hits', id), { views })
+
 // 하루 접속 수: 기기마다 하루 한 번, visits/{날짜} 의 app 또는 web 을 1 올립니다 (로그인하지 않아도)
 export async function countVisit(day) {
   const KEY = 'leelmell.visit'

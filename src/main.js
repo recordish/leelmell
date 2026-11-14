@@ -7,6 +7,7 @@ import { REVERSED } from './reversed.js'
 import { LANGS, T } from './i18n.js'
 import * as G from './game.js'
 import { ICONS as REST_ICONS, restOf } from './rest.js'
+import { browserOf, channelOf, countryOf, deviceOf, osOf } from './visit.js'
 import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
 import { loveLine, lovePos, loveParts } from './love.js'
 import { Capacitor } from '@capacitor/core'
@@ -422,6 +423,8 @@ function loadSwiper() {
 // ---------- 그리기 ----------
 const app = document.getElementById('app')
 let route = ''
+// 방문 기록: 지금 방문의 hits 문서와 본 화면 수
+const hit = { id: null, views: 0, saved: 0, hiddenAt: 0 }
 
 function render() {
   let name = location.hash.replace('#', '') || (S.introSeen ? 'home' : 'intro')
@@ -432,6 +435,7 @@ function render() {
   if (name === 'lovecards' && (!S.g.love[day()] || S.g.love[day()].done)) name = 'love'
   // 다른 화면으로 돌려보냈으면 주소도 그 화면으로 맞춥니다
   if (location.hash && location.hash !== '#' + name) history.replaceState(null, '', '#' + name)
+  if (name !== route) hit.views++
   route = name
   document.body.className = name === 'love' || name === 'lovecards' ? 'love-bg' : ''
   document.getElementById('css-intro').disabled = name !== 'intro'
@@ -976,6 +980,7 @@ if (FIREBASE_ON) {
   import('./sync.js').then((m) => {
     sync = m
     m.countVisit(day()).catch((e) => console.warn('visit count failed', e))
+    startHit(false)
     m.watchUser(async (u) => {
       const was = user
       user = u
@@ -1001,12 +1006,34 @@ if (FIREBASE_ON) {
 document.addEventListener('change', (e) => {
   if (e.target.id === 'langSel' && LANGS.includes(e.target.value)) { S.lang = e.target.value; save(); render() }
 })
+// 방문 기록 시작 (resumed: 30분 넘게 나갔다 다시 들어온 경우)
+function startHit(resumed) {
+  if (!sync) return
+  let first = false
+  try { first = !localStorage.getItem('leelmell.seen'); localStorage.setItem('leelmell.seen', '1') } catch { /* 무시 */ }
+  const ua = navigator.userAgent || ''
+  const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || '' } catch { return '' } })()
+  const lang = (navigator.language || '').slice(0, 20)
+  const { ch, src } = channelOf(resumed ? '' : document.referrer, location.hostname, NATIVE_APP)
+  const info = { ch, src, landing: route || 'home', country: countryOf(tz, lang), lang, device: deviceOf(ua), os: osOf(ua), browser: browserOf(ua, NATIVE_APP), first }
+  hit.id = null; hit.views = 1; hit.saved = 1; hit.hiddenAt = 0
+  sync.startHit(info).then((id) => { hit.id = id; saveHitViews() }).catch((e) => console.warn('hit failed', e))
+}
+// 본 화면 수: 화면을 벗어날 때와 5화면마다 저장
+function saveHitViews() {
+  if (!sync || !hit.id || hit.views <= hit.saved) return
+  hit.saved = Math.min(hit.views, 999)
+  sync.setHitViews(hit.id, hit.saved).catch(() => {})
+}
+setInterval(() => { if (hit.views - hit.saved >= 5) saveHitViews() }, 5000)
+
 window.addEventListener('hashchange', () => { opened = 0; rps = null; render() })
 window.addEventListener('resize', () => { if (route === 'cards') sizeCards() })
 document.addEventListener('visibilitychange', () => {
   // 자정이 지나 돌아오면 날짜가 바뀐 화면으로
   if (!document.hidden && (route === 'chambre' || route === 'home')) render()
   if (!document.hidden) { claimGifts(); recoverPurchases(); sync?.countVisit(day()).catch(() => {}) }
+  if (document.hidden) { hit.hiddenAt = Date.now(); saveHitViews() } else if (hit.hiddenAt && Date.now() - hit.hiddenAt > 30 * 60000) startHit(true)
 })
 
 // 새로고침해도 예전 스크롤 위치로 돌아가지 않고 화면 맨 위부터 보여 줍니다
