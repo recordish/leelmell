@@ -107,7 +107,7 @@ function homePage() {
   if (G.free100Status(S.g, day()) === 'ok') tip = t('tipFree100')
   else if (!G.free10Wait(S.g, Date.now())) tip = t('tipFree10')
   const btn = done
-    ? `<a href="#cards" class="getTodayCard done">${t('seeAgain')}<span class="next">${t('nextIn')} <b id="countdown"></b></span></a>`
+    ? `<div class="getTodayCard done">${t('homeDone')}<span class="next">${t('nextIn')} <b id="countdown"></b></span></div>`
     : `<a href="#chambre" class="getTodayCard">${t('home')}<span class="ct">1</span></a>`
   return `<div class="home_page">
   <p class="home_visual">Welcome to Leelmell's</p>
@@ -143,8 +143,7 @@ function tick() {
 function chambrePage() {
   const st = G.chambreStatus(S.g, day())
   const body = st === 'done'
-    ? `<p class="txt02">${t('chambreDone')}</p>
-       <div class="btnEnter"><button type="button" data-act="again">${t('seeAgain')}</button></div>`
+    ? `<p class="txt02">${t('chambreDone')}</p>`
     : `<p class="txt01">${t('chambreNeed')}</p>
        <div class="tribute"><span class="crystal"></span></div>
        <div class="btnEnter" id="enterChambre"><button type="button" data-act="enterChambre">${t('enter')}</button></div>`
@@ -198,8 +197,7 @@ ${color && color.show ? `<div class="seeTodayColor" style="display:none">
 function lovePage() {
   const st = G.loveStatus(S.g, day())
   const body = st === 'done'
-    ? `<p class="txt02">${t('loveDone')}</p>
-       <div class="btnEnter"><button type="button" data-act="againLove">${t('loveAgain')}</button></div>`
+    ? `<p class="txt02">${t('loveDone')}</p>`
     : `<p class="txt01">${t('loveNeed')}</p>
        <div class="tribute"><span class="crystal"></span><b class="cost">${G.LOVE_COST}</b></div>
        <div class="btnEnter"><button type="button" data-act="enterLove">${t('enter')}</button></div>`
@@ -360,9 +358,12 @@ let route = ''
 function render() {
   let name = location.hash.replace('#', '') || (S.introSeen ? 'home' : 'intro')
   if (name !== 'intro' && !ROUTES[name]) name = 'home'
-  if (name === 'cards' && !S.g.readings[day()]) name = 'chambre'
+  // 타로는 하루 한 번 보고 끝입니다. 끝까지 본 날은 주소로 들어와도 입장 화면으로 돌려보냅니다
+  if (name === 'cards' && (!S.g.readings[day()] || S.g.colors[day()]?.done)) name = 'chambre'
   if ((name === 'love' || name === 'lovecards') && !hasSyn()) name = 'depot' // 연애 타로는 한국어·영어만
-  if (name === 'lovecards' && !S.g.love[day()]) name = 'love'
+  if (name === 'lovecards' && (!S.g.love[day()] || S.g.love[day()].done)) name = 'love'
+  // 다른 화면으로 돌려보냈으면 주소도 그 화면으로 맞춥니다
+  if (location.hash && location.hash !== '#' + name) history.replaceState(null, '', '#' + name)
   route = name
   document.body.className = name === 'love' || name === 'lovecards' ? 'love-bg' : ''
   document.getElementById('css-intro').disabled = name !== 'intro'
@@ -559,14 +560,12 @@ document.addEventListener('click', (e) => {
       if (!r.ok) return needPop(r.why)
       save(); opened = 0; location.hash = '#cards'; return
     }
-    case 'again': opened = 0; location.hash = '#cards'; return
     case 'next': return opened < flow.n ? openCard() : finishCards()
     case 'enterLove': {
       const r = G.drawLove(S.g, day(), rng)
       if (!r.ok) return needPop(r.why)
       save(); opened = 0; location.hash = '#lovecards'; return
     }
-    case 'againLove': opened = 0; location.hash = '#lovecards'; return
     case 'color': {
       const r = G.seeColor(S.g, day())
       if (!r.ok) return pop02(t('noCrystal'), 'kimim')
