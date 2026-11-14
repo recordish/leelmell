@@ -98,12 +98,38 @@ const shown = { ct: S.g.crystals, rk: S.g.stones }
 function updateGnb() {
   for (const [k, v] of [['ct', S.g.crystals], ['rk', S.g.stones]]) {
     const li = $('.gnb .' + k)
-    const diff = v - shown[k]
+    const from = shown[k]
+    const diff = v - from
     shown[k] = v
-    if (!li) continue
-    li.textContent = v
-    if (diff) li.insertAdjacentHTML('beforeend', `<b class="delta ${diff > 0 ? 'plus' : 'minus'}">${diff > 0 ? '+' : ''}${diff}</b>`)
+    if (!li || !diff) continue
+    rollNumber(li, from, v)
+    li.insertAdjacentHTML('beforeend', `<b class="delta ${diff > 0 ? 'plus' : 'minus'}">${diff > 0 ? '+' : ''}${diff}</b>`)
   }
+}
+
+// 상단 숫자 촤라락: 자리마다 0~9 띠(세 바퀴)를 굴려 새 숫자에서 멈춥니다. 늘면 위로, 줄면 아래로
+const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches
+const DIGIT_STRIP = '<i></i>' + '0123456789'.repeat(3).split('').map((x) => `<i>${x}</i>`).join('')
+function rollNumber(li, from, to) {
+  li.textContent = ''
+  if (REDUCED_MOTION) { li.textContent = to; return }
+  const n = Math.max(String(from).length, String(to).length)
+  const A = String(from).padStart(n, ' ')
+  const B = String(to).padStart(n, ' ')
+  li.classList.add('rolling')
+  li.setAttribute('aria-label', to)
+  li.innerHTML = `<span class="odo" aria-hidden="true">${[...B].map(() => `<span class="d"><span>${DIGIT_STRIP}</span></span>`).join('')}</span>`
+  // 띠 위치: 0 = 빈칸, 1~10 = 첫 바퀴, 11~20 = 가운데 바퀴(시작), 21~30 = 셋째 바퀴
+  const pos = (c, turn) => (c === ' ' ? 0 : 11 + +c + turn)
+  li.querySelectorAll('.odo .d > span').forEach((el, i) => {
+    el.style.transform = `translateY(${-pos(A[i], 0) * 1.25}em)`
+    el.getBoundingClientRect()
+    el.style.transition = `transform ${0.7 + (n - i) * 0.12}s cubic-bezier(.2,.8,.2,1)`
+    el.style.transform = `translateY(${-pos(B[i], to > from ? 10 : -10) * 1.25}em)`
+  })
+  li.classList.remove('bump')
+  void li.offsetWidth
+  li.classList.add('bump')
 }
 
 // ---------- 화면별 내용 ----------
