@@ -183,7 +183,10 @@ const bold = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
 function synthesisHtml(cards) {
   if (!hasSyn()) return ''
   const sp = specials(cards, S.lang).map((x) => `<div class="special ${x.good === true ? 'good' : x.good === false ? 'bad' : 'rare'}"><h4>${t('specialTitle')}</h4><p>${bold(x.text)}</p></div>`).join('')
-  return `<div class="synthesis hidden"><h4>${t('synTitle')}</h4>${synthesizeParts(cards, S.lang).map((x) => `<p>${bold(x)}</p>`).join('')}${sp}</div>`
+  // 위: 과거·현재·미래 세 문단 / 아래: 맺음말을 따로 강조
+  const parts = synthesizeParts(cards, S.lang).map((x) => `<p>${bold(x)}</p>`)
+  return `<div class="synthesis split hidden"><div class="blk1"><h4>${t('synTitle')}</h4>${parts.slice(0, -1).join('')}</div>` +
+    `<div class="blk2"><span class="lbl">${t('synClose')}</span>${parts.at(-1)}</div>${sp}</div>`
 }
 
 // 카드 화면: 과거 → 현재 → 미래 순서로 한 장씩 뒤집어 해석을 보고, 마지막에 종합 해설

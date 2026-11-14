@@ -210,3 +210,23 @@ body.love-bg{background:#F7A3C9}
 .quick .qbuy .bonus{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#DB6AF5;color:#FFF;font-size:11px;font-weight:700;border-radius:10px;padding:1px 8px;white-space:nowrap;line-height:1.5}
 .quick .qbuy .best{position:absolute;top:6px;right:6px;background:#FFE07A;color:#3b2f00;font-size:10px;font-weight:800;border-radius:6px;padding:0 5px;line-height:1.6}
 .quick .qnote{margin:12px 0 0;text-align:center;font-size:12px;color:#7a7f8f}
+
+/* 종합 해설: 두 블럭, 아래 맺음말 강조 */
+.tarotRoom .synthesis.split{padding:0;background:none}
+.tarotRoom .synthesis .blk1{padding:18px 16px 8px;background:#EFEAFB;border-radius:12px}
+.tarotRoom .synthesis .blk2{margin-top:12px;padding:18px 16px;background:#6A32AB;border-radius:12px}
+.tarotRoom .synthesis .blk2 .lbl{display:inline-block;margin:0 0 8px;padding:2px 10px;border-radius:10px;background:#FFF;color:#6A32AB;font-size:12px;font-weight:700}
+.tarotRoom .synthesis .blk2 p{margin:0;color:#FFF;font-size:16px;font-weight:600;line-height:170%}
+.tarotRoom .synthesis .blk2 p strong{color:#FFF}
+
+/* 상점 무료 카드: 조금 작게, 노란색 연하게 */
+.shop2 .div-free{top:30px;gap:8px}
+.shop2 .div-free li{flex:0 0 96px;width:96px}
+.shop2 .div-free li a{height:138px;padding:24px 6px 8px}
+.shop2 .div-free li:not(.waiting) a{background:#FFEBA8 !important}
+.shop2 .div-free .art,.shop2 .free10stones .art{height:50px;margin:0 auto 4px}
+.shop2 .div-free .art.boxed,.shop2 .art.boxed .box{width:64px}
+.shop2 .art.boxed img{height:40px;bottom:8px}
+.shop2 .div-free li a .obj{font-size:12px}
+.shop2 .div-free li a .price{height:28px;line-height:28px;font-size:13px}
+.shop2 .div-free li .tag{top:6px;left:6px;font-size:10px}
