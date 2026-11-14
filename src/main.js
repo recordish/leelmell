@@ -352,6 +352,14 @@ function labPage() {
 // Google 로그인 버튼의 4색 G 로고 (Google 브랜드 가이드의 버튼 모양)
 const G_LOGO = '<svg class="g" viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>'
 
+// 언어 고르기 앞에 붙는 국기 (단순화한 평면 그림, 3:2)
+const FLAG = {
+  ko: '<svg viewBox="0 0 30 20" class="flag"><rect width="30" height="20" fill="#FFF"/><path d="M11 10a4 4 0 0 1 8 0z" fill="#CD2E3A"/><path d="M11 10a4 4 0 0 0 8 0z" fill="#0047A0"/><circle cx="13" cy="10" r="2" fill="#CD2E3A"/><circle cx="17" cy="10" r="2" fill="#0047A0"/><g fill="#000"><path d="M5.2 4.6l2.6-1.7.5.7-2.6 1.7zM5.9 5.6l2.6-1.7.5.7-2.6 1.7zM6.6 6.6l2.6-1.7.5.7-2.6 1.7z"/><path d="M21.7 3.6l2.6 1.7-.5.7-2.6-1.7zM21 4.6l2.6 1.7-.5.7-2.6-1.7zM20.3 5.6l2.6 1.7-.5.7-2.6-1.7z"/><path d="M5.2 15.4l2.6 1.7.5-.7-2.6-1.7zM5.9 14.4l2.6 1.7.5-.7-2.6-1.7zM6.6 13.4l2.6 1.7.5-.7-2.6-1.7z"/><path d="M21.7 16.4l2.6-1.7-.5-.7-2.6 1.7zM21 15.4l2.6-1.7-.5-.7-2.6 1.7zM20.3 14.4l2.6-1.7-.5-.7-2.6 1.7z"/></g></svg>',
+  en: '<svg viewBox="0 0 30 20" class="flag"><rect width="30" height="20" fill="#FFF"/>' + [0, 2, 4, 6, 8, 10, 12].map((i) => `<rect y="${(i * 20) / 13}" width="30" height="${20 / 13}" fill="#B22234"/>`).join('') + '<rect width="12.6" height="10.77" fill="#3C3B6E"/>' + [[2, 2], [5, 2], [8, 2], [11, 2], [3.5, 4.5], [6.5, 4.5], [9.5, 4.5], [2, 7], [5, 7], [8, 7], [11, 7], [3.5, 9.3], [6.5, 9.3], [9.5, 9.3]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r=".6" fill="#FFF"/>`).join('') + '</svg>',
+  ja: '<svg viewBox="0 0 30 20" class="flag"><rect width="30" height="20" fill="#FFF"/><circle cx="15" cy="10" r="6" fill="#BC002D"/></svg>',
+}
+const LANG_NAME = { ko: '한국어', en: 'English', ja: '日本語' }
+
 function lockerPage() {
   const acct = !FIREBASE_ON ? '' : user
     ? `<dt>${t('account')}</dt><dd><p class="acct_mail">${esc(user.email || user.displayName || '')}</p></dd>`
@@ -361,13 +369,12 @@ function lockerPage() {
   <div class="myinfo"><div class="email_pannel"><dl>
     ${acct}
     <dt>${t('language')}</dt>
-    <dd class="langs">${LANGS.map((l) => `<button type="button" class="com_btn_01${l === S.lang ? ' on' : ''}" data-lang="${l}">${{ ko: '한국어', en: 'English', ja: '日本語' }[l]}</button>`).join(' ')}</dd>
+    <dd class="langs"><div class="lang_sel">${FLAG[S.lang]}<select id="langSel" aria-label="${t('language')}">${LANGS.map((l) => `<option value="${l}"${l === S.lang ? ' selected' : ''}>${LANG_NAME[l]}</option>`).join('')}</select></div></dd>
   </dl></div></div>
   ${user ? `<div class="myinfo coupon_pannel"><dl><dt>${t('coupon')}</dt>
     <dd class="coupon_row"><input id="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="30" placeholder="${t('couponPh')}" /><button type="button" class="com_btn_01" data-act="coupon">${t('couponBtn')}</button></dd></dl></div>
-  <div class="escape_way"><p><a href="#" data-act="signout">${t('signOut')}</a></p></div>
-  <div class="escape_way"><p><a href="#" data-act="delete">${t('deleteAccount')}</a></p></div>` : ''}
-  <p class="privacy_link"><a href="privacy.html"${NATIVE_APP ? '' : ' target="_blank" rel="noopener"'}>${t('privacy')}</a></p>
+  <div class="logout_way"><a href="#" data-act="signout">${t('signOut')}</a></div>` : ''}
+  <p class="foot_links"><a href="privacy.html"${NATIVE_APP ? '' : ' target="_blank" rel="noopener"'}>${t('privacy')}</a>${user ? `<span>·</span><a href="#" data-act="delete">${t('deleteAccount')}</a>` : ''}</p>
 </div>`
 }
 
@@ -964,6 +971,9 @@ if (FIREBASE_ON) {
   }).catch((e) => console.warn('firebase load failed', e))
 }
 
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'langSel' && LANGS.includes(e.target.value)) { S.lang = e.target.value; save(); render() }
+})
 window.addEventListener('hashchange', () => { opened = 0; rps = null; render() })
 window.addEventListener('resize', () => { if (route === 'cards') sizeCards() })
 document.addEventListener('visibilitychange', () => {
