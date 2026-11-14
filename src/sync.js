@@ -1,6 +1,7 @@
 // Firebase: Google 로그인 + 계정 저장. 설정값(.env.production)이 있을 때만 main.js 가 불러옵니다.
 // 계정 데이터는 users/{uid} 문서 하나에 { g: 게임 상태, updatedAt } 로 저장합니다.
 import { initializeApp } from 'firebase/app'
+import { getAnalytics, isSupported } from 'firebase/analytics'
 import {
   GoogleAuthProvider, deleteUser, getAuth, onAuthStateChanged,
   reauthenticateWithPopup, signInWithPopup, signOut,
@@ -14,9 +15,15 @@ const app = initializeApp({
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 })
 const auth = getAuth(app)
 const db = getFirestore(app)
+
+// 방문 통계 (Google 애널리틱스). 막힌 브라우저에서는 조용히 건너뜁니다
+if (import.meta.env.PROD && import.meta.env.VITE_FIREBASE_MEASUREMENT_ID) {
+  isSupported().then((ok) => ok && getAnalytics(app)).catch(() => {})
+}
 
 export const watchUser = (cb) => onAuthStateChanged(auth, cb)
 export const signIn = () => signInWithPopup(auth, new GoogleAuthProvider())
