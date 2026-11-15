@@ -140,7 +140,7 @@ function homePage() {
   if (G.free100Status(S.g, day()) === 'ok') tip = t('tipFree100')
   else if (!G.free10Wait(S.g, Date.now())) tip = t('tipFree10')
   const btn = done
-    ? `<div class="getTodayCard done">${t('homeDone')}<span class="next">${t('nextIn')} <b id="countdown"></b></span></div>`
+    ? `<div class="getTodayCard done">${t('homeDone')}</div>`
     : `<a href="#chambre" class="getTodayCard">${t('home')}<span class="ct">1</span></a>`
   return `<div class="home_page">
   <p class="home_visual">Welcome to Leelmell's</p>
