@@ -461,6 +461,22 @@ function render() {
     sizeCards()
     cardStep()
   }
+  if (joinPending && name !== 'cards' && !user) joinPop()
+}
+
+// 로그인 권유: 첫 타로를 다 보고 카드 화면을 떠날 때 기기마다 한 번만. 새 계정이면 크리스탈 1개를 줍니다
+let joinPending = false
+function joinPop() {
+  joinPending = false
+  S.joinAsked = true
+  save()
+  resetPop()
+  const p = $('.pop01')
+  p.classList.add('join')
+  $('.pop_txt_01', p).innerHTML = `<img class="jic" src="assets/img/ic_crystal1_01.webp" alt=""><span class="jt">${t('joinTitle')}</span><span class="js">${t('joinSub')}</span>`
+  $('.pop_button .button', p).style.display = 'none'
+  $('.pop_button', p).insertAdjacentHTML('beforebegin', `<div class="jbox"><button type="button" class="gsi" data-act="joinSignin">${G_LOGO}<span>${t('signIn')}</span></button><a href="#" class="later closeLayerPopup">${t('joinLater')}</a></div>`)
+  openPop()
 }
 
 function sizeCards() {
@@ -476,7 +492,7 @@ function resetPop() {
   p.className = 'pop01'
   p.removeAttribute('style')
   $('.pop_txt_01', p).removeAttribute('style')
-  $$('.rpsgame, .rpsgame_result, .qbuy, .qnote', p).forEach((e) => e.remove())
+  $$('.rpsgame, .rpsgame_result, .qbuy, .qnote, .jbox', p).forEach((e) => e.remove())
   afterBuy = null
   const b = $('.pop_button .button', p)
   b.innerHTML = ''
@@ -689,6 +705,7 @@ document.addEventListener('click', (e) => {
     }
     case 'pay': return purchase(el.dataset.pdt)
     case 'signin': return account(() => sync.signIn())
+    case 'joinSignin': closePop(); return account(() => sync.signIn())
     case 'signout': return account(() => sync.signOutUser())
     case 'delete': return confirmDelete()
     case 'coupon': return useCoupon()
@@ -752,6 +769,8 @@ function finishCards() {
   const c = flow.rec()
   if (c && !c.done) {
     c.done = true
+    // 로그인하지 않은 앱 사용자: 카드 화면을 떠날 때 로그인 권유를 한 번 띄웁니다
+    if (route === 'cards' && NATIVE_APP && sync && !user && !S.joinAsked) joinPending = true
     save()
     // 방금 본 카드별 해석을 지나 종합 해설 위치로 내려갑니다 (없으면 맨 위로)
     if (syn) syn.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -993,9 +1012,13 @@ if (FIREBASE_ON) {
         try {
           const remote = await m.loadRemote(u.uid)
           if (remote) S.g = G.mergeIntoRemote(S.g, remote)
+          // 가입 선물: 계정 문서가 아직 없는 새 계정만 크리스탈 1개 (다시 로그인하면 문서가 있어 또 받지 않음)
+          const welcome = !remote
+          if (welcome) G.addReward(S.g, 0, 1)
           save()
           await m.saveRemote(u.uid, S.g)
           await claimGifts()
+          if (welcome) { stat('welcome'); pop02(t('joinGot'), 'crystal01') }
         } catch (e) { console.warn('sync failed', e) }
       } else if (was) {
         // 로그아웃하면 이 기기에는 새 손님 상태로 시작합니다 (계정 재화를 다른 계정으로 옮기지 못하게)

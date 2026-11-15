@@ -83,6 +83,10 @@ export const T = {
     payFail: '결제를 진행하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
     quickNeed: (n, k) => '크리스탈이 <b>' + n + '개</b> 부족해요.<br>지금 바로 채우고 ' + { chambre: '릴멜을 만나 볼까요?', love: '율리움을 만나 볼까요?', color: '오늘의 행운의 색상을 볼까요?', rps: '율리움과 가위바위보를 할까요?', lotto: '행운의 번호를 열어 볼까요?' }[k],
     quickNote: '구매하면 바로 이어서 진행돼요',
+    joinTitle: '로그인하면<br>크리스탈 <b>1개</b>를 드려요',
+    joinSub: '크리스탈과 천연석이 계정에 저장돼서<br>앱을 지우거나 폰을 바꿔도 그대로 남아요.',
+    joinLater: '다음에 할게요',
+    joinGot: '가입 선물로 크리스탈 1개를 받았어요!',
     payOk: (r) => '구매해 주셔서 고맙습니다. ' + r + '을 받았습니다.',
     items: {
       in0001: ['신비한 향수', '잠시 동안 모든 저주에서 해제되며 약간의 알수 없는 힘을 발휘합니다.<br>효과는 60분간 지속되며 구매 즉시 사용됩니다.'],
@@ -217,6 +221,10 @@ export const T = {
     payFail: 'The payment could not be completed. Please try again in a moment.',
     quickNeed: (n, k) => 'You need <b>' + n + ' more crystal' + (n > 1 ? 's' : '') + '</b>.<br>Top up now and ' + { chambre: 'meet Leelmell?', love: 'meet Ulyooum?', color: 'see your lucky color?', rps: 'play rock-paper-scissors with Ulyooum?', lotto: 'open your lucky number?' }[k],
     quickNote: 'You will continue right after buying',
+    joinTitle: 'Sign in and get<br><b>1</b> crystal',
+    joinSub: 'Your crystals and stones are saved to your account,<br>so they stay even if you reinstall or change phones.',
+    joinLater: 'Maybe later',
+    joinGot: 'You got 1 crystal as a welcome gift!',
     payOk: (r) => 'Thank you for your purchase. You got ' + r + '.',
     items: {
       in0001: ['Mysterious Perfume', 'A mysterious power will be with you for the next 60 minutes.'],
@@ -351,6 +359,10 @@ export const T = {
     payFail: '決済を進められませんでした。しばらくしてからもう一度お試しください。',
     quickNeed: (n, k) => 'クリスタルが<b>' + n + '個</b>足りません。<br>今すぐ補充して' + { chambre: 'リルメルに会いましょうか？', love: 'ユリウムに会いましょうか？', color: '今日のラッキーカラーを見ましょうか？', rps: 'ユリウムとじゃんけんしましょうか？', lotto: 'ラッキーナンバーを開けてみましょうか？' }[k],
     quickNote: '購入するとそのまま続けられます',
+    joinTitle: 'ログインすると<br>クリスタル<b>1個</b>をプレゼント',
+    joinSub: 'クリスタルと天然石がアカウントに保存され、<br>アプリを消しても機種を変えてもそのまま残ります。',
+    joinLater: 'あとで',
+    joinGot: '登録プレゼントでクリスタル1個をもらいました！',
     payOk: (r) => 'ご購入ありがとうございます。' + r + 'を受け取りました。',
     items: {
       in0001: ['神秘の香水', 'しばらくのあいだ、あらゆる呪いから解き放たれ、少しだけ不思議な力を発揮します。<br>効果は60分間続き、購入するとすぐに使われます。'],
