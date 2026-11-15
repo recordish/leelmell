@@ -238,8 +238,8 @@ function cardsPage() {
   ${synthesisHtml(cards)}
 </div></div>
 ${color && color.show ? `<div class="seeTodayColor" style="display:none">
-  <button class="getTodayColor" type="button" data-act="color" aria-label="${t('colorBtn')}" style="${color.seen ? 'display:none' : ''}"><span class="q">?</span><span class="tx"><b>${t('colorQ')}</b><small>${t('colorSub')}</small></span><span class="pr"><img src="assets/img/com_ico_gem_01.webp" alt="">${t('colorOpen')} 1</span></button>
-  <div class="todayColorResult" style="${color.seen ? '' : 'display:none'}"><h4>${t('colorTitle')}</h4><div class="colorCode" style="background:${color.color}"></div></div>
+  <button class="getTodayColor" type="button" data-act="color" aria-label="${t('colorBtn')}" style="${color.seen ? 'display:none' : ''}"><span class="kim"><img src="assets/img/ic_kimim100_01.webp" alt=""><i>?</i></span><span class="tx"><b>${t('colorQ')}</b><small>${t('colorSub')}</small></span><span class="pr"><img src="assets/img/com_ico_gem_01.webp" alt="">${t('colorOpen')} 1</span></button>
+  <div class="todayColorResult" style="${color.seen ? '' : 'display:none'}"><h4>TODAY'S LUCKY COLOR</h4><p class="t">${t('colorTitle')}</p><div class="stage"><span class="colorCode" style="background:${color.color}"></span><img src="assets/img/ic_kimim100_01.webp" alt=""></div><span class="say">${t('colorSay')}</span></div>
 </div>` : ''}
 ${SHARE_ON ? `<div class="shareToday" style="display:none"><button type="button" data-act="share">${SHARE_ICON}<span>${t('shareBtn')}</span></button></div>` : ''}
 </div>`
