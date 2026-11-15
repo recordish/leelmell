@@ -274,3 +274,4 @@ body.love-bg{background:#F7A3C9}
 .shop2 .door01{transform:scale(.9);transform-origin:right bottom}
 @media (max-height:670px){.shop2 .door01{top:174px;bottom:auto;right:24px;transform:scale(.68);transform-origin:right top}}
 .wrap.shop .seaurchin{right:auto;left:20px}
+.wrap.shop.depot .seaurchin{left:auto;right:20px} /* 창고: 왼쪽 분홍 문과 겹치지 않게 오른쪽 */
