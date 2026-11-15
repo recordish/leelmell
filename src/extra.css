@@ -298,10 +298,23 @@ body.love-bg{background:#F7A3C9}
 .sharepick .sbox i.sq{width:22px;height:22px}.sharepick .sbox i.st{width:16px;height:28px;margin:0 3px}
 
 /* 오늘의 행운의 색상 버튼: 물음표 색상칩 + 열기 */
-.seeTodayColor .getTodayColor{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px;padding:14px 16px;background:#FFF;border:2px dashed #8E6CF0;border-radius:16px;text-align:left;color:#3B2E8C;cursor:pointer}
-.getTodayColor .q{flex:none;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:12px;background:#E9E5FB;font-size:26px;font-weight:800;color:#8E6CF0}
+.seeTodayColor .getTodayColor{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:20px;padding:12px 16px 12px 12px;background:#FFF;border:2px dashed #8E6CF0;border-radius:16px;text-align:left;color:#3B2E8C;cursor:pointer}
+.getTodayColor .kim{flex:none;position:relative;width:56px;height:56px}
+.getTodayColor .kim img{display:block;width:56px;height:56px;animation:kwob 1.6s ease-in-out infinite}
+.getTodayColor .kim i{position:absolute;right:-4px;top:-4px;display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:2px solid #FFF;border-radius:50%;background:#E9E5FB;color:#8E6CF0;font-style:normal;font-size:13px;font-weight:800}
+@keyframes kwob{50%{transform:rotate(-8deg) translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.getTodayColor .kim img{animation:none}}
 .getTodayColor .tx{flex:1;min-width:0;line-height:1.35}
-.getTodayColor .tx b{display:block;font-size:16px;font-weight:800;color:#3B2E8C}
-.getTodayColor .tx small{display:block;margin-top:2px;font-size:12.5px;font-weight:400;color:#7a7f8f}
+.getTodayColor .tx b{display:block;word-break:keep-all;font-size:15.5px;font-weight:800;color:#3B2E8C}
+.getTodayColor .tx small{display:block;word-break:keep-all;margin-top:2px;font-size:12.5px;font-weight:400;color:#7a7f8f}
 .getTodayColor .pr{flex:none;display:flex;align-items:center;gap:4px;padding:8px 14px 8px 10px;background:#6D5AE3;border-radius:18px;font-size:14px;font-weight:800;color:#FFF;white-space:nowrap}
 .getTodayColor .pr img{width:20px}
+
+/* 오늘의 행운의 색상 결과: 키밈이 들고 온 큰 원 */
+.seeTodayColor .todayColorResult{margin:20px;padding:22px 18px 20px;background:#FFF;border:0;border-radius:16px;text-align:center}
+.todayColorResult h4{margin:0;font-size:13px;font-weight:700;letter-spacing:.04em;color:#8E6CF0 !important}
+.todayColorResult .t{margin:4px 0 0;font-size:18px;font-weight:800;color:#3B2E8C}
+.todayColorResult .stage{position:relative;width:170px;height:150px;margin:16px auto 0}
+.todayColorResult .colorCode{position:absolute;right:0;top:0;width:130px;height:130px;margin:0;border:6px solid #FFF;border-radius:50%;box-shadow:0 0 0 2px #E9E5FB}
+.todayColorResult .stage img{position:absolute;left:-6px;bottom:-4px;width:78px;transform:rotate(-10deg)}
+.todayColorResult .say{display:inline-block;margin:14px 0 0;padding:8px 14px;background:#F3F0FF;border-radius:14px;font-size:13.5px;color:#4a4f66}
