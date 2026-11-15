@@ -2,6 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script>
+// 앱 전용 서비스: 웹(recordishapp.com)으로 들어오면 소개 페이지로 보냅니다.
+// 앱은 https://localhost 에서 열리므로 여기에 걸리지 않고, update/ 의 라이브 업데이트 파일도 그대로입니다
+if (location.hostname === 'recordishapp.com' || location.hostname === 'www.recordishapp.com') location.replace('https://trimarrai.github.io/')
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Leelmell's Tarotcards</title>
 <meta name="description" content="신비한 능력을 지닌 외계문어 릴멜이 매일 3장의 타로카드로 과거 · 현재 · 미래를 보여줍니다.">
