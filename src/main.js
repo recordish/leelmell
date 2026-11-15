@@ -551,7 +551,6 @@ function pop03(id, html, price) {
 }
 // 크리스탈이 모자랄 때: 앱에서는 그 자리에서 바로 사고 하던 일을 이어서 합니다
 const QUICK_COST = { chambre: 1, color: 1, love: G.LOVE_COST, lotto: 1 }
-let rpsPending = 0 // 바로 사는 창을 띄운 가위바위보의 크리스탈 수
 let lottoPending = null // 바로 사는 창을 띄운 행운의 번호 공
 function quickPop(kind, cost = QUICK_COST[kind]) {
   resetPop()
@@ -570,6 +569,14 @@ function quickPop(kind, cost = QUICK_COST[kind]) {
   afterBuy = kind
   openPop()
   loadPrices()
+}
+// 크리스탈이 모자랄 때 (릴멜의 방 · 기도실 · 가위바위보): 천연석이 100개 이상이면 실험실로, 모자라면 상점의 트리마레에게.
+// 크리스탈이 아예 없으면 '없으시네요', 조금 있으면 '부족하시네요'
+const labPop = () => {
+  const lab = S.g.stones > 99
+  const none = S.g.crystals < 1
+  if (lab) pop01(t(none ? 'needLab' : 'lessLab'), t('goLab'), '#lab', 'popup_bg_03')
+  else pop01(t(none ? 'needShop' : 'lessShop'), t('goShop'), '#shop', 'popup_bg_01')
 }
 const needPop = (why, kind) => {
   if (kind && NATIVE_APP && why !== 'done') return quickPop(kind)
@@ -679,14 +686,14 @@ document.addEventListener('click', (e) => {
     }
     case 'enterPray': {
       const why = G.prayCheck(S.g, +$('.tribute_amount').value)
-      if (why !== 'ok') return needPop(why)
+      if (why !== 'ok') return labPop()
       document.body.classList.add('begin-pray')
       $('#pray_text').focus()
       return
     }
     case 'pray': {
       const r = G.pray(S.g, +$('.tribute_amount').value, $('#pray_text').value, Date.now())
-      if (!r.ok) return r.why === 'empty' ? pop02(t('prayEmpty'), 'kimim') : needPop(r.why)
+      if (!r.ok) return r.why === 'empty' ? pop02(t('prayEmpty'), 'kimim') : labPop()
       save(); stat('pray')
       document.body.classList.remove('begin-pray')
       document.body.classList.add('end-pray')
@@ -783,8 +790,8 @@ const stat = (...fields) => { sync?.bump(fields).catch(() => {}) }
 
 function enterChambre() {
   const r = G.drawTarot(S.g, day(), rng)
-  // 릴멜의 방은 천연석 수와 관계없이 실험실로 안내합니다 (바로 구매 창 없음)
-  if (!r.ok) return r.why === 'done' || r.why === 'rest' ? render() : pop01(t('needLab'), t('goLab'), '#lab', 'popup_bg_03')
+  // 릴멜의 방은 바로 구매 창 없이 실험실(천연석 100개 이상) 또는 상점으로 안내합니다
+  if (!r.ok) return r.why === 'done' || r.why === 'rest' ? render() : labPop()
   save(); stat('tarot'); opened = 0; location.hash = '#cards'
 }
 function enterLove() {
@@ -805,14 +812,6 @@ const CONTINUE = {
   chambre: enterChambre,
   love: enterLove,
   color: seeColor,
-  // 가위바위보: 결투 신청 창을 다시 열고 바로 받아 줍니다
-  rps: () => {
-    if (!rpsPending) return
-    rps = { ticket: rpsPending, step: 'ask' }
-    rpsPending = 0
-    pop02(t('rpsAsk'), 'war01')
-    rpsAccept()
-  },
   // 행운의 번호: 누른 공을 이어서 엽니다
   lotto: () => {
     const el = lottoPending
@@ -840,11 +839,9 @@ function lab(kind) {
 function rpsAccept() {
   const r = G.rpsAccept(S.g, rps.ticket)
   if (!r.ok) {
-    const ticket = rps.ticket
     rps = null
     closePop()
-    if (NATIVE_APP) { rpsPending = ticket; return quickPop('rps', ticket) }
-    return pop02(t('noCrystal'), 'kimim')
+    return labPop()
   }
   save()
   rps.step = 'choose'
