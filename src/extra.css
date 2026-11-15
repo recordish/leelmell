@@ -287,3 +287,12 @@ body.love-bg{background:#F7A3C9}
 .join .gsi span{color:#1F1F1F;white-space:nowrap}
 .join .later{display:block !important;position:static !important;width:auto !important;height:auto !important;margin:12px 0 0;background:none !important;font-size:13px;color:#8a8fa0;text-decoration:underline;text-indent:0 !important}
 .pop01.join .pop_button{display:none}
+
+/* 오늘의 카드 공유 */
+.shareToday{margin:18px 16px 26px;text-align:center}
+.shareToday button{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:340px;height:50px;border:0;border-radius:25px;background:#6D5AE3;color:#FFF !important;font-size:16px;font-weight:700;cursor:pointer}
+.shareToday button span{color:#FFF !important}
+.sharepick .sbox{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.sharepick .sbox button{display:flex;align-items:center;gap:12px;height:52px;padding:0 16px;border:1.5px solid #C9C2F5;border-radius:14px;background:#FFF;color:#3B2E8C;font-size:15px;font-weight:700;cursor:pointer}
+.sharepick .sbox i{flex:none;display:block;border:2px solid #6D5AE3;border-radius:3px;background:#D6E1FF}
+.sharepick .sbox i.sq{width:22px;height:22px}.sharepick .sbox i.st{width:16px;height:28px;margin:0 3px}

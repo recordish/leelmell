@@ -11,6 +11,7 @@ import { browserOf, channelOf, countryOf, deviceOf, osOf } from './visit.js'
 import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
 import { loveLine, lovePos, loveParts } from './love.js'
 import { Capacitor } from '@capacitor/core'
+import { PLAY_URL, canShare, draw as drawShare, shareImage } from './share.js'
 
 const NATIVE_APP = Capacitor.isNativePlatform()
 
@@ -240,6 +241,7 @@ ${color && color.show ? `<div class="seeTodayColor" style="display:none">
   <button class="getTodayColor" type="button" data-act="color" style="${color.seen ? 'display:none' : ''}">${t('colorBtn')}<span class="ct">1</span></button>
   <div class="todayColorResult" style="${color.seen ? '' : 'display:none'}"><h4>${t('colorTitle')}</h4><div class="colorCode" style="background:${color.color}"></div></div>
 </div>` : ''}
+${SHARE_ON ? `<div class="shareToday" style="display:none"><button type="button" data-act="share">${SHARE_ICON}<span>${t('shareBtn')}</span></button></div>` : ''}
 </div>`
 }
 
@@ -464,6 +466,42 @@ function render() {
   if (joinPending && name !== 'cards' && !user) joinPop()
 }
 
+// ---------- 오늘의 카드 공유 (공유 · 파일 플러그인이 있는 앱 빌드만) ----------
+const SHARE_ON = NATIVE_APP && canShare()
+const SHARE_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18 16a3 3 0 0 0-2.4 1.2l-6.7-3.4a3 3 0 0 0 0-1.6l6.7-3.4A3 3 0 1 0 15 7l-6.7 3.4a3 3 0 1 0 0 3.2L15 17a3 3 0 1 0 3-1z"/></svg>'
+function sharePop() {
+  resetPop()
+  const p = $('.pop01')
+  p.classList.add('join', 'sharepick')
+  $('.pop_txt_01', p).innerHTML = `<span class="jt">${t('shareAsk')}</span>`
+  $('.pop_button .button', p).style.display = 'none'
+  $('.pop_button', p).insertAdjacentHTML('beforebegin', `<div class="sbox"><button type="button" data-act="shareSq"><i class="sq"></i>${t('shareSq')}</button><button type="button" data-act="shareSt"><i class="st"></i>${t('shareSt')}</button><a href="#" class="later closeLayerPopup">${t('shareClose')}</a></div>`)
+  openPop()
+}
+let sharing = false
+async function shareToday(tall) {
+  closePop()
+  const cards = S.g.readings[day()]
+  if (!cards || sharing) return
+  sharing = true
+  try {
+    const pos = t('pos')
+    // 릴멜의 한마디: 종합 해설 맺음말의 앞 두 문장 (종합 해설이 없는 언어는 생략)
+    const close = hasSyn() ? String(synthesizeParts(cards, S.lang).at(-1) || '').replace(/\*\*/g, '') : ''
+    const line = (close.match(/[^.!?。！？]+[.!?。！？]?/g) || []).slice(0, 2).join(' ').replace(/\s+/g, ' ').trim()
+    const cv = await drawShare({
+      date: t('dateFmt')(new Date()), title: t('shareTitle'), label: t('synClose'), line,
+      cards: cards.map((c, i) => ({ src: img(c.id), rev: !!c.rev, name: CARDS[c.id].name[S.lang] || CARDS[c.id].name.en, pos: pos[i] + (c.rev ? ' · ' + t('rev') : '') })),
+      app: t('shareApp'), free: t('shareFree'), mascot: 'assets/img/mm01.webp', icon: 'icons/icon-192.png',
+    }, tall)
+    await shareImage(cv, t('shareText') + '\n' + PLAY_URL, t('shareTitle'))
+    stat(tall ? 'share_st' : 'share_sq')
+  } catch (e) {
+    console.warn('share failed', e)
+    pop02(t('shareFail'), 'kimim')
+  } finally { sharing = false }
+}
+
 // 로그인 권유: 첫 타로를 다 보고 카드 화면을 떠날 때 기기마다 한 번만. 새 계정이면 크리스탈 1개를 줍니다
 let joinPending = false
 function joinPop() {
@@ -492,7 +530,7 @@ function resetPop() {
   p.className = 'pop01'
   p.removeAttribute('style')
   $('.pop_txt_01', p).removeAttribute('style')
-  $$('.rpsgame, .rpsgame_result, .qbuy, .qnote, .jbox', p).forEach((e) => e.remove())
+  $$('.rpsgame, .rpsgame_result, .qbuy, .qnote, .jbox, .sbox', p).forEach((e) => e.remove())
   afterBuy = null
   const b = $('.pop_button .button', p)
   b.innerHTML = ''
@@ -713,6 +751,9 @@ document.addEventListener('click', (e) => {
     case 'pay': return purchase(el.dataset.pdt)
     case 'signin': return account(() => sync.signIn())
     case 'joinSignin': closePop(); return account(() => sync.signIn())
+    case 'share': return sharePop()
+    case 'shareSq': return shareToday(false)
+    case 'shareSt': return shareToday(true)
     case 'signout': return account(() => sync.signOutUser())
     case 'delete': return confirmDelete()
     case 'coupon': return useCoupon()
@@ -773,6 +814,7 @@ function finishCards() {
   $('.flipGuide').classList.add('hidden')
   $('.readcards').style.display = 'none'
   if ($('.seeTodayColor')) $('.seeTodayColor').style.display = 'block'
+  if ($('.shareToday')) $('.shareToday').style.display = 'block'
   const c = flow.rec()
   if (c && !c.done) {
     c.done = true
