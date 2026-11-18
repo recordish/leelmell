@@ -503,6 +503,31 @@ async function shareToday(tall) {
   } finally { sharing = false }
 }
 
+// ---------- 안드로이드 뒤로가기 ----------
+// 한 번: 열린 알림창을 닫거나 이전 화면으로. 1.5초 안에 3번 이상(또는 더 돌아갈 화면이 없을 때): 종료할지 묻습니다
+function exitPop() {
+  resetPop()
+  const p = $('.pop01')
+  p.classList.add('join', 'exitpick')
+  $('.pop_txt_01', p).innerHTML = `<img class="jic" src="assets/img/com_starfish_02.webp" alt=""><span class="jt">${t('exitAsk')}</span>`
+  $('.pop_button .button', p).style.display = 'none'
+  $('.pop_button', p).insertAdjacentHTML('beforebegin', `<div class="ebox"><a href="#" class="no closeLayerPopup">${t('exitNo')}</a><button type="button" class="yes" data-act="exitYes">${t('exitYes')}</button></div>`)
+  openPop()
+}
+if (NATIVE_APP) {
+  const presses = []
+  import('@capacitor/app').then(({ App }) => App.addListener('backButton', ({ canGoBack }) => {
+    const now = Date.now()
+    presses.push(now)
+    while (presses.length && now - presses[0] > 1500) presses.shift()
+    if (presses.length >= 3) { presses.length = 0; return exitPop() }
+    const open = $('.pop01')?.style.display === 'block'
+    if (open) return closePop()
+    if (canGoBack && location.hash && location.hash !== '#home') return history.back()
+    exitPop()
+  })).catch((e) => console.warn('back button failed', e))
+}
+
 // 설정 화면 맨 아래 버전 표시: 화면(웹) 버전 · 앱 빌드 번호. 라이브 업데이트가 적용됐는지 확인용
 let appBuild = ''
 if (NATIVE_APP) import('@capacitor/app').then(({ App }) => App.getInfo()).then((i) => { appBuild = i.build; const v = $('.locker_page .ver'); if (v) v.textContent = verLine() }).catch(() => {})
@@ -539,7 +564,7 @@ function resetPop() {
   p.className = 'pop01'
   p.removeAttribute('style')
   $('.pop_txt_01', p).removeAttribute('style')
-  $$('.rpsgame, .rpsgame_result, .qbuy, .qnote, .jbox, .sbox', p).forEach((e) => e.remove())
+  $$('.rpsgame, .rpsgame_result, .qbuy, .qnote, .jbox, .sbox, .ebox', p).forEach((e) => e.remove())
   afterBuy = null
   const b = $('.pop_button .button', p)
   b.innerHTML = ''
@@ -761,6 +786,7 @@ document.addEventListener('click', (e) => {
     case 'signin': return account(() => sync.signIn())
     case 'joinSignin': closePop(); return account(() => sync.signIn())
     case 'share': return sharePop()
+    case 'exitYes': return import('@capacitor/app').then(({ App }) => App.exitApp())
     case 'shareSq': return shareToday(false)
     case 'shareSt': return shareToday(true)
     case 'signout': return account(() => sync.signOutUser())
