@@ -377,6 +377,7 @@ function lockerPage() {
     <dd class="coupon_row"><input id="couponCode" type="text" autocomplete="off" autocapitalize="characters" maxlength="30" placeholder="${t('couponPh')}" /><button type="button" class="com_btn_01" data-act="coupon">${t('couponBtn')}</button></dd></dl></div>
   <div class="logout_way"><a href="#" data-act="signout">${t('signOut')}</a></div>` : ''}
   <p class="foot_links"><a href="privacy.html"${NATIVE_APP ? '' : ' target="_blank" rel="noopener"'}>${t('privacy')}</a>${user ? `<span>·</span><a href="#" data-act="delete">${t('deleteAccount')}</a>` : ''}</p>
+  <p class="ver">${verLine()}</p>
 </div>`
 }
 
@@ -500,6 +501,14 @@ async function shareToday(tall) {
     console.warn('share failed', e)
     pop02(t('shareFail'), 'kimim')
   } finally { sharing = false }
+}
+
+// 설정 화면 맨 아래 버전 표시: 화면(웹) 버전 · 앱 빌드 번호. 라이브 업데이트가 적용됐는지 확인용
+let appBuild = ''
+if (NATIVE_APP) import('@capacitor/app').then(({ App }) => App.getInfo()).then((i) => { appBuild = i.build; const v = $('.locker_page .ver'); if (v) v.textContent = verLine() }).catch(() => {})
+function verLine() {
+  const w = String(__WEB_VERSION__).split('-')[0]
+  return 'v' + w + (appBuild ? ' · build ' + appBuild : '')
 }
 
 // 로그인 권유: 첫 타로를 다 보고 카드 화면을 떠날 때 기기마다 한 번만. 새 계정이면 크리스탈 1개를 줍니다
