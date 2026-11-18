@@ -113,6 +113,7 @@ function updateGnb() {
 const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches
 const DIGIT_STRIP = '<i></i>' + '0123456789'.repeat(3).split('').map((x) => `<i>${x}</i>`).join('')
 function rollNumber(li, from, to) {
+  clearTimeout(li._rollDone)
   li.textContent = ''
   if (REDUCED_MOTION) { li.textContent = to; return }
   const n = Math.max(String(from).length, String(to).length)
@@ -129,6 +130,12 @@ function rollNumber(li, from, to) {
     el.style.transition = `transform ${0.7 + (n - i) * 0.12}s cubic-bezier(.2,.8,.2,1)`
     el.style.transform = `translateY(${-pos(B[i], to > from ? 10 : -10) * 1.25}em)`
   })
+  // 다 굴러가면 원래 글자로 되돌립니다 (굴러가는 칸이 남아 있으면 숫자가 살짝 내려가 보임)
+  li._rollDone = setTimeout(() => {
+    li.classList.remove('rolling')
+    li.removeAttribute('aria-label')
+    li.textContent = to
+  }, (0.7 + n * 0.12) * 1000 + 100)
   li.classList.remove('bump')
   void li.offsetWidth
   li.classList.add('bump')
