@@ -101,6 +101,9 @@ export const T = {
     joinTitle: '로그인하면<br>크리스탈 <b>1개</b>를 드려요',
     joinSub: '크리스탈과 천연석이 계정에 저장돼서<br>앱을 지우거나 폰을 바꿔도 그대로 남아요.',
     joinLater: '다음에 할게요',
+    exitAsk: '앱을 종료할까요?',
+    exitYes: '종료',
+    exitNo: '취소',
     joinGot: '가입 선물로 크리스탈 1개를 받았어요!',
     payOk: (r) => '구매해 주셔서 고맙습니다. ' + r + '을 받았습니다.',
     items: {
@@ -254,6 +257,9 @@ export const T = {
     joinTitle: 'Sign in and get<br><b>1</b> crystal',
     joinSub: 'Your crystals and stones are saved to your account,<br>so they stay even if you reinstall or change phones.',
     joinLater: 'Maybe later',
+    exitAsk: 'Close the app?',
+    exitYes: 'Close',
+    exitNo: 'Cancel',
     joinGot: 'You got 1 crystal as a welcome gift!',
     payOk: (r) => 'Thank you for your purchase. You got ' + r + '.',
     items: {
@@ -407,6 +413,9 @@ export const T = {
     joinTitle: 'ログインすると<br>クリスタル<b>1個</b>をプレゼント',
     joinSub: 'クリスタルと天然石がアカウントに保存され、<br>アプリを消しても機種を変えてもそのまま残ります。',
     joinLater: 'あとで',
+    exitAsk: 'アプリを終了しますか？',
+    exitYes: '終了',
+    exitNo: 'キャンセル',
     joinGot: '登録プレゼントでクリスタル1個をもらいました！',
     payOk: (r) => 'ご購入ありがとうございます。' + r + 'を受け取りました。',
     items: {
