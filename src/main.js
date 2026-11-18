@@ -12,6 +12,7 @@ import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.j
 import { loveLine, lovePos, loveParts } from './love.js'
 import { Capacitor } from '@capacitor/core'
 import { PLAY_URL, canShare, draw as drawShare, shareImage } from './share.js'
+import { glass } from './glass.js'
 
 const NATIVE_APP = Capacitor.isNativePlatform()
 
@@ -290,27 +291,31 @@ function loveCardsPage() {
 </div></div></div>`
 }
 
+// 기도실: 스테인드글라스 창 아래에서 크리스탈 수를 정하고(ready) → 편지에 소망을 적고(praying) → 전달 완료(done)
+const GLASS = glass('prayGlass')
 function prayPage() {
-  return `<div class="sec-pray">
+  const candles = '<div class="candles" aria-hidden="true"><span><i></i><i class="s"></i></span><span><i class="s"></i><i></i></span></div>'
+  return `<div class="sec-pray gs">
+  <span class="beam" aria-hidden="true"></span>
+  <div class="win" aria-hidden="true">${GLASS}</div><span class="sill" aria-hidden="true"></span>
   <div class="ready">
-    <p class="txt01">${t('prayNeed')}</p>
-    <div id="preparePrayroom">
-      <div class="tribute"><span class="crystal"></span>
-        <span class="amount">
-          <input type="text" name="tribute" value="3" class="tribute_amount" readonly aria-label="crystals" />
-          <button class="t_up" type="button" data-act="up" aria-label="+"></button>
-          <button class="t_down" type="button" data-act="down" aria-label="-"></button>
-        </span>
-      </div>
-      <button class="btnEnter" id="enterPrayroom" type="button" data-act="enterPray">${t('prayEnter')}</button>
+    <h3>${t('prayTitle')}</h3>
+    <p class="d">${t('prayDesc')}</p>
+    <div class="tribute" id="preparePrayroom">
+      <button class="t_down" type="button" data-act="down" aria-label="-">−</button>
+      <span class="v"><img src="assets/img/ic_crystal1_01.webp" alt=""><input type="text" name="tribute" value="3" class="tribute_amount" readonly aria-label="crystals" /></span>
+      <button class="t_up" type="button" data-act="up" aria-label="+">+</button>
     </div>
+    <div class="chips">${[1, 3, 5, 10].map((n) => `<button type="button" data-act="trib" data-n="${n}"${n === 3 ? ' class="on"' : ''}>${n}</button>`).join('')}</div>
+    <button class="go" id="enterPrayroom" type="button" data-act="enterPray">${t('prayEnter')}</button>
   </div>
   <div class="praying" style="display:none">
-    <p class="txt02">${t('prayReady')}</p>
-    <p class="centre"><textarea class="txtInp" name="pray_text" id="pray_text" maxlength="1000"></textarea></p>
-    <div class="userActions"><button class="submitPray" type="button" data-act="pray">${t('send')}</button></div>
+    <div class="who"><img src="assets/img/mm01.webp" alt="">${t('prayWho')}</div>
+    <div class="letter"><span class="to"></span><textarea class="txtInp" name="pray_text" id="pray_text" maxlength="1000" aria-label="${t('prayEmpty')}"></textarea><span class="cnt">0 / 1000</span></div>
+    <button class="go submitPray" type="button" data-act="pray">${t('praySend')}</button>
   </div>
-  <div class="done" style="display:none"><div class="stt">${t('prayDone')}</div></div>
+  <div class="done" style="display:none"><p class="stt">${t('prayDone')}</p><p class="d">${t('prayDoneSub')}</p></div>
+  ${candles}
 </div>`
 }
 
@@ -761,12 +766,19 @@ document.addEventListener('click', (e) => {
     case 'up': case 'down': {
       const inp = $('.tribute_amount')
       inp.value = Math.max(1, Math.min(99, +inp.value + (act === 'up' ? 1 : -1)))
+      $$('.sec-pray .chips button').forEach((b) => b.classList.toggle('on', +b.dataset.n === +inp.value))
+      return
+    }
+    case 'trib': {
+      $('.tribute_amount').value = +el.dataset.n
+      $$('.sec-pray .chips button').forEach((b) => b.classList.toggle('on', b === el))
       return
     }
     case 'enterPray': {
       const why = G.prayCheck(S.g, +$('.tribute_amount').value)
       if (why !== 'ok') return labPop()
       document.body.classList.add('begin-pray')
+      $('.sec-pray .letter .to').textContent = t('prayTo')(+$('.tribute_amount').value)
       $('#pray_text').focus()
       return
     }
@@ -1111,6 +1123,11 @@ if (FIREBASE_ON) {
     })
   }).catch((e) => console.warn('firebase load failed', e))
 }
+
+// 기도 편지 글자 수
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'pray_text') { const c = $('.sec-pray .letter .cnt'); if (c) c.textContent = e.target.value.length + ' / 1000' }
+})
 
 document.addEventListener('change', (e) => {
   if (e.target.id === 'langSel' && LANGS.includes(e.target.value)) { S.lang = e.target.value; save(); render() }

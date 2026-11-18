@@ -326,3 +326,49 @@ body.love-bg{background:#F7A3C9}
 .exitpick .ebox .no,.exitpick .ebox .yes{flex:1;display:flex;align-items:center;justify-content:center;height:48px;border-radius:24px;font-size:15px;font-weight:700;text-decoration:none;cursor:pointer}
 .exitpick .ebox .no{position:static !important;width:auto !important;background:#EDE9FE !important;color:#3B2E8C !important;text-indent:0 !important}
 .exitpick .ebox .yes{border:0;background:#6D5AE3;color:#FFF}
+
+/* ---------- 기도실: 스테인드글라스 성당 ---------- */
+.wrap.prayroom{background:#15123A !important}
+.wrap.prayroom .sec-pray.gs{position:absolute;top:84px;bottom:84px;left:0;right:0;height:auto;transform:none;display:flex;flex-direction:column;align-items:center;padding:0 22px;text-align:center;color:#F4EEDC;overflow:hidden}
+.begin-pray .wrap.prayroom .sec-pray.gs,.end-pray .wrap.prayroom .sec-pray.gs{top:20px;bottom:20px}
+.sec-pray.gs .beam{position:absolute;left:50%;top:150px;width:520px;height:640px;margin-left:-260px;background:#FFE9A8;opacity:.07;clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);pointer-events:none}
+.sec-pray.gs .win{position:relative;width:184px;margin-top:10px;flex:none}
+.sec-pray.gs .win svg{display:block;width:100%}
+.sec-pray.gs .sill{position:relative;flex:none;width:220px;height:10px;margin-top:-2px;border-radius:3px;background:#C9A24A}
+.begin-pray .sec-pray.gs .win,.end-pray .sec-pray.gs .win{width:110px}
+.begin-pray .sec-pray.gs .sill,.end-pray .sec-pray.gs .sill{width:136px}
+.sec-pray.gs .ready{position:relative;margin:0;padding:0;background:none;border-radius:0;width:100%;display:flex;flex-direction:column;align-items:center}
+.sec-pray.gs .ready:after{display:none}
+.sec-pray.gs h3{margin:18px 0 0;font-size:20px;font-weight:800;letter-spacing:.02em;color:#F4EEDC}
+.sec-pray.gs p.d{margin:6px 0 0;font-size:12.5px;line-height:1.6;color:#B9B2DC}
+.sec-pray.gs .tribute{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:300px;margin:16px auto 0;padding:8px;background:#221E52;border:1.5px solid #C9A24A;border-radius:16px}
+.sec-pray.gs .tribute button{position:static;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:#2F2A6B;color:#E9C46A;font-size:22px;font-weight:700;line-height:1;cursor:pointer}
+.sec-pray.gs .tribute button:before,.sec-pray.gs .tribute button:after{display:none}
+.sec-pray.gs .tribute .v{display:flex;align-items:center;gap:8px;margin:0}
+.sec-pray.gs .tribute .v img{width:28px}
+.sec-pray.gs .tribute input{width:52px;height:36px;padding:0;border:0;background:none;color:#F4EEDC;font-size:26px;font-weight:800;text-align:left;font-family:inherit;outline:none}
+.sec-pray.gs .chips{display:flex;gap:8px;margin-top:10px}
+.sec-pray.gs .chips button{min-width:44px;padding:4px 10px;border:1px solid #3A3478;border-radius:12px;background:none;font-size:12.5px;font-weight:700;color:#B9B2DC;cursor:pointer}
+.sec-pray.gs .chips button.on{background:#E9C46A;border-color:#E9C46A;color:#15123A}
+.sec-pray.gs .go{display:block;width:100%;max-width:300px;height:50px;margin:16px auto 0;border:0;border-radius:25px;background:#E9C46A;color:#15123A;font-size:16px;font-weight:800;cursor:pointer}
+.sec-pray.gs .praying{position:relative;width:100%;height:auto;background:none;flex-direction:column;align-items:center}
+.begin-pray .sec-pray.gs .praying{display:flex !important}
+.sec-pray.gs .who{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:12.5px;color:#B9B2DC}.sec-pray.gs .who img{width:46px}
+.sec-pray.gs .letter{width:100%;max-width:340px;margin:14px auto 0;padding:16px 18px 10px;background:#F7F1DE;border-radius:14px;text-align:left;color:#3a3350}
+.sec-pray.gs .letter .to{display:block;font-size:12px;font-weight:800;letter-spacing:.04em;color:#8A6D1E}
+.sec-pray.gs .letter textarea{display:block;width:100%;height:180px;margin-top:8px;padding:0;border:0;resize:none;background:repeating-linear-gradient(transparent 0 29px,#E5DABA 29px 30px);font-size:15px;line-height:30px;color:#3a3350;font-family:inherit;max-width:none;letter-spacing:0;outline:none}
+.sec-pray.gs .letter .cnt{display:block;text-align:right;font-size:11px;color:#a8996a}
+.sec-pray.gs .done{position:relative;top:auto;left:auto;transform:none;width:100%;height:auto;line-height:normal;margin-top:30px;background:none;border-radius:0}
+.end-pray .sec-pray.gs .done{display:block !important}
+.sec-pray.gs .done .stt{margin:0;font-size:20px;font-weight:800;color:#F4EEDC;line-height:1.5}
+.sec-pray.gs .done .d{margin-top:10px}
+.sec-pray.gs .candles{position:absolute;left:0;right:0;bottom:18px;display:flex;justify-content:space-between;padding:0 26px;pointer-events:none}
+.sec-pray.gs .candles span{display:flex;gap:8px;align-items:flex-end}
+.sec-pray.gs .candles i{position:relative;display:block;width:12px;height:34px;border-radius:2px;background:#F4EEDC}
+.sec-pray.gs .candles i.s{height:24px}
+.sec-pray.gs .candles i:before{content:"";position:absolute;left:3px;top:-14px;width:6px;height:12px;border-radius:50%/60% 60% 40% 40%;background:#FFD36B;animation:flick 2.4s ease-in-out infinite}
+@keyframes flick{50%{transform:scaleY(.82) translateY(1px)}}
+@media (prefers-reduced-motion:reduce){.sec-pray.gs .candles i:before{animation:none}}
+@media (max-height:700px){.sec-pray.gs .win{width:130px}.sec-pray.gs .sill{width:160px}.sec-pray.gs .candles{display:none}}
+.begin-pray .sec-pray.gs .ready,.end-pray .sec-pray.gs .ready,.end-pray .sec-pray.gs .praying{display:none !important}
+.sec-pray.gs,.sec-pray.gs *{box-sizing:border-box}
