@@ -509,7 +509,7 @@ function exitPop() {
   resetPop()
   const p = $('.pop01')
   p.classList.add('join', 'exitpick')
-  $('.pop_txt_01', p).innerHTML = `<img class="jic" src="assets/img/mm01.webp" alt=""><span class="jt">${t('exitAsk')}</span>`
+  $('.pop_txt_01', p).innerHTML = `<img class="jic" src="assets/img/com_starfish_02.webp" alt=""><span class="jt">${t('exitAsk')}</span>`
   $('.pop_button .button', p).style.display = 'none'
   $('.pop_button', p).insertAdjacentHTML('beforebegin', `<div class="ebox"><a href="#" class="no closeLayerPopup">${t('exitNo')}</a><button type="button" class="yes" data-act="exitYes">${t('exitYes')}</button></div>`)
   openPop()
