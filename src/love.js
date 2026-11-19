@@ -5,7 +5,7 @@ import { CARDS } from './cards.js'
 import { EN } from './en.js'
 import { LINK_PN, SEP, TR, joinLink, synLine, toneOf } from './synthesis.js'
 
-export const HOST = '?' // 핑크룸에서 연애운을 봐 주는 분홍 바다사자 (율리움의 모습을 한 초월적인 존재)
+export const HOST = '누군가' // 핑크룸에서 연애운을 봐 주는 분홍 바다사자 (율리움의 모습을 한 초월적인 존재)
 
 export const LOVE = [
   ['계산 없이 설레고, 새로 시작해 보고 싶은 마음입니다.', '가볍고 자유로운 호기심으로 당신을 보고 있습니다. 아직 깊이 재지 않은 순수한 끌림입니다.', '앞뒤를 재지 않는 가벼움입니다. 약속과 책임 앞에서 한 사람이 준비되지 않았습니다.'],
