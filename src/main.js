@@ -253,7 +253,7 @@ ${SHARE_ON ? `<div class="shareToday" style="display:none"><button type="button"
 </div>`
 }
 
-// ---------- 율리움의 방: 연애 타로 6장 (한국어만) ----------
+// ---------- 핑크룸: 연애 타로 6장 (한국어 · 영어) ----------
 function lovePage() {
   const st = G.loveStatus(S.g, day())
   const body = st === 'done'
