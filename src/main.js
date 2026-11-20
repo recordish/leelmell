@@ -855,9 +855,9 @@ function cardStep() {
   $$('.holytable li').forEach((li, i) => li.classList.toggle('hidden', flow.peek || i !== opened - 1))
   if (flow.peek) peekCard(opened - 1)
   const guide = $('.flipGuide')
-  guide.textContent = opened < flow.n ? flow.guide(opened) : ''
-  // 오늘의 카드: 다음 카드 버튼 없이, 세 장을 다 열면 '자세히 보기'만 나옵니다
-  guide.classList.toggle('hidden', !!flow.peek || opened > 0) // 오늘의 카드는 안내 문구 없음
+  // 오늘의 카드: 카드를 열기 전에만 '당신을 위한 3장의 카드입니다'. 다음 카드 버튼 없이, 세 장을 다 열면 '자세히 보기'만
+  guide.textContent = flow.peek ? t('cardsIntro') : opened < flow.n ? flow.guide(opened) : ''
+  guide.classList.toggle('hidden', opened > 0)
   const btn = $('.readcards')
   btn.style.display = (flow.peek ? opened >= flow.n : opened > 0) ? 'block' : 'none'
   $('a', btn).textContent = opened < flow.n ? flow.next(opened) : flow.final()
