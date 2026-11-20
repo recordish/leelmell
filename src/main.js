@@ -879,33 +879,6 @@ function peekCard(i) {
   box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop')
 }
 
-// '자세히 보기': 첫 카드 해석부터 종합 해설까지 천천히 내려가며 보여 줍니다. 손을 대면 멈춥니다
-let slowRun = null
-function slowScroll(from, to) {
-  if (slowRun) slowRun.stop()
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, from); return }
-  const SPEED = 55 // 1초에 내려가는 거리(px)
-  const start = performance.now() + 900 // 첫 카드 해석에서 잠깐 머문 뒤 출발
-  let raf = 0
-  const stop = () => { cancelAnimationFrame(raf); ['touchstart', 'wheel', 'keydown', 'mousedown'].forEach((e) => removeEventListener(e, stop)); slowRun = null }
-  ;['touchstart', 'wheel', 'keydown', 'mousedown'].forEach((e) => addEventListener(e, stop, { passive: true }))
-  const head = window.scrollY
-  const tick = (now) => {
-    if (now < start) {
-      // 먼저 첫 카드 해석 위치로 부드럽게 이동
-      const k = Math.min(1, (now - (start - 900)) / 700)
-      window.scrollTo(0, head + (from - head) * (1 - Math.pow(1 - k, 3)))
-    } else {
-      const y = from + ((now - start) / 1000) * SPEED
-      window.scrollTo(0, Math.min(y, to))
-      if (y >= to || window.innerHeight + window.scrollY >= document.body.scrollHeight - 2) return stop()
-    }
-    raf = requestAnimationFrame(tick)
-  }
-  raf = requestAnimationFrame(tick)
-  slowRun = { stop }
-}
-
 function openCard() {
   opened++
   cardStep()
@@ -928,11 +901,7 @@ function finishCards() {
     if (route === 'cards' && NATIVE_APP && sync && !user && !S.joinAsked) joinPending = true
     save()
     if (flow.peek) {
-      // 오늘의 카드: 첫 카드 해석부터 종합 해설(끝)까지 천천히
-      const top = (el) => el.getBoundingClientRect().top + window.scrollY - 70
-      const first = $('.holytable li')
-      const end = syn || $$('.holytable li').at(-1)
-      if (first && end) slowScroll(top(first), top(end) + end.offsetHeight - window.innerHeight + 140)
+      // 오늘의 카드: 화면은 그대로 두고 아래에 카드별 해석과 종합 해설을 펼칩니다 (사용자가 직접 내려 읽음)
     } else if (syn) {
       // 연애운: 방금 본 카드별 해석을 지나 종합 해설 위치로 내려갑니다
       syn.scrollIntoView({ behavior: 'smooth', block: 'start' })
