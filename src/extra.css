@@ -78,7 +78,7 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 .tarotRoom .result span.wait{opacity:.5}
 .tarotRoom .flipGuide{margin:34px 0 6px;text-align:center;font-size:15px;font-weight:500;color:#2b3140}
 .tarotRoom .readcards{padding:24px 0 0 0}
-.tarotRoom .holytable{margin-top:34px}
+.tarotRoom .holytable{margin-top:58px} /* 카드 아래 과거 · 역방향 글자와 첫 해석 사이 여백 */
 .tarotRoom .synthesis{margin:24px 10px 0;padding:18px 16px;background:#EFEAFB;border-radius:12px;scroll-margin-top:16px}
 .tarotRoom .synthesis h4{margin:0 0 10px;font-size:16px;font-weight:700;color:#4a2f8f}
 .tarotRoom .synthesis p{margin:0 0 10px;font-size:15px;line-height:170%;color:#2b3140;user-select:text;-webkit-user-select:text}
