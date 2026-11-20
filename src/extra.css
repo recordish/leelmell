@@ -382,3 +382,9 @@ body.love-bg{background:#F7A3C9}
 .tarotRoom .peek.pop{animation:peekIn .45s ease-out}
 @keyframes peekIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.tarotRoom .peek.pop{animation:none}}
+
+/* 핑크룸 한 줄 설명 칸 */
+.wrap.love .tarotRoom .peek{margin-top:46px;border-color:#F6CFE4}
+.wrap.love .tarotRoom .peek .pos{background:#FDE7F2;color:#C2418F}
+.wrap.love .tarotRoom .peek b{color:#B83B82}
+.wrap.love .tarotRoom .peek b small{color:#C2418F}

@@ -289,6 +289,7 @@ function loveCardsPage() {
   <p class="todaydate">${t('dateFmt')(new Date())}</p>
   <div class="result">${cards.map((p, i) => `<span class="${p.rev ? 'rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${pos[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
   <p class="flipGuide"></p>
+  <div class="peek" style="display:none" aria-live="polite"></div>
   <div class="holytable"><ul>${cards.map(loveMeaning).join('')}</ul></div>
   <p class="readcards" style="display:none"><a href="#" data-act="next"></a></p>
   <div class="synthesis split hidden">${((ps) => `<div class="blk1"><h4>${t('loveSynTitle')}</h4>${ps.slice(0, -1).join('')}</div><div class="blk2"><span class="lbl">${t('loveClose')}</span>${ps.at(-1)}</div>`)(loveParts(cards, S.lang).map((x) => `<p>${bold(x)}</p>`))}${pair ? `<div class="special ${pair.good ? 'good' : 'bad'}"><h4>${t('specialTitle')}</h4><p>${bold(pair.text)}</p></div>` : ''}</div>
@@ -825,18 +826,21 @@ const FLOWS = {
   // 오늘의 카드: 한 장씩 뒤집으면 이름과 한 줄 설명만, 세 장을 다 보면 '자세히 보기'로 전체 해석과 종합 해설
   cards: () => ({
     n: 3,
-    peek: true,
+    peek: (i) => { const c = S.g.readings[day()]?.[i]; return c && { c, pos: t('pos')[i], line: synLine(c, KEYS[i], S.lang) } },
+    intro: () => t('cardsIntro'),
     rec: () => S.g.colors[day()],
     guide: (i) => t('flipGuide')[i],
     next: (i) => t('nextCard')[i],
     final: () => t('seeDetail'),
   }),
+  // 핑크룸 연애운도 같은 방식: 한 장씩 이름과 한 줄 설명, 여섯 장을 다 보면 '자세히 보기'
   lovecards: () => ({
     n: 6,
+    peek: (i) => { const c = S.g.love[day()]?.cards[i]; return c && { c, pos: lovePos(S.lang)[i], line: loveLine(c, i, S.lang) } },
     rec: () => S.g.love[day()],
     guide: (i) => t('loveGuide')(lovePos(S.lang)[i]),
     next: (i) => t('loveNext')(lovePos(S.lang)[i]),
-    final: () => t('loveFinal'),
+    final: () => t('seeDetail'),
   }),
 }
 
@@ -855,29 +859,28 @@ function cardStep() {
   $$('.holytable li').forEach((li, i) => li.classList.toggle('hidden', flow.peek || i !== opened - 1))
   if (flow.peek) peekCard(opened - 1)
   const guide = $('.flipGuide')
-  // 오늘의 카드: 카드를 열기 전에만 '당신을 위한 3장의 카드입니다'. 다음 카드 버튼 없이, 세 장을 다 열면 '자세히 보기'만
-  guide.textContent = flow.peek ? t('cardsIntro') : opened < flow.n ? flow.guide(opened) : ''
+  // 카드를 열기 전에만 안내 문구(오늘의 카드: '당신을 위한 3장의 카드입니다'). 다음 카드 버튼 없이, 다 열면 '자세히 보기'만
+  guide.textContent = flow.intro ? flow.intro() : opened < flow.n ? flow.guide(opened) : ''
   guide.classList.toggle('hidden', opened > 0)
   const btn = $('.readcards')
   btn.style.display = (flow.peek ? opened >= flow.n : opened > 0) ? 'block' : 'none'
   $('a', btn).textContent = opened < flow.n ? flow.next(opened) : flow.final()
 }
 
-// 뒤집은 카드 한 장: 카드 이름(역방향 표시)과 한 줄 설명
+// 뒤집은 카드 한 장: 자리 · 카드 이름(역방향 표시) · 한 줄 설명
 const KEYS = ['p', 'n', 'f']
-function oneLine(c, i) {
+function oneLine(text) {
   // 자리 문장은 '카드 소개 문장 + 뜻 문장' 이라, 소개 문장을 빼고 뜻 문장 하나만 씁니다
-  const s = synLine(c, KEYS[i], S.lang).replace(/\*\*/g, '')
-  const parts = s.split(/(?<=[.!?。！？])\s*/).filter(Boolean)
+  const parts = String(text).replace(/\*\*/g, '').split(/(?<=[.!?。！？])\s*/).filter(Boolean)
   return parts[1] || parts[0] || ''
 }
 function peekCard(i) {
   const box = $('.peek')
   if (!box) return
-  const c = S.g.readings[day()]?.[i]
-  if (!c) { box.style.display = 'none'; return }
-  const name = CARDS[c.id].name[S.lang] || CARDS[c.id].name.en
-  box.innerHTML = `<span class="pos">${t('pos')[i]}</span><b>${esc(name)}${c.rev ? ` <small>${t('rev')}</small>` : ''}</b><p>${esc(oneLine(c, i))}</p>`
+  const x = i >= 0 && flow.peek(i)
+  if (!x) { box.style.display = 'none'; return }
+  const name = CARDS[x.c.id].name[S.lang] || CARDS[x.c.id].name.en
+  box.innerHTML = `<span class="pos">${esc(x.pos)}</span><b>${esc(name)}${x.c.rev ? ` <small>${t('rev')}</small>` : ''}</b><p>${esc(oneLine(x.line))}</p>`
   box.style.display = 'block'
   box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop')
 }
@@ -893,6 +896,7 @@ function finishCards() {
   const syn = $('.synthesis')
   syn?.classList.remove('hidden')
   if ($('.peek')) $('.peek').style.display = 'none'
+  $$('.holytable details').forEach((d) => { d.open = true })
   $('.flipGuide').classList.add('hidden')
   $('.readcards').style.display = 'none'
   if ($('.seeTodayColor')) $('.seeTodayColor').style.display = 'block'
