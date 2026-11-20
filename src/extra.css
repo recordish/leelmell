@@ -78,7 +78,7 @@ a:focus-visible,button:focus-visible,span:focus-visible{outline:2px solid #6D5AE
 .tarotRoom .result span.wait{opacity:.5}
 .tarotRoom .flipGuide{margin:34px 0 6px;text-align:center;font-size:15px;font-weight:500;color:#2b3140}
 .tarotRoom .readcards{padding:24px 0 0 0}
-.tarotRoom .holytable{margin-top:34px}
+.tarotRoom .holytable{margin-top:58px} /* 카드 아래 과거 · 역방향 글자와 첫 해석 사이 여백 */
 .tarotRoom .synthesis{margin:24px 10px 0;padding:18px 16px;background:#EFEAFB;border-radius:12px;scroll-margin-top:16px}
 .tarotRoom .synthesis h4{margin:0 0 10px;font-size:16px;font-weight:700;color:#4a2f8f}
 .tarotRoom .synthesis p{margin:0 0 10px;font-size:15px;line-height:170%;color:#2b3140;user-select:text;-webkit-user-select:text}
@@ -372,3 +372,13 @@ body.love-bg{background:#F7A3C9}
 @media (max-height:700px){.sec-pray.gs .win{width:130px}.sec-pray.gs .sill{width:160px}.sec-pray.gs .candles{display:none}}
 .begin-pray .sec-pray.gs .ready,.end-pray .sec-pray.gs .ready,.end-pray .sec-pray.gs .praying{display:none !important}
 .sec-pray.gs,.sec-pray.gs *{box-sizing:border-box}
+
+/* 오늘의 카드: 뒤집은 카드의 이름 + 한 줄 설명 */
+.tarotRoom .peek{margin:34px 16px 0;padding:14px 16px;background:#FFF;border:2px solid #E9E5FB;border-radius:14px;text-align:center}
+.tarotRoom .peek .pos{display:inline-block;padding:1px 10px;border-radius:10px;background:#EDE9FE;font-size:12px;font-weight:700;color:#6D5AE3}
+.tarotRoom .peek b{display:block;margin-top:6px;font-size:18px;font-weight:800;color:#3B2E8C}
+.tarotRoom .peek b small{margin-left:4px;font-size:12px;font-weight:700;color:#6D5AE3}
+.tarotRoom .peek p{margin:6px 0 0;font-size:14.5px;line-height:1.6;color:#4a4f66;word-break:keep-all}
+.tarotRoom .peek.pop{animation:peekIn .45s ease-out}
+@keyframes peekIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.tarotRoom .peek.pop{animation:none}}
