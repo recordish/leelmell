@@ -8,7 +8,7 @@ import { LANGS, T } from './i18n.js'
 import * as G from './game.js'
 import { ICONS as REST_ICONS, restOf } from './rest.js'
 import { browserOf, channelOf, countryOf, deviceOf, osOf } from './visit.js'
-import { SYN_LANGS, pairSpecial, specials, synthesizeParts } from './synthesis.js'
+import { SYN_LANGS, pairSpecial, specials, synLine, synthesizeParts } from './synthesis.js'
 import { loveLine, lovePos, loveParts } from './love.js'
 import { Capacitor } from '@capacitor/core'
 import { PLAY_URL, canShare, draw as drawShare, shareImage } from './share.js'
@@ -241,6 +241,7 @@ function cardsPage() {
   <p class="todaydate">${t('dateFmt')(new Date())}</p>
   <div class="result">${cards.map((p, i) => `<span class="s${G.randInt(rng, 2, 5)}${p.rev ? ' rev' : ''}" data-i="${i}"><i class="face" style="background-image:url(${img(p.id)})"></i><strong>${pos[i]}${p.rev ? `<em>${t('rev')}</em>` : ''}</strong></span>`).join('')}</div>
   <p class="flipGuide"></p>
+  <div class="peek" style="display:none" aria-live="polite"></div>
   <div class="holytable"><ul>${cards.map(meaning).join('')}</ul></div>
   <p class="readcards" style="display:none"><a href="#" data-act="next"></a></p>
   ${synthesisHtml(cards)}
@@ -818,12 +819,14 @@ document.addEventListener('click', (e) => {
 // flow: 지금 화면의 카드 장수와 문구, 끝까지 봤는지 기록하는 곳
 let flow = null
 const FLOWS = {
+  // 오늘의 카드: 한 장씩 뒤집으면 이름과 한 줄 설명만, 세 장을 다 보면 '자세히 보기'로 전체 해석과 종합 해설
   cards: () => ({
     n: 3,
+    peek: true,
     rec: () => S.g.colors[day()],
     guide: (i) => t('flipGuide')[i],
     next: (i) => t('nextCard')[i],
-    final: () => t(hasSyn() ? 'seeSynthesis' : 'seeAll'),
+    final: () => t('seeDetail'),
   }),
   lovecards: () => ({
     n: 6,
@@ -846,13 +849,60 @@ function cardStep() {
     s.classList.toggle('opened', i < opened)
     s.classList.toggle('wait', i > opened)
   })
-  $$('.holytable li').forEach((li, i) => li.classList.toggle('hidden', i !== opened - 1))
+  $$('.holytable li').forEach((li, i) => li.classList.toggle('hidden', flow.peek || i !== opened - 1))
+  if (flow.peek) peekCard(opened - 1)
   const guide = $('.flipGuide')
   guide.textContent = opened < flow.n ? flow.guide(opened) : ''
   guide.classList.toggle('hidden', opened > 0)
   const btn = $('.readcards')
   btn.style.display = opened > 0 ? 'block' : 'none'
   $('a', btn).textContent = opened < flow.n ? flow.next(opened) : flow.final()
+}
+
+// 뒤집은 카드 한 장: 카드 이름(역방향 표시)과 한 줄 설명
+const KEYS = ['p', 'n', 'f']
+function oneLine(c, i) {
+  // 자리 문장은 '카드 소개 문장 + 뜻 문장' 이라, 소개 문장을 빼고 뜻 문장 하나만 씁니다
+  const s = synLine(c, KEYS[i], S.lang).replace(/\*\*/g, '')
+  const parts = s.split(/(?<=[.!?。！？])\s*/).filter(Boolean)
+  return parts[1] || parts[0] || ''
+}
+function peekCard(i) {
+  const box = $('.peek')
+  if (!box) return
+  const c = S.g.readings[day()]?.[i]
+  if (!c) { box.style.display = 'none'; return }
+  const name = CARDS[c.id].name[S.lang] || CARDS[c.id].name.en
+  box.innerHTML = `<span class="pos">${t('pos')[i]}</span><b>${esc(name)}${c.rev ? ` <small>${t('rev')}</small>` : ''}</b><p>${esc(oneLine(c, i))}</p>`
+  box.style.display = 'block'
+  box.classList.remove('pop'); void box.offsetWidth; box.classList.add('pop')
+}
+
+// '자세히 보기': 첫 카드 해석부터 종합 해설까지 천천히 내려가며 보여 줍니다. 손을 대면 멈춥니다
+let slowRun = null
+function slowScroll(from, to) {
+  if (slowRun) slowRun.stop()
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, from); return }
+  const SPEED = 55 // 1초에 내려가는 거리(px)
+  const start = performance.now() + 900 // 첫 카드 해석에서 잠깐 머문 뒤 출발
+  let raf = 0
+  const stop = () => { cancelAnimationFrame(raf); ['touchstart', 'wheel', 'keydown', 'mousedown'].forEach((e) => removeEventListener(e, stop)); slowRun = null }
+  ;['touchstart', 'wheel', 'keydown', 'mousedown'].forEach((e) => addEventListener(e, stop, { passive: true }))
+  const head = window.scrollY
+  const tick = (now) => {
+    if (now < start) {
+      // 먼저 첫 카드 해석 위치로 부드럽게 이동
+      const k = Math.min(1, (now - (start - 900)) / 700)
+      window.scrollTo(0, head + (from - head) * (1 - Math.pow(1 - k, 3)))
+    } else {
+      const y = from + ((now - start) / 1000) * SPEED
+      window.scrollTo(0, Math.min(y, to))
+      if (y >= to || window.innerHeight + window.scrollY >= document.body.scrollHeight - 2) return stop()
+    }
+    raf = requestAnimationFrame(tick)
+  }
+  raf = requestAnimationFrame(tick)
+  slowRun = { stop }
 }
 
 function openCard() {
@@ -865,6 +915,7 @@ function finishCards() {
   $$('.holytable li').forEach((li) => li.classList.remove('hidden'))
   const syn = $('.synthesis')
   syn?.classList.remove('hidden')
+  if ($('.peek')) $('.peek').style.display = 'none'
   $('.flipGuide').classList.add('hidden')
   $('.readcards').style.display = 'none'
   if ($('.seeTodayColor')) $('.seeTodayColor').style.display = 'block'
@@ -875,9 +926,16 @@ function finishCards() {
     // 로그인하지 않은 앱 사용자: 카드 화면을 떠날 때 로그인 권유를 한 번 띄웁니다
     if (route === 'cards' && NATIVE_APP && sync && !user && !S.joinAsked) joinPending = true
     save()
-    // 방금 본 카드별 해석을 지나 종합 해설 위치로 내려갑니다 (없으면 맨 위로)
-    if (syn) syn.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    else window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (flow.peek) {
+      // 오늘의 카드: 첫 카드 해석부터 종합 해설(끝)까지 천천히
+      const top = (el) => el.getBoundingClientRect().top + window.scrollY - 70
+      const first = $('.holytable li')
+      const end = syn || $$('.holytable li').at(-1)
+      if (first && end) slowScroll(top(first), top(end) + end.offsetHeight - window.innerHeight + 140)
+    } else if (syn) {
+      // 연애운: 방금 본 카드별 해석을 지나 종합 해설 위치로 내려갑니다
+      syn.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
