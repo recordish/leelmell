@@ -64,12 +64,27 @@ export function seeColor(s, day) {
   return { ok: true, color: c.color }
 }
 
-// ---------- 율리움의 방 (연애 타로 6장) ----------
+// ---------- 핑크룸 (연애 타로 6장) ----------
 export const LOVE_COST = 3
+export const LOVE_DAYS = 7 // 한 번 보면 7일 뒤에 다시 볼 수 있습니다
 
-// 하루 한 번, 크리스탈 3개 (3장 타로와는 따로 셉니다)
+// 두 날짜('YYYY-MM-DD') 사이의 날 수
+const dayNum = (d) => Math.round(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) / 86400000)
+
+// 다시 볼 수 있을 때까지 남은 날 수 (0 이면 지금 볼 수 있음). 오늘 본 것도 7일로 셉니다
+export function loveWait(s, day) {
+  const last = Object.keys(s.love || {}).filter((d) => d <= day).sort().at(-1)
+  if (!last) return 0
+  return Math.max(0, LOVE_DAYS - (dayNum(day) - dayNum(last)))
+}
+
+// 오늘 뽑고 아직 다 보지 않은 연애 타로가 있으면 이어서 볼 수 있습니다
+export const loveOpen = (s, day) => !!s.love[day] && !s.love[day].done
+
+// 7일에 한 번, 크리스탈 3개 (3장 타로와는 따로 셉니다)
 export function loveStatus(s, day) {
   if (s.love[day]) return 'done'
+  if (loveWait(s, day) > 0) return 'wait'
   if (s.crystals >= LOVE_COST) return 'ok'
   if (s.crystals < 1) return s.stones > 99 ? 'needLab' : 'needShop'
   return 'lessShop'
