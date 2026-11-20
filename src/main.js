@@ -257,8 +257,11 @@ ${SHARE_ON ? `<div class="shareToday" style="display:none"><button type="button"
 // ---------- 핑크룸: 연애 타로 6장 (한국어 · 영어) ----------
 function lovePage() {
   const st = G.loveStatus(S.g, day())
-  const body = st === 'done'
-    ? `<p class="txt02">${t('loveDone')}</p>`
+  // 한 번 보고 나면 7일 동안 닫힙니다. 오늘 뽑고 덜 본 카드는 이어서 볼 수 있습니다
+  const body = G.loveOpen(S.g, day())
+    ? `<p class="txt01">${t('loveNeed')}</p><div class="btnEnter"><a class="go" href="#lovecards">${t('loveGo')}</a></div>`
+    : st === 'done' || st === 'wait'
+    ? `<p class="txt02">${t('loveWait')(G.loveWait(S.g, day()))}</p>`
     : `<p class="txt01">${t('loveNeed')}</p>
        <div class="tribute"><span class="crystal"></span><b class="cost">${G.LOVE_COST}</b></div>
        <div class="btnEnter"><button type="button" data-act="enterLove">${t('enter')}</button></div>`
@@ -352,7 +355,7 @@ function depotPage() {
   <ul class="luxe2">${li('in0003')}${li('in0004')}</ul>
   <span class="objMonarisa"></span>
   <a class="door01" href="#shop" aria-label="shop"></a>
-  ${hasSyn() ? `<a class="door02" href="#love" aria-label="${t('loveDoor')}"></a>` : ''}
+  ${hasSyn() && (G.loveOpen(S.g, day()) || !G.loveWait(S.g, day())) ? `<a class="door02" href="#love" aria-label="${t('loveDoor')}"></a>` : ''}
 </div></div>`
 }
 

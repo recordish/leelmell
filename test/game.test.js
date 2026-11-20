@@ -299,3 +299,23 @@ test('방문 기록: 유입 채널 · 국가 추정 · 기기', async () => {
   assert.deepEqual([V.deviceOf(win), V.osOf(win), V.browserOf(win)], ['pc', 'Windows', 'Chrome'])
   assert.equal(V.browserOf(android, true), 'app')
 })
+
+test('핑크룸: 한 번 보면 7일 동안 닫히고 7일째에 다시 열림', () => {
+  const s = G.newState()
+  s.crystals = 10
+  const day = '2026-11-14'
+  assert.ok(G.drawLove(s, day, Math.random).ok)
+  assert.equal(G.loveOpen(s, day), true)
+  s.love[day].done = true
+  assert.equal(G.loveOpen(s, day), false)
+  assert.equal(G.loveWait(s, day), 7)
+  assert.equal(G.loveStatus(s, '2026-11-15'), 'wait')
+  assert.equal(G.loveWait(s, '2026-11-15'), 6)
+  assert.equal(G.loveWait(s, '2026-11-20'), 1)
+  assert.equal(G.loveWait(s, '2026-11-21'), 0)
+  assert.equal(G.loveStatus(s, '2026-11-21'), 'ok')
+  // 달이 바뀌어도 날 수로 셉니다
+  const t = G.newState(); t.love['2026-11-28'] = { cards: [], done: true }
+  assert.equal(G.loveWait(t, '2026-12-04'), 1)
+  assert.equal(G.loveWait(t, '2026-12-05'), 0)
+})
