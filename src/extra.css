@@ -388,3 +388,6 @@ body.love-bg{background:#F7A3C9}
 .wrap.love .tarotRoom .peek .pos{background:#FDE7F2;color:#C2418F}
 .wrap.love .tarotRoom .peek b{color:#B83B82}
 .wrap.love .tarotRoom .peek b small{color:#C2418F}
+
+/* 일본어는 띄어쓰기가 없어 keep-all 이면 줄이 바뀌지 않고 화면 밖으로 나갑니다. 일본어에서는 글자 단위로 줄을 바꿉니다 */
+.wrap[data-lang="ja"] *{word-break:normal;line-break:strict}
