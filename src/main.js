@@ -1203,12 +1203,19 @@ render()
 setInterval(tick, 1000)
 recoverPurchases()
 
-// 앱 라이브 업데이트: 잘 떴다고 바로 알리고, 조금 뒤 새 웹 버전이 있는지 봅니다 (적용은 다음에 열 때)
+// 앱 라이브 업데이트: 잘 떴다고 바로 알리고, 받아 둔 새 버전이 있으면 바로 적용, 없으면 조금 뒤 새 버전을 받아 둡니다.
+// 단계별 결과는 관리자 통계(daily 의 upd_*)에 남깁니다 (Firebase 가 늦게 뜨면 잠시 기다렸다 남김)
 if (NATIVE_APP) {
-  import('./updater.js').then((u) => {
-    u.ready().catch(() => {})
-    setTimeout(() => u.checkUpdate(__WEB_VERSION__).catch((e) => console.warn('update check failed', e)), 4000)
-  }).catch((e) => console.warn('updater load failed', e))
+  const report = (f, tries = 0) => {
+    if (sync) return stat(f)
+    if (tries < 15) setTimeout(() => report(f, tries + 1), 2000)
+  }
+  import('./updater.js').then(async (u) => {
+    await u.ready().catch((e) => report('upd_err_ready_' + String(e?.message || e).replace(/[^A-Za-z0-9]+/g, '_').slice(0, 30)))
+    report('upd_run_' + String(__WEB_VERSION__).replace(/[^A-Za-z0-9]/g, '_'))
+    const applied = await u.applyDownloaded(__WEB_VERSION__, report).catch((e) => { report('upd_err_set_' + String(e?.message || e).replace(/[^A-Za-z0-9]+/g, '_').slice(0, 30)); return false })
+    if (!applied) setTimeout(() => u.checkUpdate(__WEB_VERSION__, report).catch((e) => console.warn('update check failed', e)), 4000)
+  }).catch((e) => { console.warn('updater load failed', e); report('upd_err_load') })
 }
 
 // 앱(안드로이드)은 파일을 앱 안에 담고 있어서 서비스 워커가 필요 없습니다
