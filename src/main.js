@@ -550,7 +550,8 @@ let appBuild = ''
 if (NATIVE_APP) import('@capacitor/app').then(({ App }) => App.getInfo()).then((i) => { appBuild = i.build; const v = $('.locker_page .ver'); if (v) v.textContent = verLine() }).catch(() => {})
 function verLine() {
   const w = String(__WEB_VERSION__).split('-')[0]
-  return 'v' + w + (appBuild ? ' · build ' + appBuild : '')
+  // 화면에는 날짜로 보이지 않게 앞의 '20' 을 '1' 로 바꿔 씁니다 (202611212246 → v12611212246). 업데이트 비교는 원래 값 그대로
+  return 'v' + w.replace(/^20/, '1') + (appBuild ? ' · build ' + appBuild : '')
 }
 
 // 로그인 권유: 첫 타로를 다 보고 카드 화면을 떠날 때 기기마다 한 번만. 새 계정이면 크리스탈 1개를 줍니다
