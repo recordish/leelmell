@@ -75,6 +75,8 @@ jobs:
   emulator:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 스크린샷을 emulator-shots 브랜치에 올리기 위해
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
@@ -136,3 +138,18 @@ jobs:
           name: leelmell-emulator-shots
           path: shots/
           if-no-files-found: ignore
+
+      # 스크린샷을 저장소의 emulator-shots 브랜치에도 올립니다 (매번 덮어씀). 브라우저나 git 으로 바로 볼 수 있게
+      - name: Screenshots to emulator-shots branch
+        if: always()
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          [ -d shots ] || exit 0
+          cd shots
+          git init -q -b emulator-shots
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add -A
+          git commit -qm "에뮬레이터 스크린샷 (실행 ${{ github.run_number }}, ${GITHUB_SHA::7})"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${{ github.repository }}" emulator-shots
