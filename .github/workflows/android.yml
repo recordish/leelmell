@@ -1,5 +1,5 @@
 # 안드로이드 앱 빌드 (Actions 탭 → "Android app" → Run workflow)
-# 결과물: 테스트용 APK (디버그 서명) · Play 업로드용 AAB (업로드 키 서명, 비밀값이 있을 때)
+# 결과물: 테스트용 APK (디버그 서명) · Play 업로드용 AAB (업로드 키 서명, 비밀값이 있을 때) · 에뮬레이터 확인 스크린샷
 #
 # 필요한 저장소 비밀값 (Settings → Secrets and variables → Actions)
 #   ANDROID_KEYSTORE_BASE64   업로드 키 파일을 base64 로 바꾼 값
@@ -69,3 +69,87 @@ jobs:
 
       - run: rm -f "$RUNNER_TEMP/upload.keystore"
         if: always()
+
+  # 에뮬레이터 확인: 만든 디버그 앱을 안드로이드 에뮬레이터에 설치해 주요 화면을 열어 보고 스크린샷을 남깁니다
+  # 결과: 이 단계가 초록이면 통과, 빨강이면 로그의 "실패:" 아래를 확인. 스크린샷은 Artifacts → leelmell-emulator-shots
+  emulator:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 스크린샷을 emulator-shots 브랜치에 올리기 위해
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: leelmell-test-apk
+
+      - run: npm i --no-save --no-package-lock playwright@1.63.0
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # 부팅된 가상 폰 상태를 저장해 두고 다음부터 불러옵니다 (처음 한 번만 오래 걸림)
+      - uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-34-google_apis-x86_64-pixel_6
+
+      - name: Save emulator snapshot
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          force-avd-creation: false
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: echo "snapshot saved"
+
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          force-avd-creation: false
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash e2e/android-run.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leelmell-emulator-shots
+          path: shots/
+          if-no-files-found: ignore
+
+      # 스크린샷을 저장소의 emulator-shots 브랜치에도 올립니다 (매번 덮어씀). 브라우저나 git 으로 바로 볼 수 있게
+      - name: Screenshots to emulator-shots branch
+        if: always()
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          [ -d shots ] || exit 0
+          cd shots
+          git init -q -b emulator-shots
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add -A
+          git commit -qm "에뮬레이터 스크린샷 (실행 ${{ github.run_number }}, ${GITHUB_SHA::7})"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${{ github.repository }}" emulator-shots
