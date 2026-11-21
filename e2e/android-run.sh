@@ -6,4 +6,4 @@ adb install -r app-debug.apk
 adb shell svc wifi disable || true
 adb shell svc data disable || true
 adb logcat -c || true
-node test/android/smoke.cjs
+node e2e/android-smoke.cjs

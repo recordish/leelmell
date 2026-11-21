@@ -105,7 +105,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: bash test/android/run.sh
+          script: bash e2e/android-run.sh
 
       - uses: actions/upload-artifact@v4
         if: always()
