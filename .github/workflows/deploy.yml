@@ -6,6 +6,13 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    # 문서·테스트·앱 빌드 설정만 바뀌면 배포하지 않습니다 (앱에 같은 내용의 업데이트가 또 가지 않게)
+    paths-ignore:
+      - '**.md'
+      - 'e2e/**'
+      - 'test/**'
+      - '.github/workflows/android.yml'
+      - '.gitignore'
   workflow_dispatch:
 
 permissions:
