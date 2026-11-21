@@ -22,7 +22,9 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms))
   await device.shell(`am start -W -n ${PKG}/.MainActivity`)
   const webview = await device.webView({ pkg: PKG }, { timeout: 60000 })
   const page = await webview.page()
-  page.on('pageerror', (e) => errors.push(`[${page.url().split('#')[1] || '-'}] ${e.message}`))
+  // 인터넷을 끊고 돌리므로, 오프라인이라 생기는 오류(Firebase 등)는 기록만 하고 실패로 치지 않습니다
+  const OFFLINE = /offline|ERR_INTERNET_DISCONNECTED|Failed to fetch|network|unavailable/i
+  page.on('pageerror', (e) => (OFFLINE.test(e.message) ? console.log('  (오프라인 오류, 무시)', e.message.slice(0, 120)) : errors.push(`[${page.url().split('#')[1] || '-'}] ${e.message}`)))
   page.on('console', (m) => { if (m.type() === 'error') console.log('  console.error:', m.text().slice(0, 200)) })
 
   await page.waitForFunction(() => document.querySelector('#app')?.children.length > 0, null, { timeout: 30000 })
@@ -47,11 +49,16 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms))
   // 홈에서 뒤로가기 → 종료 확인창
   await page.evaluate(() => { location.hash = '#home' })
   await wait(1500)
-  await device.shell('input keyevent 4')
-  await wait(1500)
-  const exitShown = await page.evaluate(() => !!document.querySelector('.pop01.exitpick') && getComputedStyle(document.querySelector('.pop01')).display !== 'none')
-  console.log('뒤로가기 → 종료 확인창:', exitShown)
-  if (!exitShown) fails.push('뒤로가기를 눌러도 종료 확인창이 뜨지 않음')
+  // 1.5초 안에 3번 누르면 (열린 알림창이 있든 없든) 종료 확인창이 떠야 합니다
+  await device.shell('input keyevent 4 4 4')
+  let exitShown = false
+  for (let i = 0; i < 10 && !exitShown; i++) {
+    await wait(500)
+    exitShown = await page.evaluate(() => !!document.querySelector('.pop01.exitpick') && getComputedStyle(document.querySelector('.pop01')).display !== 'none')
+  }
+  const popState = await page.evaluate(() => ({ hash: location.hash, cls: document.querySelector('.pop01')?.className, display: document.querySelector('.pop01')?.style.display }))
+  console.log('뒤로가기 3번 → 종료 확인창:', exitShown, JSON.stringify(popState))
+  if (!exitShown) fails.push('뒤로가기를 3번 눌러도 종료 확인창이 뜨지 않음')
   await shot('exit-popup')
 
   const pid = String(await device.shell(`pidof ${PKG}`)).trim()
