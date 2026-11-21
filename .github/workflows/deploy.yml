@@ -46,7 +46,9 @@ jobs:
           mkdir -p dist/update
           mv bundle.zip "dist/update/bundle-$V.zip"
           MIN=$(node -p "require('./package.json').liveUpdate.minBuild")
-          printf '{"version":"%s","url":"bundle-%s.zip","minBuild":%s}\n' "$V" "$V" "$MIN" > dist/update/latest.json
+          # 앱 업데이트 플러그인은 묶음의 SHA-256 체크섬이 있어야 내려받습니다
+          SUM=$(sha256sum "dist/update/bundle-$V.zip" | cut -d' ' -f1)
+          printf '{"version":"%s","url":"bundle-%s.zip","checksum":"%s","minBuild":%s}\n' "$V" "$V" "$SUM" "$MIN" > dist/update/latest.json
           cat dist/update/latest.json
           ls -la dist/update
 

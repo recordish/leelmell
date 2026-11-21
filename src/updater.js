@@ -13,7 +13,7 @@ const FEED = 'https://recordishapp.com/leelmell/update/latest.json'
 // 앱이 잘 떴다고 알립니다. 늦으면 플러그인이 이전 버전으로 되돌리므로 시작하자마자 부릅니다
 export const ready = () => CapacitorUpdater.notifyAppReady()
 
-const short = (e) => String(e?.message || e || 'x').replace(/[^A-Za-z0-9]+/g, '_').slice(0, 40)
+const short = (e) => String(e?.data?.message || e?.errorMessage || e?.message || e || 'x').replace(/https?:\/\/\S+/g, '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40)
 // 버전은 'YYYYMMDDHHMM-커밋' 이라 글자 순서가 곧 시간 순서입니다
 const newer = (a, b) => String(a) > String(b)
 
@@ -42,6 +42,7 @@ export async function checkUpdate(current, report = () => {}) {
     if (!res.ok) return report('upd_err_feed_' + res.status)
     const feed = await res.json()
     if (!feed.version || !feed.url) return report('upd_err_feed_bad')
+    if (!feed.checksum) return report('upd_err_no_checksum')
     if (!newer(feed.version, current)) return report('upd_latest')
     step = 'build'
     const build = Number((await App.getInfo()).build) || 0
@@ -52,7 +53,8 @@ export async function checkUpdate(current, report = () => {}) {
     let next = bundles.find((b) => b.version === feed.version && b.status !== 'error')
     if (!next) {
       step = 'download'
-      next = await CapacitorUpdater.download({ url: new URL(feed.url, FEED).href, version: feed.version })
+      // 플러그인은 묶음의 SHA-256 체크섬이 있어야 받습니다 (없으면 'Checksum required' 로 거부)
+      next = await CapacitorUpdater.download({ url: new URL(feed.url, FEED).href, version: feed.version, checksum: feed.checksum })
       report('upd_dl')
     }
     step = 'next'
