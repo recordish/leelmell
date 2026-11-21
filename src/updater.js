@@ -28,12 +28,6 @@ export async function applyDownloaded(current, report = () => {}) {
   return true
 }
 
-// 받은 번들을 지금 바로 적용합니다 (화면이 다시 열립니다)
-export async function applyNow(bundle, report = () => {}) {
-  report('upd_set_now')
-  await CapacitorUpdater.set({ id: bundle.id })
-}
-
 // 새 버전을 받아 다음 적용으로 걸어 둡니다. 받은 번들을 돌려줍니다 (새 버전이 없으면 undefined)
 export async function checkUpdate(current, report = () => {}) {
   let step = 'feed'
