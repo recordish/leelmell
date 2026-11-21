@@ -29,6 +29,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms))
 
   await page.waitForFunction(() => document.querySelector('#app')?.children.length > 0, null, { timeout: 30000 })
   await wait(3000)
+  console.log('화면 언어:', await page.evaluate(() => navigator.language))
   await shot('first')
 
   for (const r of ROUTES) {
