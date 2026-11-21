@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "test": "node --test",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:web": "vite build && node e2e/web-smoke.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.2",
