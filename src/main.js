@@ -356,7 +356,7 @@ function depotPage() {
   <ul class="luxe2">${li('in0003')}${li('in0004')}</ul>
   <span class="objMonarisa"></span>
   <a class="door01" href="#shop" aria-label="shop"></a>
-  ${hasSyn() && (G.loveOpen(S.g, day()) || !G.loveWait(S.g, day())) ? `<a class="door02" href="#love" aria-label="${t('loveDoor')}"></a>` : ''}
+  ${hasSyn() ? `<a class="door02" href="#love" aria-label="${t('loveDoor')}"></a>` : ''}
 </div></div>`
 }
 
