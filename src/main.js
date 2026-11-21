@@ -1203,18 +1203,41 @@ render()
 setInterval(tick, 1000)
 recoverPurchases()
 
-// 앱 라이브 업데이트: 잘 떴다고 바로 알리고, 받아 둔 새 버전이 있으면 바로 적용, 없으면 조금 뒤 새 버전을 받아 둡니다.
+// 앱 라이브 업데이트: 잘 떴다고 바로 알리고, 받아 둔 새 버전이 있으면 바로 적용, 없으면 곧바로 새 버전을 받습니다.
 // 단계별 결과는 관리자 통계(daily 의 upd_*)에 남깁니다 (Firebase 가 늦게 뜨면 잠시 기다렸다 남김)
 if (NATIVE_APP) {
   const report = (f, tries = 0) => {
     if (sync) return stat(f)
     if (tries < 15) setTimeout(() => report(f, tries + 1), 2000)
   }
-  import('./updater.js').then(async (u) => {
-    await u.ready().catch((e) => report('upd_err_ready_' + String(e?.message || e).replace(/[^A-Za-z0-9]+/g, '_').slice(0, 30)))
+  const errKey = (pre, e) => pre + String(e?.message || e).replace(/[^A-Za-z0-9]+/g, '_').slice(0, 30)
+  // 앱을 열거나 돌아온 뒤 아직 아무것도 누르지 않았으면, 새 버전을 받자마자 바로 적용합니다 (쓰는 중이면 다음에 열 때)
+  let since = Date.now()
+  let touched = false
+  addEventListener('pointerdown', () => { touched = true }, { capture: true, passive: true })
+  let busy = false
+  let lastCheck = 0
+  const run = async (u) => {
+    if (busy) return
+    busy = true
+    try {
+      const applied = await u.applyDownloaded(__WEB_VERSION__, report).catch((e) => { report(errKey('upd_err_set_', e)); return false })
+      if (applied) return
+      lastCheck = Date.now()
+      const got = await u.checkUpdate(__WEB_VERSION__, report).catch((e) => console.warn('update check failed', e))
+      if (got && !touched && Date.now() - since < 30000) await u.applyNow(got, report).catch((e) => report(errKey('upd_err_now_', e)))
+    } finally { busy = false }
+  }
+  Promise.all([import('./updater.js'), import('@capacitor/app')]).then(async ([u, { App }]) => {
+    await u.ready().catch((e) => report(errKey('upd_err_ready_', e)))
     report('upd_run_' + String(__WEB_VERSION__).replace(/[^A-Za-z0-9]/g, '_'))
-    const applied = await u.applyDownloaded(__WEB_VERSION__, report).catch((e) => { report('upd_err_set_' + String(e?.message || e).replace(/[^A-Za-z0-9]+/g, '_').slice(0, 30)); return false })
-    if (!applied) setTimeout(() => u.checkUpdate(__WEB_VERSION__, report).catch((e) => console.warn('update check failed', e)), 4000)
+    run(u)
+    // 다른 앱에 갔다 돌아왔을 때도 확인합니다 (2분에 한 번까지)
+    App.addListener('resume', () => {
+      since = Date.now()
+      touched = false
+      if (Date.now() - lastCheck > 120000) run(u)
+    })
   }).catch((e) => { console.warn('updater load failed', e); report('upd_err_load') })
 }
 
