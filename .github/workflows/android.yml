@@ -1,5 +1,5 @@
 # 안드로이드 앱 빌드 (Actions 탭 → "Android app" → Run workflow)
-# 결과물: 테스트용 APK (디버그 서명) · Play 업로드용 AAB (업로드 키 서명, 비밀값이 있을 때)
+# 결과물: 테스트용 APK (디버그 서명) · Play 업로드용 AAB (업로드 키 서명, 비밀값이 있을 때) · 에뮬레이터 확인 스크린샷
 #
 # 필요한 저장소 비밀값 (Settings → Secrets and variables → Actions)
 #   ANDROID_KEYSTORE_BASE64   업로드 키 파일을 base64 로 바꾼 값
@@ -69,3 +69,47 @@ jobs:
 
       - run: rm -f "$RUNNER_TEMP/upload.keystore"
         if: always()
+
+  # 에뮬레이터 확인: 만든 디버그 앱을 안드로이드 에뮬레이터에 설치해 주요 화면을 열어 보고 스크린샷을 남깁니다
+  # 결과: 이 단계가 초록이면 통과, 빨강이면 로그의 "실패:" 아래를 확인. 스크린샷은 Artifacts → leelmell-emulator-shots
+  emulator:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: leelmell-test-apk
+
+      - run: npm i --no-save --no-package-lock playwright@1.63.0
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash test/android/run.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leelmell-emulator-shots
+          path: shots/
+          if-no-files-found: ignore
