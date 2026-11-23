@@ -39,7 +39,8 @@ service cloud.firestore {
           && request.resource.data.web == resource.data.get('web', 0) + 1);
     }
 
-    // 방문 기록: 누구나 한 줄씩 만들 수 있고(정해진 항목만), 본 화면 수(views)만 늘릴 수 있습니다. 읽기는 관리자만
+    // 방문 기록: 누구나 한 줄씩 만들 수 있고(정해진 항목만), 본 화면 수(views)만 늘릴 수 있습니다. 읽기는 관리자만.
+    // 로그인한 사용자는 자기 방문에 계정 식별자(uid)를 한 번 붙일 수 있습니다 (붙인 뒤에는 바꾸거나 지울 수 없음)
     match /hits/{id} {
       allow read: if isAdmin();
       allow create: if request.resource.data.keys().hasOnly(['ch', 'src', 'landing', 'country', 'lang', 'device', 'os', 'browser', 'first', 'views', 'at'])
@@ -58,6 +59,10 @@ service cloud.firestore {
         && request.resource.data.views is int
         && request.resource.data.views > resource.data.views
         && request.resource.data.views <= 999;
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['uid'])
+        && !('uid' in resource.data)
+        && request.resource.data.uid == request.auth.uid;
     }
 
     // 하루 합계: 누구나 칸을 더할 수 있고(앱·웹이 1씩 더함), 읽기는 관리자만. 한 번에 바꾸는 칸 수와 문서 크기를 제한합니다
