@@ -91,7 +91,8 @@ export async function saveRemote(uid, g) {
   }
 }
 
-// 방문 기록: 앱을 열 때마다 hits 에 한 줄 (유입 채널 · 첫 화면 · 국가 추정 · 언어 · 기기). 본 화면 수는 views 로 올립니다
+// 방문 기록: 앱을 열 때마다 hits 에 한 줄 (유입 채널 · 첫 화면 · 국가 추정 · 언어 · 기기). 본 화면 수는 views 로 올립니다.
+// 로그인한 사용자의 방문에는 나중에 uid 를 붙입니다 (setHitUser)
 export async function startHit(info) {
   const ref = await addDoc(collection(db, 'hits'), { ...info, views: 1, at: serverTimestamp() })
   bump(['h', 'ch_' + info.ch, info.src ? 'src_' + key(info.ch + '_' + info.src) : '', 'c_' + (info.country || 'xx'),
@@ -99,6 +100,8 @@ export async function startHit(info) {
   return ref.id
 }
 export const setHitViews = (id, views) => updateDoc(doc(db, 'hits', id), { views })
+// 로그인한 방문이면 방문 기록에 계정 식별자(uid)를 한 번 붙입니다 (관리자 화면에서 누구의 방문인지 보려고). 이메일은 넣지 않습니다
+export const setHitUser = (id, uid) => updateDoc(doc(db, 'hits', id), { uid })
 
 // 하루 접속 수: 기기마다 하루 한 번, visits/{날짜} 의 app 또는 web 을 1 올립니다 (로그인하지 않아도)
 export async function countVisit(day) {

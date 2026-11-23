@@ -1,5 +1,5 @@
 // 방문 기록(hits)에 남길 정보: 유입 채널 · 국가(추정) · 기기 · OS · 브라우저
-// 개인을 알아볼 수 있는 정보(IP, 계정, 기기 ID)는 남기지 않습니다
+// IP 와 기기 ID 는 남기지 않습니다. 로그인한 방문에만 계정 식별자(uid)를 나중에 붙입니다 (sync.js 의 setHitUser)
 
 const SEARCH = [['google.', 'Google'], ['naver.', 'Naver'], ['daum.', 'Daum'], ['bing.', 'Bing'], ['yahoo.', 'Yahoo'], ['duckduckgo.', 'DuckDuckGo'], ['baidu.', 'Baidu'], ['yandex.', 'Yandex']]
 const SNS = [['instagram.', 'Instagram'], ['facebook.', 'Facebook'], ['fb.', 'Facebook'], ['t.co', 'X'], ['x.com', 'X'], ['twitter.', 'X'], ['threads.', 'Threads'],

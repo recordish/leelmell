@@ -443,7 +443,7 @@ function loadSwiper() {
 const app = document.getElementById('app')
 let route = ''
 // 방문 기록: 지금 방문의 hits 문서와 본 화면 수
-const hit = { id: null, views: 0, saved: 0, hiddenAt: 0 }
+const hit = { id: null, views: 0, saved: 0, hiddenAt: 0, tagged: false }
 
 function render() {
   let name = location.hash.replace('#', '') || (S.introSeen ? 'home' : 'intro')
@@ -1138,6 +1138,7 @@ if (FIREBASE_ON) {
       const was = user
       user = u
       if (u) {
+        tagHitUser()
         try {
           const remote = await m.loadRemote(u.uid)
           if (remote) S.g = G.mergeIntoRemote(S.g, remote)
@@ -1178,8 +1179,15 @@ function startHit(resumed) {
   const lang = (navigator.language || '').slice(0, 20)
   const { ch, src } = channelOf(resumed ? '' : document.referrer, location.hostname, NATIVE_APP)
   const info = { ch, src, landing: route || 'home', country: countryOf(tz, lang), lang, device: deviceOf(ua), os: osOf(ua), browser: browserOf(ua, NATIVE_APP), first }
-  hit.id = null; hit.views = 1; hit.saved = 1; hit.hiddenAt = 0
-  sync.startHit(info).then((id) => { hit.id = id; saveHitViews() }).catch((e) => console.warn('hit failed', e))
+  hit.id = null; hit.views = 1; hit.saved = 1; hit.hiddenAt = 0; hit.tagged = false
+  sync.startHit(info).then((id) => { hit.id = id; saveHitViews(); tagHitUser() }).catch((e) => console.warn('hit failed', e))
+}
+// 로그인한 방문이면 방문 기록에 계정 식별자를 한 번 붙입니다.
+// 기록이 먼저 만들어지든 로그인이 먼저 확인되든, 둘 다 준비된 때에 붙습니다 (실패해도 앱 동작에는 영향 없음)
+function tagHitUser() {
+  if (!sync || !hit.id || !user || hit.tagged) return
+  hit.tagged = true
+  sync.setHitUser(hit.id, user.uid).catch(() => {})
 }
 // 본 화면 수: 화면을 벗어날 때와 5화면마다 저장
 function saveHitViews() {
